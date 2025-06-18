@@ -12,34 +12,35 @@
       color: #f5f5f5;
     }
     h1 {
-      font-size: 2.7rem;
+      font-size: 3.2rem;
       color: #ffd700;
       text-shadow: 1px 2px 8px #222, 0 1px 0 #fff;
-      margin-top: 32px;
-      margin-bottom: 18px;
-      letter-spacing: 2px;
+      margin-top: 18px;
+      margin-bottom: 16px;
+      letter-spacing: 2.5px;
       font-family: 'Nanum Myeongjo', serif;
       text-align: center;
     }
     #controls {
-      margin: 24px auto 18px auto;
+      margin: 0 auto 18px auto;
       text-align: center;
     }
     #destination {
-      padding: 8px 14px;
+      padding: 14px 22px;
       border-radius: 6px;
-      border: 1px solid #bbb;
-      font-size: 1.1rem;
-      width: 220px;
+      border: 1.5px solid #bbb;
+      font-size: 1.3rem;
+      width: 320px;
+      margin-right: 10px;
     }
     #searchBtn {
-      padding: 8px 18px;
+      padding: 14px 32px;
       border-radius: 6px;
       border: none;
       background: #ffd700;
       color: #232526;
       font-weight: bold;
-      font-size: 1.1rem;
+      font-size: 1.3rem;
       margin-left: 8px;
       cursor: pointer;
       box-shadow: 0 2px 8px #2224;
@@ -49,46 +50,50 @@
       background: #ffea70;
     }
     #map {
-      width: 90vw;
-      height: 260px;
-      margin: 0 auto 18px auto;
+      width: 96vw;
+      height: 400px;
+      margin: 0 auto 24px auto;
       border-radius: 0;
       border: 2.5px solid #ffd700;
       box-shadow: 0 8px 32px #000a, 0 1.5px 0 #fff;
       overflow: hidden;
       display: block;
+      max-width: 1600px;
     }
     #lists {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      width: 90vw;
+      width: 96vw;
       margin: 0 auto 0 auto;
       gap: 0;
+      max-width: 1600px;
     }
     .list-section {
       background: rgba(34, 36, 38, 0.85);
       border-radius: 0;
-      padding: 18px 22px 12px 22px;
-      min-width: 270px;
+      padding: 28px 32px 18px 32px;
+      min-width: 340px;
       width: 48%;
       box-shadow: 0 2px 12px #0005;
       border: 2px solid #ffd700;
     }
     .list-section h2 {
       color: #ffd700;
-      font-size: 1.3rem;
-      margin-bottom: 10px;
+      font-size: 1.6rem;
+      margin-bottom: 18px;
       font-family: 'Nanum Myeongjo', serif;
+      letter-spacing: 1px;
     }
     .place-item {
       cursor: pointer;
-      margin: 8px 0;
-      padding: 8px 10px;
-      border: 1px solid #ffd70044;
+      margin: 14px 0;
+      padding: 16px 18px;
+      border: 1.5px solid #ffd70044;
       border-radius: 0;
       background: #232526cc;
       color: #fff;
+      font-size: 1.25rem;
       transition: background 0.2s, color 0.2s;
     }
     .place-item:hover {
@@ -96,27 +101,31 @@
       color: #232526;
     }
     #info {
-      margin: 32px auto 0 auto;
-      max-width: 600px;
+      margin: 36px auto 0 auto;
+      max-width: 700px;
       background: rgba(34,36,38,0.92);
       border-radius: 0;
       box-shadow: 0 2px 16px #0007;
-      padding: 24px 32px;
+      padding: 32px 40px;
       color: #fff;
-      font-size: 1.1rem;
+      font-size: 1.25rem;
       display: none;
       border: 2px solid #ffd700;
     }
     #info img {
       max-width: 100%;
       border-radius: 0;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
       box-shadow: 0 2px 8px #0005;
     }
+    @media (max-width: 1200px) {
+      #lists, #map { width: 99vw; max-width: 99vw; }
+      .list-section { min-width: 180px; width: 49vw; padding: 18px 8px 12px 8px; }
+    }
     @media (max-width: 900px) {
-      #lists { flex-direction: column; align-items: center; gap: 18px; width: 98vw; }
-      .list-section { min-width: 180px; width: 98vw; }
-      #map { width: 98vw; }
+      #lists { flex-direction: column; align-items: center; gap: 18px; width: 99vw; }
+      .list-section { min-width: 180px; width: 99vw; }
+      #map { width: 99vw; }
     }
   </style>
 </head>
@@ -243,3 +252,9 @@
       utter.lang = 'ko-KR';
       speechSynthesis.speak(utter);
     }
+
+    // 페이지 로드 시 Google Maps API 로드 시작
+    window.onload = loadGoogleMapAPI;
+  </script>
+</body>
+</html> 
