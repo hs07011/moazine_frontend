@@ -2,151 +2,185 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>moazin 관광지 및 맛집 안내 서비스</title>
+  <title>모아진 주변 관광지 및 맛집 소개 서비스</title>
   <style>
     body {
-      min-height: 100vh;
       margin: 0;
       font-family: 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-      background: linear-gradient(135deg, #232526 0%, #414345 100%);
-      color: #f5f5f5;
+      background: #f4f4f4;
+      color: #222;
     }
-    h1 {
-      font-size: 3.2rem;
-      color: #ffd700;
-      text-shadow: 1px 2px 8px #222, 0 1px 0 #fff;
-      margin-top: 18px;
-      margin-bottom: 16px;
-      letter-spacing: 2.5px;
-      font-family: 'Nanum Myeongjo', serif;
-      text-align: center;
+    .header {
+      background: #217093;
+      color: #fff;
+      padding: 36px 0 28px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
     }
-    #controls {
-      margin: 0 auto 18px auto;
-      text-align: center;
+    .header-title {
+      font-size: 2.8rem;
+      font-weight: bold;
+      margin-left: 60px;
+      letter-spacing: 2px;
+    }
+    .header-search {
+      margin-right: 60px;
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border-radius: 4px;
+      padding: 8px 16px;
     }
     #destination {
-      padding: 14px 22px;
-      border-radius: 6px;
-      border: 1.5px solid #bbb;
-      font-size: 1.3rem;
-      width: 320px;
-      margin-right: 10px;
+      border: none;
+      outline: none;
+      font-size: 1.2rem;
+      padding: 8px 10px;
+      width: 220px;
+      background: transparent;
     }
     #searchBtn {
-      padding: 14px 32px;
-      border-radius: 6px;
+      background: #217093;
+      color: #fff;
       border: none;
-      background: #ffd700;
-      color: #232526;
+      font-size: 1.1rem;
       font-weight: bold;
-      font-size: 1.3rem;
-      margin-left: 8px;
+      padding: 8px 18px;
+      border-radius: 4px;
+      margin-left: 10px;
       cursor: pointer;
-      box-shadow: 0 2px 8px #2224;
       transition: background 0.2s;
     }
     #searchBtn:hover {
-      background: #ffea70;
+      background: #14516b;
     }
-    #map {
-      width: 96vw;
-      height: 400px;
-      margin: 0 auto 24px auto;
-      border-radius: 0;
-      border: 2.5px solid #ffd700;
-      box-shadow: 0 8px 32px #000a, 0 1.5px 0 #fff;
-      overflow: hidden;
-      display: block;
-      max-width: 1600px;
-    }
-    #lists {
+    .main {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      width: 96vw;
-      margin: 0 auto 0 auto;
-      gap: 0;
-      max-width: 1600px;
+      padding: 32px 32px 0 32px;
+      gap: 32px;
+      min-height: 600px;
     }
-    .list-section {
-      background: rgba(34, 36, 38, 0.85);
-      border-radius: 0;
-      padding: 28px 32px 18px 32px;
-      min-width: 340px;
-      width: 48%;
-      box-shadow: 0 2px 12px #0005;
-      border: 2px solid #ffd700;
+    .map-container {
+      flex: 2 1 0;
+      min-width: 350px;
+      max-width: 900px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px #0002;
+      padding: 0;
+      margin-right: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
     }
-    .list-section h2 {
-      color: #ffd700;
-      font-size: 1.6rem;
-      margin-bottom: 18px;
-      font-family: 'Nanum Myeongjo', serif;
+    #map {
+      width: 100%;
+      height: 420px;
+      border-radius: 8px;
+    }
+    .side-tables {
+      flex: 1 1 0;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .table-section {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px #0001;
+      padding: 0 0 12px 0;
+      overflow: hidden;
+    }
+    .table-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 12px 0;
+      text-align: center;
       letter-spacing: 1px;
     }
-    .place-item {
+    .attraction-table {
+      background: #d6f5d6;
+    }
+    .restaurant-table {
+      background: #ffe5e0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 1.1rem;
+    }
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+    }
+    th {
+      background: #f0f0f0;
+      font-weight: bold;
+    }
+    tr {
+      border-bottom: 1px solid #ccc;
+    }
+    tr:last-child {
+      border-bottom: none;
+    }
+    td.score {
+      text-align: right;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+    tr.clickable:hover {
+      background: #b2e6b2 !important;
       cursor: pointer;
-      margin: 14px 0;
-      padding: 16px 18px;
-      border: 1.5px solid #ffd70044;
-      border-radius: 0;
-      background: #232526cc;
-      color: #fff;
-      font-size: 1.25rem;
-      transition: background 0.2s, color 0.2s;
     }
-    .place-item:hover {
-      background: #ffd700;
-      color: #232526;
+    .restaurant-table tr.clickable:hover {
+      background: #ffd6cc !important;
     }
-    #info {
-      margin: 36px auto 0 auto;
-      max-width: 700px;
-      background: rgba(34,36,38,0.92);
-      border-radius: 0;
-      box-shadow: 0 2px 16px #0007;
-      padding: 32px 40px;
-      color: #fff;
-      font-size: 1.25rem;
-      display: none;
-      border: 2px solid #ffd700;
+    @media (max-width: 1000px) {
+      .main { flex-direction: column; gap: 18px; padding: 18px 4vw 0 4vw; }
+      .map-container, .side-tables { max-width: 100vw; width: 100%; }
     }
-    #info img {
-      max-width: 100%;
-      border-radius: 0;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 8px #0005;
-    }
-    @media (max-width: 1200px) {
-      #lists, #map { width: 99vw; max-width: 99vw; }
-      .list-section { min-width: 180px; width: 49vw; padding: 18px 8px 12px 8px; }
-    }
-    @media (max-width: 900px) {
-      #lists { flex-direction: column; align-items: center; gap: 18px; width: 99vw; }
-      .list-section { min-width: 180px; width: 99vw; }
-      #map { width: 99vw; }
+    @media (max-width: 600px) {
+      .header { flex-direction: column; align-items: flex-start; padding: 18px 0 12px 0; }
+      .header-title { margin-left: 18px; font-size: 2rem; }
+      .header-search { margin: 12px 0 0 18px; width: 90vw; }
+      .main { padding: 8px 2vw 0 2vw; }
+      .map-container, .side-tables { min-width: 0; }
+      #map { height: 260px; }
     }
   </style>
 </head>
 <body>
-  <h1>moazin 관광지 및 맛집 안내 서비스</h1>
-  <div id="controls">
-    <input id="destination" placeholder="목적지(예: 서울역)" />
-    <button id="searchBtn">목적지 이동</button>
-  </div>
-  <div id="map"></div>
-  <div id="lists">
-    <div class="list-section">
-      <h2>주요 관광지 (5개)</h2>
-      <div id="attractions"></div>
-    </div>
-    <div class="list-section">
-      <h2>주요 맛집 (5개)</h2>
-      <div id="restaurants"></div>
+  <div class="header">
+    <div class="header-title">모아진 주변 관광지 및 맛집 소개 서비스</div>
+    <div class="header-search">
+      <input id="destination" placeholder="Search" />
+      <button id="searchBtn">검색</button>
     </div>
   </div>
-  <div id="info"></div>
+  <div class="main">
+    <div class="map-container">
+      <div id="map"></div>
+    </div>
+    <div class="side-tables">
+      <div class="table-section attraction-table">
+        <div class="table-title">관광지 5선</div>
+        <table id="attractionTable">
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="table-section restaurant-table">
+        <div class="table-title">맛집 5선</div>
+        <table id="restaurantTable">
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
   <script>
     const PROXY = 'https://moazine.onrender.com';
     let map, marker, destLatLng, attractions = [], restaurants = [];
@@ -164,7 +198,7 @@
     window.initMap = function() {
       map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: 37.5665, lng: 126.9780 },
-        zoom: 13
+        zoom: 14
       });
       // 현재 위치 마커
       if (navigator.geolocation) {
@@ -196,61 +230,40 @@
     };
 
     function loadPlaces() {
-      document.getElementById('attractions').innerHTML = '관광지 목록을 불러오는 중...';
-      document.getElementById('restaurants').innerHTML = '맛집 목록을 불러오는 중...';
       fetch(`${PROXY}/places?lat=${destLatLng.lat}&lng=${destLatLng.lng}`)
       .then(res => res.json())
       .then(data => {
         attractions = data.attractions || [];
         restaurants = data.restaurants || [];
-        renderList('attractions', attractions);
-        renderList('restaurants', restaurants);
+        renderTable('attractionTable', attractions, '관광지');
+        renderTable('restaurantTable', restaurants, '맛집');
       });
     }
 
-    function renderList(type, list) {
-      const container = document.getElementById(type);
+    function renderTable(tableId, list, type) {
+      const tbody = document.getElementById(tableId).querySelector('tbody');
       if (!list.length) {
-        container.innerHTML = type === 'attractions' ? '주변 관광지를 찾을 수 없습니다.' : '주변 맛집을 찾을 수 없습니다.';
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;">주변 ${type} 정보를 찾을 수 없습니다.</td></tr>`;
         return;
       }
-      container.innerHTML = list.map((item, i) =>
-        `<div class="place-item" data-type="${type}" data-idx="${i}">
-          <b>${item.name}</b> <span style="color:#ffd700;">★${item.rating || '-'} </span>
-        </div>`
+      tbody.innerHTML = list.map((item, i) =>
+        `<tr class="clickable" onclick="showPlaceInfo('${type}', ${i})">
+          <td style="width:36px;text-align:center;">${i+1}.</td>
+          <td>${item.name}</td>
+          <td class="score">${item.rating ? item.rating.toFixed(1) + '점' : '-'}</td>
+        </tr>`
       ).join('');
-      container.querySelectorAll('.place-item').forEach(item => {
-        item.onclick = function() {
-          const idx = this.getAttribute('data-idx');
-          const t = this.getAttribute('data-type');
-          showPlaceInfo(t === 'attractions' ? attractions[idx] : restaurants[idx]);
-        };
-      });
     }
 
-    function showPlaceInfo(place) {
+    window.showPlaceInfo = function(type, idx) {
+      const place = type === '관광지' ? attractions[idx] : restaurants[idx];
       const name = place.name;
       const addr = place.vicinity || place.formatted_address || '';
       const rating = place.rating ? `평점: ${place.rating}` : '';
       const photo = place.photos && place.photos[0]
         ? `<img src="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${window.google && google.maps ? google.maps.apiKey : ''}" alt="${name}">`
         : '';
-      const infoHtml = `
-        <h3 style="color:#ffd700; font-family:'Nanum Myeongjo',serif;">${name}</h3>
-        ${photo}
-        <p><b>주소:</b> ${addr}</p>
-        <p><b>${rating}</b></p>
-        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}" target="_blank" style="color:#ffd700;">상세 정보 보기</a>
-        <span style="float:right;cursor:pointer;color:#ffd700;font-size:1.3em;" onclick="document.getElementById('info').style.display='none'">✕</span>
-      `;
-      const infoDiv = document.getElementById('info');
-      infoDiv.innerHTML = infoHtml;
-      infoDiv.style.display = 'block';
-      // 음성 안내
-      let msg = `${name}. 주소는 ${addr}. ${rating}`;
-      const utter = new SpeechSynthesisUtterance(msg);
-      utter.lang = 'ko-KR';
-      speechSynthesis.speak(utter);
+      alert(`${name}\n${addr}\n${rating}`);
     }
 
     // 페이지 로드 시 Google Maps API 로드 시작
