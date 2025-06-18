@@ -134,11 +134,12 @@
   </div>
   <div id="info"></div>
   <script>
+    const PROXY = 'https://moazine.onrender.com';
     let map, marker, destLatLng, attractions = [], restaurants = [];
 
     // Google Maps JS API 동적 로드
     async function loadGoogleMapAPI() {
-      const response = await fetch('/map-key');
+      const response = await fetch(`${PROXY}/map-key`);
       const { apiKey } = await response.json();
       const script = document.createElement('script');
       script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=places`;
@@ -164,7 +165,7 @@
     document.getElementById('searchBtn').onclick = function() {
       const dest = document.getElementById('destination').value;
       if (!dest) return alert('목적지를 입력하세요!');
-      fetch(`/geocode?query=${encodeURIComponent(dest)}`)
+      fetch(`${PROXY}/geocode?query=${encodeURIComponent(dest)}`)
       .then(res => res.json())
       .then(data => {
         if (data.results && data.results.length > 0) {
@@ -183,7 +184,7 @@
     function loadPlaces() {
       document.getElementById('attractions').innerHTML = '관광지 목록을 불러오는 중...';
       document.getElementById('restaurants').innerHTML = '맛집 목록을 불러오는 중...';
-      fetch(`/places?lat=${destLatLng.lat}&lng=${destLatLng.lng}`)
+      fetch(`${PROXY}/places?lat=${destLatLng.lat}&lng=${destLatLng.lng}`)
       .then(res => res.json())
       .then(data => {
         attractions = data.attractions || [];
