@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>Moazine 관광지 안내 서비스</title>
+  <title>Moazine 관광지 안내 서비스 (Google Maps)</title>
   <style>
     #map { width: 100%; height: 400px; margin-bottom: 20px; }
     #controls { margin: 20px 0; }
@@ -13,7 +13,7 @@
   </style>
 </head>
 <body>
-  <h1>Moazine 관광지 안내 서비스</h1>
+  <h1>Moazine 관광지 안내 서비스 (Google Maps)</h1>
   <div id="controls">
     <input id="destination" placeholder="목적지(예: 서울역)" />
     <button id="searchBtn">목적지 이동</button>
@@ -24,35 +24,30 @@
   <script>
     let map, marker, destLatLng, attractions = [];
 
-    // 네이버 지도 API 동적 로드
-    async function loadNaverMapAPI() {
-      try {
-        const response = await fetch('https://moazine.onrender.com/map-key');
-        const { clientId } = await response.json();
-        const script = document.createElement('script');
-        script.src = `https://openapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${clientId}`;
-        script.onload = initMap;
-        document.head.appendChild(script);
-      } catch (error) {
-        console.error('Failed to load Naver Maps API:', error);
-        alert('지도 로딩에 실패했습니다. 잠시 후 다시 시도해주세요.');
-      }
+    // Google Maps JS API 동적 로드
+    async function loadGoogleMapAPI() {
+      const response = await fetch('https://moazine.onrender.com/map-key');
+      const { apiKey } = await response.json();
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=places`;
+      script.async = true;
+      document.head.appendChild(script);
     }
 
-    function initMap() {
-      map = new naver.maps.Map('map', {
-        center: new naver.maps.LatLng(37.5665, 126.9780),
+    window.initMap = function() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: 37.5665, lng: 126.9780 },
         zoom: 13
       });
       // 현재 위치 마커
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
           const lat = pos.coords.latitude, lng = pos.coords.longitude;
-          map.setCenter(new naver.maps.LatLng(lat, lng));
-          new naver.maps.Marker({ position: new naver.maps.LatLng(lat, lng), map: map, title: '현재 위치' });
+          map.setCenter({ lat, lng });
+          new google.maps.Marker({ position: { lat, lng }, map: map, title: '현재 위치' });
         });
       }
-    }
+    };
 
     document.getElementById('searchBtn').onclick = function() {
       const dest = document.getElementById('destination').value;
@@ -60,12 +55,12 @@
       fetch(`https://moazine.onrender.com/geocode?query=${encodeURIComponent(dest)}`)
       .then(res => res.json())
       .then(data => {
-        if (data.addresses && data.addresses.length > 0) {
-          const addr = data.addresses[0];
-          destLatLng = new naver.maps.LatLng(addr.y, addr.x);
+        if (data.results && data.results.length > 0) {
+          const loc = data.results[0].geometry.location;
+          destLatLng = { lat: loc.lat, lng: loc.lng };
           map.setCenter(destLatLng);
           if (marker) marker.setMap(null);
-          marker = new naver.maps.Marker({ position: destLatLng, map: map, title: '목적지' });
+          marker = new google.maps.Marker({ position: destLatLng, map: map, title: '목적지' });
           loadAttractions();
         } else {
           alert('목적지를 찾을 수 없습니다.');
@@ -75,18 +70,18 @@
 
     function loadAttractions() {
       document.getElementById('attractions').innerHTML = '관광지 목록을 불러오는 중...';
-      fetch(`https://moazine.onrender.com/attractions?lng=${destLatLng.lng()}&lat=${destLatLng.lat()}`)
+      fetch(`https://moazine.onrender.com/attractions?lat=${destLatLng.lat}&lng=${destLatLng.lng}`)
       .then(res => res.json())
       .then(data => {
-        attractions = data.items || [];
+        attractions = data.results || [];
         if (attractions.length === 0) {
           document.getElementById('attractions').innerHTML = '주변 관광지를 찾을 수 없습니다.';
           return;
         }
         document.getElementById('attractions').innerHTML =
           '<b>주요 관광지 목록 (10개):</b><br>' +
-          attractions.map((a, i) =>
-            `<div class="attraction-item" data-idx="${i}">${a.title.replace(/<[^>]+>/g, '')}</div>`
+          attractions.slice(0, 10).map((a, i) =>
+            `<div class="attraction-item" data-idx="${i}">${a.name}</div>`
           ).join('');
         document.querySelectorAll('.attraction-item').forEach(item => {
           item.onclick = function() {
@@ -98,28 +93,26 @@
     }
 
     function showAttractionInfo(attraction) {
-      const name = attraction.title.replace(/<[^>]+>/g, '');
-      const desc = attraction.description ? attraction.description.replace(/<[^>]+>/g, '') : '';
-      const tel = attraction.telephone || '';
-      const addr = attraction.address || '';
+      const name = attraction.name;
+      const addr = attraction.vicinity || '';
+      const rating = attraction.rating ? `평점: ${attraction.rating}` : '';
       const infoHtml = `
         <h3>${name}</h3>
         <p><b>주소:</b> ${addr}</p>
-        <p><b>전화:</b> ${tel}</p>
-        <p><b>설명:</b> ${desc || '정보 없음'}</p>
-        <a href="${attraction.link}" target="_blank">상세 정보 보기</a>
+        <p><b>${rating}</b></p>
+        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}" target="_blank">상세 정보 보기</a>
       `;
       document.getElementById('info').innerHTML = infoHtml;
 
       // 음성 안내
-      let msg = `${name}. 주소는 ${addr}. 전화번호는 ${tel ? tel + '.' : ''} ${desc ? desc : ''}`;
+      let msg = `${name}. 주소는 ${addr}. ${rating}`;
       const utter = new SpeechSynthesisUtterance(msg);
       utter.lang = 'ko-KR';
       speechSynthesis.speak(utter);
     }
 
-    // 페이지 로드 시 네이버 지도 API 로드 시작
-    window.onload = loadNaverMapAPI;
+    // 페이지 로드 시 Google Maps API 로드 시작
+    window.onload = loadGoogleMapAPI;
   </script>
 </body>
 </html> 
