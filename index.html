@@ -49,10 +49,10 @@
       background: #ffea70;
     }
     #map {
-      width: 90%;
-      height: 420px;
-      margin: 0 auto 28px auto;
-      border-radius: 18px;
+      width: 90vw;
+      height: 260px;
+      margin: 0 auto 18px auto;
+      border-radius: 0;
       border: 2.5px solid #ffd700;
       box-shadow: 0 8px 32px #000a, 0 1.5px 0 #fff;
       overflow: hidden;
@@ -60,16 +60,20 @@
     }
     #lists {
       display: flex;
-      justify-content: center;
-      gap: 40px;
-      margin-bottom: 18px;
+      justify-content: space-between;
+      align-items: flex-start;
+      width: 90vw;
+      margin: 0 auto 0 auto;
+      gap: 0;
     }
     .list-section {
       background: rgba(34, 36, 38, 0.85);
-      border-radius: 12px;
+      border-radius: 0;
       padding: 18px 22px 12px 22px;
       min-width: 270px;
+      width: 48%;
       box-shadow: 0 2px 12px #0005;
+      border: 2px solid #ffd700;
     }
     .list-section h2 {
       color: #ffd700;
@@ -82,7 +86,7 @@
       margin: 8px 0;
       padding: 8px 10px;
       border: 1px solid #ffd70044;
-      border-radius: 7px;
+      border-radius: 0;
       background: #232526cc;
       color: #fff;
       transition: background 0.2s, color 0.2s;
@@ -95,22 +99,23 @@
       margin: 32px auto 0 auto;
       max-width: 600px;
       background: rgba(34,36,38,0.92);
-      border-radius: 14px;
+      border-radius: 0;
       box-shadow: 0 2px 16px #0007;
       padding: 24px 32px;
       color: #fff;
       font-size: 1.1rem;
       display: none;
+      border: 2px solid #ffd700;
     }
     #info img {
       max-width: 100%;
-      border-radius: 10px;
+      border-radius: 0;
       margin-bottom: 12px;
       box-shadow: 0 2px 8px #0005;
     }
     @media (max-width: 900px) {
-      #lists { flex-direction: column; align-items: center; gap: 18px; }
-      .list-section { min-width: 180px; width: 90vw; }
+      #lists { flex-direction: column; align-items: center; gap: 18px; width: 98vw; }
+      .list-section { min-width: 180px; width: 98vw; }
       #map { width: 98vw; }
     }
   </style>
@@ -238,9 +243,3 @@
       utter.lang = 'ko-KR';
       speechSynthesis.speak(utter);
     }
-
-    // 페이지 로드 시 Google Maps API 로드 시작
-    window.onload = loadGoogleMapAPI;
-  </script>
-</body>
-</html> 
