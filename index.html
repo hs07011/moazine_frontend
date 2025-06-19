@@ -470,8 +470,22 @@
 
     function showSummaryBox(text) {
       const box = document.getElementById('summaryBox');
-      box.innerHTML = `<span class='close-btn' onclick="this.parentNode.style.display='none'">✕</span>` + text;
+      box.innerHTML = `<span class='close-btn' onclick="closeSummaryBox()">✕</span>` + text;
       box.style.display = 'block';
+      // 음성 출력
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // 기존 음성 중지
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'ko-KR';
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    function closeSummaryBox() {
+      document.getElementById('summaryBox').style.display = 'none';
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
     }
 
     // 페이지 로드 시 Google Maps API 로드 시작
