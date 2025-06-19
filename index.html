@@ -320,17 +320,24 @@
 
     function renderTable(tableId, list, type) {
       const tbody = document.getElementById(tableId).querySelector('tbody');
-      if (!list.length) {
-        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;">주변 ${type} 정보를 찾을 수 없습니다.</td></tr>`;
-        return;
+      let html = '';
+      if (list.length === 0) {
+        html = `<tr><td colspan="3" style="text-align:center; color:#888;">현재 위치에서 추천할 곳이 없습니다</td></tr>`;
+      } else {
+        html = list.map((item, i) =>
+          `<tr class="clickable" onclick="showPlaceInfo('${type}', ${i})">
+            <td style="width:36px;text-align:center;">${i+1}.</td>
+            <td>${item.name}</td>
+            <td class="score">${item.rating ? item.rating.toFixed(1) + '점' : '-'}</td>
+          </tr>`
+        ).join('');
+        if (list.length < 5) {
+          for (let i = list.length; i < 5; i++) {
+            html += `<tr><td colspan="3" style="text-align:center; color:#888;">현재 위치에서 추천할 곳이 없습니다</td></tr>`;
+          }
+        }
       }
-      tbody.innerHTML = list.map((item, i) =>
-        `<tr class="clickable" onclick="showPlaceInfo('${type}', ${i})">
-          <td style="width:36px;text-align:center;">${i+1}.</td>
-          <td>${item.name}</td>
-          <td class="score">${item.rating ? item.rating.toFixed(1) + '점' : '-'}</td>
-        </tr>`
-      ).join('');
+      tbody.innerHTML = html;
     }
 
     window.showPlaceInfo = function(type, idx) {
