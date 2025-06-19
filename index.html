@@ -188,19 +188,26 @@
     </div>
     <div class="side-tables">
       <div class="table-section attraction-table">
-        <div class="table-title"><img src="/assets/attraction.png" alt="관광지" style="vertical-align:middle;width:3.52rem;height:3.52rem;margin-right:10px;">관광지 5선</div>
+        <div class="table-title">
+          <img src="/assets/attraction.png" alt="관광지" style="vertical-align:middle;width:3.52rem;height:3.52rem;margin-right:10px;">관광지 5선
+          <button id="attractionSummaryBtn" style="margin-left:16px;font-size:1.1rem;padding:6px 16px;border-radius:6px;border:none;background:#217093;color:#fff;cursor:pointer;">요약 정보 보기</button>
+        </div>
         <table id="attractionTable">
           <tbody></tbody>
         </table>
       </div>
       <div class="table-section restaurant-table">
-        <div class="table-title"><img src="/assets/restaurant.png" alt="맛집" style="vertical-align:middle;width:3.52rem;height:3.52rem;margin-right:10px;">맛집 5선</div>
+        <div class="table-title">
+          <img src="/assets/restaurant.png" alt="맛집" style="vertical-align:middle;width:3.52rem;height:3.52rem;margin-right:10px;">맛집 5선
+          <button id="restaurantSummaryBtn" style="margin-left:16px;font-size:1.1rem;padding:6px 16px;border-radius:6px;border:none;background:#217093;color:#fff;cursor:pointer;">요약 정보 보기</button>
+        </div>
         <table id="restaurantTable">
           <tbody></tbody>
         </table>
       </div>
     </div>
   </div>
+  <div id="summaryBox" style="display:none;max-width:900px;margin:32px auto 0 auto;padding:24px 32px;background:#f8f8f8;border-radius:12px;box-shadow:0 2px 12px #0002;font-size:1.3rem;position:relative;line-height:1.7;color:#222;"></div>
   <script>
     const PROXY = 'https://moazine.onrender.com';
     let map, marker, destLatLng, attractions = [], restaurants = [];
@@ -372,6 +379,39 @@
         ? `<img src="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${window.google && google.maps ? google.maps.apiKey : ''}" alt="${name}">`
         : '';
       alert(`${name}\n${addr}\n${rating}`);
+    }
+
+    // 요약 정보 보기 버튼 이벤트
+    document.getElementById('attractionSummaryBtn').onclick = function() {
+      showSummary('관광지', attractions);
+    };
+    document.getElementById('restaurantSummaryBtn').onclick = function() {
+      showSummary('맛집', restaurants);
+    };
+
+    function showSummary(type, list) {
+      if (!list || list.length === 0) {
+        showSummaryBox('요약할 정보가 없습니다.');
+        return;
+      }
+      showSummaryBox('요약 정보를 불러오는 중...');
+      fetch('https://moazine.onrender.com/summarize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ places: list, type })
+      })
+      .then(res => res.json())
+      .then(data => {
+        showSummaryBox(data.summary || '요약 정보를 가져오지 못했습니다.');
+      })
+      .catch(() => showSummaryBox('요약 정보를 가져오지 못했습니다.'));
+    }
+
+    function showSummaryBox(text) {
+      const box = document.getElementById('summaryBox');
+      box.innerHTML = `<span style='position:absolute;top:8px;right:18px;cursor:pointer;font-size:1.5rem;color:#888;' onclick="this.parentNode.style.display='none'">✕</span>` + text;
+      box.style.display = 'block';
     }
 
     // 페이지 로드 시 Google Maps API 로드 시작
