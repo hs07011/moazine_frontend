@@ -265,6 +265,13 @@
       });
     };
 
+    // 검색창에서 엔터키 입력 시에도 검색 동작
+    document.getElementById('destination').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('searchBtn').click();
+      }
+    });
+
     function clearPlaceMarkers() {
       placeMarkers.forEach(m => m.setMap(null));
       placeMarkers = [];
@@ -292,6 +299,9 @@
                 scaledSize: new google.maps.Size(48, 48)
               }
             });
+            m.addListener('click', function() {
+              window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}`,'_blank');
+            });
             placeMarkers.push(m);
           }
         });
@@ -305,6 +315,9 @@
                 url: '/assets/restaurant.png',
                 scaledSize: new google.maps.Size(48, 48)
               }
+            });
+            m.addListener('click', function() {
+              window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}`,'_blank');
             });
             placeMarkers.push(m);
           }
