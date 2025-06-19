@@ -280,21 +280,30 @@
         restaurants = data.restaurants || [];
         renderTable('attractionTable', attractions, '관광지');
         renderTable('restaurantTable', restaurants, '맛집');
-        // 관광지/맛집 마커 표시
-        [...attractions, ...restaurants].forEach((place, idx) => {
+        // 관광지/맛집 마커 표시 (아이콘 적용)
+        attractions.forEach(place => {
           if (place.geometry && place.geometry.location) {
-            const color = idx < attractions.length ? '#4caf50' : '#ff7043';
             const m = new google.maps.Marker({
               position: place.geometry.location,
               map: map,
               title: place.name,
               icon: {
-                path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-                scale: 5,
-                fillColor: color,
-                fillOpacity: 1,
-                strokeWeight: 1,
-                strokeColor: '#222'
+                url: '/assets/attraction.png',
+                scaledSize: new google.maps.Size(48, 48)
+              }
+            });
+            placeMarkers.push(m);
+          }
+        });
+        restaurants.forEach(place => {
+          if (place.geometry && place.geometry.location) {
+            const m = new google.maps.Marker({
+              position: place.geometry.location,
+              map: map,
+              title: place.name,
+              icon: {
+                url: '/assets/restaurant.png',
+                scaledSize: new google.maps.Size(48, 48)
               }
             });
             placeMarkers.push(m);
