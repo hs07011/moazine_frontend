@@ -468,14 +468,29 @@
       .catch(() => showSummaryBox('요약 정보를 가져오지 못했습니다.'));
     }
 
+    function getSpeechText(text) {
+      // 괄호, 대괄호, 슬래시, 점, 하이픈 등 불필요한 기호 제거 및 일부 자연스러운 변환
+      let speech = text
+        .replace(/[\[\]\(\)\-·\*=_~^|#@$%&+=]/g, ' ')
+        .replace(/:/g, '은')
+        .replace(/\//g, ' 또는 ')
+        .replace(/\s{2,}/g, ' ')
+        .replace(/\d+\./g, '') // 1. 2. 3. 등 번호 제거
+        .replace(/평점/g, '평점은')
+        .replace(/\n/g, ' ')
+        .trim();
+      return speech;
+    }
+
     function showSummaryBox(text) {
       const box = document.getElementById('summaryBox');
       box.innerHTML = `<span class='close-btn' onclick="closeSummaryBox()">✕</span>` + text;
       box.style.display = 'block';
-      // 음성 출력
+      // 음성 출력 (기호 제거 및 자연스러운 변환)
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel(); // 기존 음성 중지
-        const utter = new SpeechSynthesisUtterance(text);
+        const speechText = getSpeechText(text);
+        const utter = new SpeechSynthesisUtterance(speechText);
         utter.lang = 'ko-KR';
         window.speechSynthesis.speak(utter);
       }
