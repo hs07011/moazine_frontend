@@ -469,9 +469,10 @@
     }
 
     function getSpeechText(text) {
-      // 괄호, 대괄호, 슬래시, 점, 하이픈 등 불필요한 기호 제거 및 일부 자연스러운 변환
+      // 괄호와 괄호 안의 내용 전체 제거, 그 외 기호도 정리
       let speech = text
-        .replace(/[\[\]\(\)\-·\*=_~^|#@$%&+=]/g, ' ')
+        .replace(/\([^\)]*\)/g, '') // ( ... ) 전체 제거
+        .replace(/[\[\]\-·\*=_~^|#@$%&+=]/g, ' ')
         .replace(/:/g, '은')
         .replace(/\//g, ' 또는 ')
         .replace(/\s{2,}/g, ' ')
@@ -507,4 +508,3 @@
     window.onload = loadGoogleMapAPI;
   </script>
 </body>
-</html> 
