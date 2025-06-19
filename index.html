@@ -322,7 +322,9 @@
       const tbody = document.getElementById(tableId).querySelector('tbody');
       let html = '';
       if (list.length === 0) {
-        html = `<tr><td colspan="3" style="text-align:center; color:#888;">현재 위치에서 추천할 곳이 없습니다</td></tr>`;
+        for (let i = 0; i < 5; i++) {
+          html += `<tr><td style='width:36px;text-align:center;color:#888;'>${i+1}.</td><td style='color:#888;'>현재 위치에서 추천할 곳이 없습니다</td><td class='score'></td></tr>`;
+        }
       } else {
         html = list.map((item, i) =>
           `<tr class="clickable" onclick="showPlaceInfo('${type}', ${i})">
@@ -333,7 +335,7 @@
         ).join('');
         if (list.length < 5) {
           for (let i = list.length; i < 5; i++) {
-            html += `<tr><td colspan="3" style="text-align:center; color:#888;">현재 위치에서 추천할 곳이 없습니다</td></tr>`;
+            html += `<tr><td style='width:36px;text-align:center;color:#888;'>${i+1}.</td><td style='color:#888;'>현재 위치에서 추천할 곳이 없습니다</td><td class='score'></td></tr>`;
           }
         }
       }
