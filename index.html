@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>주변 관광지 및 맛집 소개 모아진 서비스</title>
+  <title>모아진 주변 관광지 및 맛집 소개 서비스</title>
   <style>
     body {
       margin: 0;
@@ -234,7 +234,7 @@
 </head>
 <body>
   <div class="header">
-    <div class="header-title">주변 관광지 및 맛집 소개 모아진 서비스</div>
+    <div class="header-title">주변 관광지 및 맛집 소재 모아진 서비스</div>
     <div class="header-search">
       <input id="destination" placeholder="현재 위치 검색 결과" style="color:#888;" />
       <button id="searchBtn">검색</button>
@@ -432,13 +432,23 @@
 
     window.showPlaceInfo = function(type, idx) {
       const place = type === '관광지' ? attractions[idx] : restaurants[idx];
+      if (!place || !place.geometry || !place.geometry.location) {
+        alert('장소 정보를 가져올 수 없습니다.');
+        return;
+      }
+
       const name = place.name;
       const addr = place.vicinity || place.formatted_address || '';
-      const rating = place.rating ? `평점: ${place.rating}` : '';
-      const photo = place.photos && place.photos[0]
-        ? `<img src="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${window.google && google.maps ? google.maps.apiKey : ''}" alt="${name}">`
-        : '';
-      alert(`${name}\n${addr}\n${rating}`);
+      const rating = place.rating ? `평점: ${place.rating.toFixed(1)}점` : '평점 정보 없음';
+      
+      const infoText = `${name}\n${addr}\n${rating}\n\n이 장소로 길안내를 시작할까요?`;
+
+      if (confirm(infoText)) {
+        const destination = `${place.geometry.location.lat},${place.geometry.location.lng}`;
+        const origin = `${destLatLng.lat},${destLatLng.lng}`;
+        const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=driving`;
+        window.open(mapsUrl, '_blank');
+      }
     }
 
     // 요약 정보 보기 버튼 이벤트
