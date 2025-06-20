@@ -278,7 +278,7 @@
       const response = await fetch(`${PROXY}/map-key`);
       const { apiKey } = await response.json();
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=places,marker&loading=async`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=places`;
       script.async = true;
       document.head.appendChild(script);
     }
@@ -286,21 +286,15 @@
     window.initMap = function() {
       map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: 37.5665, lng: 126.9780 },
-        zoom: 14,
-        mapId: 'DEMO_MAP_ID' // AdvancedMarkerElement 사용을 위해 Map ID가 필요합니다.
+        zoom: 14
       });
       // 첫 진입 시 현재 위치로 자동 검색
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
           const lat = pos.coords.latitude, lng = pos.coords.longitude;
           map.setCenter({ lat, lng });
-          if (marker) marker.map = null;
-          marker = new google.maps.marker.AdvancedMarkerElement({
-            map: map,
-            position: { lat, lng },
-            title: '현재 위치',
-            content: createMarkerIcon('/assets/current.png')
-          });
+          if (marker) marker.setMap(null);
+          marker = new google.maps.Marker({ position: { lat, lng }, map: map, title: '현재 위치', icon: { url: '/assets/current.png', scaledSize: new google.maps.Size(48, 48) } });
           destLatLng = { lat, lng };
           document.getElementById('destination').value = '';
           document.getElementById('destination').placeholder = '현재 위치 검색 결과';
@@ -336,12 +330,8 @@
           const loc = data.results[0].geometry.location;
           destLatLng = { lat: loc.lat, lng: loc.lng };
           map.setCenter(destLatLng);
-          if (marker) marker.map = null;
-          marker = new google.maps.marker.AdvancedMarkerElement({
-            map: map,
-            position: destLatLng,
-            title: '목적지'
-          });
+          if (marker) marker.setMap(null);
+          marker = new google.maps.Marker({ position: destLatLng, map: map, title: '목적지' });
           document.getElementById('destination').style.color = '#222';
           loadPlaces(false);
         } else {
@@ -358,17 +348,8 @@
     });
 
     function clearPlaceMarkers() {
-      placeMarkers.forEach(m => m.map = null);
+      placeMarkers.forEach(m => m.setMap(null));
       placeMarkers = [];
-    }
-
-    function createMarkerIcon(iconUrl) {
-      const img = document.createElement('img');
-      img.src = iconUrl;
-      img.style.width = '48px';
-      img.style.height = '48px';
-      img.style.cursor = 'pointer';
-      return img;
     }
 
     function loadPlaces(isCurrentLocation) {
@@ -384,14 +365,16 @@
         // 관광지/맛집 마커 표시 (아이콘 적용)
         attractions.forEach(place => {
           if (place.geometry && place.geometry.location) {
-            const markerContent = createMarkerIcon('/assets/attraction.png');
-            const m = new google.maps.marker.AdvancedMarkerElement({
+            const m = new google.maps.Marker({
               position: place.geometry.location,
               map: map,
               title: place.name,
-              content: markerContent
+              icon: {
+                url: '/assets/attraction.png',
+                scaledSize: new google.maps.Size(48, 48)
+              }
             });
-            markerContent.addEventListener('click', function() {
+            m.addListener('click', function() {
               window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}`,'_blank');
             });
             placeMarkers.push(m);
@@ -399,14 +382,16 @@
         });
         restaurants.forEach(place => {
           if (place.geometry && place.geometry.location) {
-            const markerContent = createMarkerIcon('/assets/restaurant.png');
-            const m = new google.maps.marker.AdvancedMarkerElement({
+            const m = new google.maps.Marker({
               position: place.geometry.location,
               map: map,
               title: place.name,
-              content: markerContent
+              icon: {
+                url: '/assets/restaurant.png',
+                scaledSize: new google.maps.Size(48, 48)
+              }
             });
-            markerContent.addEventListener('click', function() {
+            m.addListener('click', function() {
               window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}`,'_blank');
             });
             placeMarkers.push(m);
@@ -464,26 +449,12 @@
       showSummary('맛집', restaurants);
     };
 
-    function updateSummaryBoxText(text) {
-      const box = document.getElementById('summaryBox');
-      box.innerHTML = `<span class='close-btn' onclick="closeSummaryBox()">✕</span>` + text;
-      box.style.display = 'block';
-    }
-
     function showSummary(type, list) {
-      const attractionBtn = document.getElementById('attractionSummaryBtn');
-      const restaurantBtn = document.getElementById('restaurantSummaryBtn');
-
       if (!list || list.length === 0) {
         showSummaryBox('요약할 정보가 없습니다.');
         return;
       }
-
-      // 요약 요청 중 버튼 비활성화
-      attractionBtn.disabled = true;
-      restaurantBtn.disabled = true;
-      updateSummaryBoxText('요약 정보를 불러오는 중...');
-
+      showSummaryBox('요약 정보를 불러오는 중...');
       fetch('https://moazine.onrender.com/summarize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -494,158 +465,17 @@
       .then(data => {
         showSummaryBox(data.summary || '요약 정보를 가져오지 못했습니다.');
       })
-      .catch(() => showSummaryBox('요약 정보를 가져오지 못했습니다.'))
-      .finally(() => {
-        // 버튼 다시 활성화
-        attractionBtn.disabled = false;
-        restaurantBtn.disabled = false;
-      });
-    }
-
-    function getSpeechText(text) {
-      // 괄호와 괄호 안의 내용 전체 제거, 그 외 기호도 정리
-      let speech = text
-        .replace(/\([^\)]*\)/g, '') // ( ... ) 전체 제거
-        .replace(/[\[\]\-·\*=_~^|#@$%&+=]/g, ' ')
-        .replace(/:/g, '은')
-        .replace(/\//g, ' 또는 ')
-        .replace(/\s{2,}/g, ' ')
-        .replace(/\d+\./g, '') // 1. 2. 3. 등 번호 제거
-        .replace(/평점/g, '평점은')
-        .replace(/\n/g, ' ')
-        .trim();
-      return speech;
+      .catch(() => showSummaryBox('요약 정보를 가져오지 못했습니다.'));
     }
 
     function showSummaryBox(text) {
       const box = document.getElementById('summaryBox');
-      box.innerHTML = `<span class='close-btn' onclick="closeSummaryBox()">✕</span>` + text;
+      box.innerHTML = `<span class='close-btn' onclick="this.parentNode.style.display='none'">✕</span>` + text;
       box.style.display = 'block';
-      
-      // 음성 출력 개선
-      speakText(text);
-    }
-
-    // 음성 출력 함수 개선
-    function speakText(text) {
-      if (!('speechSynthesis' in window)) {
-        console.log('이 브라우저는 음성 합성을 지원하지 않습니다.');
-        return;
-      }
-
-      // 기존 음성 중지
-      window.speechSynthesis.cancel();
-
-      const guideIntro = '안녕하세요, 여행 가이드입니다. 지금부터 추천 장소를 소개해드릴게요. ';
-      const speechText = guideIntro + getSpeechText(text);
-      
-      const utter = new SpeechSynthesisUtterance(speechText);
-      utter.lang = 'ko-KR';
-      utter.rate = 0.9; // 속도 조정
-      utter.pitch = 1.0; // 피치 조정
-      utter.volume = 1.0; // 볼륨 설정
-
-      // 음성 선택 로직 개선
-      function setVoice() {
-        const voices = window.speechSynthesis.getVoices();
-        console.log('사용 가능한 음성:', voices.map(v => `${v.name} (${v.lang})`));
-        
-        // 한국어 음성 우선 선택
-        let koVoice = voices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
-        if (!koVoice) {
-          koVoice = voices.find(v => v.lang === 'ko-KR');
-        }
-        if (!koVoice) {
-          koVoice = voices.find(v => v.lang.startsWith('ko'));
-        }
-        if (!koVoice) {
-          koVoice = voices.find(v => v.lang === 'en-US'); // 영어 음성으로 대체
-        }
-        
-        if (koVoice) {
-          utter.voice = koVoice;
-          console.log('선택된 음성:', koVoice.name);
-        }
-        
-        // 음성 재생
-        window.speechSynthesis.speak(utter);
-      }
-
-      // 음성 목록이 로드되었는지 확인
-      if (window.speechSynthesis.getVoices().length > 0) {
-        setVoice();
-      } else {
-        // 음성 목록 로드 대기
-        window.speechSynthesis.onvoiceschanged = setVoice;
-      }
-
-      // 음성 재생 상태 모니터링
-      utter.onstart = () => console.log('음성 재생 시작');
-      utter.onend = () => console.log('음성 재생 완료');
-      utter.onerror = (event) => {
-        console.error('음성 재생 오류:', event.error);
-        // 오류 발생 시 텍스트만 표시
-        alert('음성 출력에 실패했습니다. 텍스트를 확인해주세요.');
-      };
-    }
-
-    // 음성 테스트 함수 추가
-    function testSpeech() {
-      if (!('speechSynthesis' in window)) {
-        alert('이 브라우저는 음성 합성을 지원하지 않습니다.');
-        return;
-      }
-      
-      const testText = '안녕하세요, 음성 테스트입니다.';
-      const utter = new SpeechSynthesisUtterance(testText);
-      utter.lang = 'ko-KR';
-      utter.rate = 0.9;
-      utter.pitch = 1.0;
-      utter.volume = 1.0;
-      
-      window.speechSynthesis.speak(utter);
-      
-      utter.onstart = () => console.log('테스트 음성 재생 시작');
-      utter.onend = () => console.log('테스트 음성 재생 완료');
-      utter.onerror = (event) => {
-        console.error('테스트 음성 재생 오류:', event.error);
-        alert('음성 테스트에 실패했습니다.');
-      };
-    }
-
-    // 음성 테스트 버튼 추가 (개발용)
-    function addSpeechTestButton() {
-      const testBtn = document.createElement('button');
-      testBtn.textContent = '음성 테스트';
-      testBtn.style.cssText = `
-        position: fixed;
-        top: 10px;
-        right: 10px;
-        z-index: 1001;
-        padding: 8px 16px;
-        background: #217093;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-      `;
-      testBtn.onclick = testSpeech;
-      document.body.appendChild(testBtn);
     }
 
     // 페이지 로드 시 Google Maps API 로드 시작
-    window.onload = function() {
-      loadGoogleMapAPI();
-      // 음성 테스트 버튼 추가 (개발용)
-      addSpeechTestButton();
-    };
-
-    function closeSummaryBox() {
-      document.getElementById('summaryBox').style.display = 'none';
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
-    }
+    window.onload = loadGoogleMapAPI;
   </script>
 </body>
+</html> 
