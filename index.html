@@ -490,7 +490,7 @@
       // 음성 출력 (여행 가이드 인트로, 옵션 조정)
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel(); // 기존 음성 중지
-        const guideIntro = '안녕하세요, 여행 가이드입니다. 지금부터 추천 장소를 소개해드릴게요. ';
+        // const guideIntro = '안녕하세요, 여행 가이드입니다. 지금부터 추천 장소를 소개해드릴게요. ';
         const speechText = guideIntro + getSpeechText(text);
         const utter = new SpeechSynthesisUtterance(speechText);
         utter.lang = 'ko-KR';
