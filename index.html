@@ -286,7 +286,8 @@
     window.initMap = function() {
       map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: 37.5665, lng: 126.9780 },
-        zoom: 14
+        zoom: 14,
+        mapId: 'DEMO_MAP_ID' // AdvancedMarkerElement 사용을 위해 Map ID가 필요합니다.
       });
       // 첫 진입 시 현재 위치로 자동 검색
       if (navigator.geolocation) {
@@ -464,11 +465,19 @@
     };
 
     function showSummary(type, list) {
+      const attractionBtn = document.getElementById('attractionSummaryBtn');
+      const restaurantBtn = document.getElementById('restaurantSummaryBtn');
+
       if (!list || list.length === 0) {
         showSummaryBox('요약할 정보가 없습니다.');
         return;
       }
-      showSummaryBox('요약 정보를 불러오는 중...');
+
+      // 요약 요청 중 버튼 비활성화
+      attractionBtn.disabled = true;
+      restaurantBtn.disabled = true;
+      updateSummaryBoxText('요약 정보를 불러오는 중...');
+
       fetch('https://moazine.onrender.com/summarize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -479,7 +488,12 @@
       .then(data => {
         showSummaryBox(data.summary || '요약 정보를 가져오지 못했습니다.');
       })
-      .catch(() => showSummaryBox('요약 정보를 가져오지 못했습니다.'));
+      .catch(() => showSummaryBox('요약 정보를 가져오지 못했습니다.'))
+      .finally(() => {
+        // 버튼 다시 활성화
+        attractionBtn.disabled = false;
+        restaurantBtn.disabled = false;
+      });
     }
 
     function getSpeechText(text) {
