@@ -500,12 +500,11 @@
       // 음성 출력 (여행 가이드 인트로, 옵션 조정)
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel(); // 기존 음성 중지
-        // const guideIntro = '안녕하세요, 여행 가이드입니다. 지금부터 추천 장소를 소개해드릴게요. ';
         const speechText = getSpeechText(text);
         const utter = new SpeechSynthesisUtterance(speechText);
         utter.lang = 'ko-KR';
-        utter.rate = 1.05;
-        utter.pitch = 1.1;
+        utter.rate = 1; // 자연스러운 속도
+        utter.pitch = 1; // 자연스러운 높이
         // 자연스러운 한국어 voice 선택
         const voices = window.speechSynthesis.getVoices();
         const koVoice = voices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
