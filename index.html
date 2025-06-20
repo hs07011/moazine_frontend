@@ -16,20 +16,22 @@
     .header {
       background: #217093;
       color: #fff;
-      padding: 36px 0 28px 0;
+      padding: 3vw 0 2vw 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
+      width: 100vw;
     }
     .header-title {
-      font-size: 5.6rem;
+      font-size: 4vw;
       font-weight: bold;
-      margin-left: 60px;
-      letter-spacing: 2px;
+      margin-left: 4vw;
+      letter-spacing: 0.2vw;
+      white-space: pre-line;
     }
     .header-search {
-      margin-right: 60px;
+      margin-right: 4vw;
       display: flex;
       align-items: center;
       background: #fff;
@@ -64,10 +66,11 @@
       display: flex;
       justify-content: space-between;
       align-items: stretch;
-      padding: 32px 32px 0 32px;
-      gap: 32px;
+      padding: 2vw 2vw 0 2vw;
+      gap: 2vw;
       min-height: 0;
       height: auto;
+      width: 100vw;
     }
     .map-container {
       flex: 1 1 0;
@@ -160,18 +163,21 @@
       background: #ffd6cc !important;
     }
     @media (max-width: 1000px) {
-      .main { flex-direction: column; gap: 18px; padding: 18px 4vw 0 4vw; }
+      .header { flex-direction: column; align-items: flex-start; padding: 2vw 0 1vw 0; }
+      .header-title { margin-left: 2vw; font-size: 2.5rem; }
+      .header-search { margin: 10px 0 0 2vw; width: 96vw; }
+      .main { flex-direction: column; gap: 2vw; padding: 2vw 2vw 0 2vw; width: 100vw; }
       .map-container, .side-tables { max-width: 100vw; width: 100%; height: auto; min-width: 0; }
       .side-tables { max-width: 100vw; min-width: 0; }
       .table-section { max-height: 320px; }
     }
     @media (max-width: 600px) {
-      .header { flex-direction: column; align-items: flex-start; padding: 12px 0 8px 0; }
-      .header-title { margin-left: 10px; font-size: 1.5rem; }
-      .header-search { margin: 10px 0 0 10px; width: 96vw; }
+      .header { flex-direction: column; align-items: flex-start; padding: 8px 0 6px 0; }
+      .header-title { margin-left: 2vw; font-size: 1.2rem; }
+      .header-search { margin: 8px 0 0 2vw; width: 96vw; }
       #destination { font-size: 1.1rem; padding: 8px 8px; width: 60vw; }
       #searchBtn { font-size: 1.1rem; padding: 8px 16px; margin-left: 10px; }
-      .main { padding: 4px 1vw 0 1vw; }
+      .main { padding: 2vw 1vw 0 1vw; width: 100vw; }
       .map-container, .side-tables { min-width: 0; width: 100vw; }
       #map { height: 140px; min-height: 100px; }
       .table-section { max-height: 200px; }
