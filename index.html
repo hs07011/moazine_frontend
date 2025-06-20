@@ -250,7 +250,7 @@
         <div class="table-title">
           <button id="attractionSummaryBtn" class="summary-btn">요약</button>
           <img src="/assets/attraction.png" alt="관광지" style="vertical-align:middle;width:3.52rem;height:3.52rem;margin:0 10px 0 10px;">
-          관광지 5선
+          관광지 10선
         </div>
         <table id="attractionTable">
           <tbody></tbody>
@@ -260,7 +260,7 @@
         <div class="table-title">
           <button id="restaurantSummaryBtn" class="summary-btn">요약</button>
           <img src="/assets/restaurant.png" alt="맛집" style="vertical-align:middle;width:3.52rem;height:3.52rem;margin:0 10px 0 10px;">
-          맛집 5선
+          맛집 10선
         </div>
         <table id="restaurantTable">
           <tbody></tbody>
@@ -410,7 +410,7 @@
       const tbody = document.getElementById(tableId).querySelector('tbody');
       let html = '';
       if (list.length === 0) {
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 10; i++) {
           html += `<tr><td style='width:36px;text-align:center;color:#888;'>${i+1}.</td><td style='color:#888;'>현재 위치에서 추천할 곳이 없습니다</td><td class='score'></td></tr>`;
         }
       } else {
@@ -421,8 +421,8 @@
             <td class="score">${item.rating ? item.rating.toFixed(1) + '점' : '-'}</td>
           </tr>`
         ).join('');
-        if (list.length < 5) {
-          for (let i = list.length; i < 5; i++) {
+        if (list.length < 10) {
+          for (let i = list.length; i < 10; i++) {
             html += `<tr><td style='width:36px;text-align:center;color:#888;'>${i+1}.</td><td style='color:#888;'>현재 위치에서 추천할 곳이 없습니다</td><td class='score'></td></tr>`;
           }
         }
@@ -484,7 +484,12 @@
                        .replace(/^2\./gm, '두번째')
                        .replace(/^3\./gm, '셋번째')
                        .replace(/^4\./gm, '네번째')
-                       .replace(/^5\./gm, '다섯번째');
+                       .replace(/^5\./gm, '다섯번째')
+                       .replace(/^6\./gm, '여섯번째')
+                       .replace(/^7\./gm, '일곱번째')
+                       .replace(/^8\./gm, '여덟번째')
+                       .replace(/^9\./gm, '아홉번째')
+                       .replace(/^10\./gm, '열번째');
 
       // 2. 괄호와 괄호 안의 내용, 그 외 기호를 정리합니다.
       speech = speech
