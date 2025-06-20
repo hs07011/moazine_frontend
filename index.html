@@ -469,27 +469,30 @@
     }
 
     function getSpeechText(text) {
-      // 괄호와 괄호 안의 내용 전체 제거, 그 외 기호도 정리
-      let speech = text
+      // 1. 줄 시작의 번호를 한국어 서수로 먼저 변환합니다. (멀티라인 `m` 플래그 사용)
+      let speech = text.replace(/^1\./gm, '첫번째')
+                       .replace(/^2\./gm, '두번째')
+                       .replace(/^3\./gm, '셋번째')
+                       .replace(/^4\./gm, '네번째')
+                       .replace(/^5\./gm, '다섯번째');
+
+      // 2. 괄호와 괄호 안의 내용, 그 외 기호를 정리합니다.
+      speech = speech
         .replace(/\([^\)]*\)/g, '') // ( ... ) 전체 제거
         .replace(/[\[\]\-·\*=_~^|#@$%&+=]/g, ' ')
         .replace(/:/g, '은')
         .replace(/\//g, ' 또는 ')
-        .replace(/\s{2,}/g, ' ')
-        .replace(/평점/g, '평점은')
-        .replace(/\n/g, ' ')
-        .trim();
+        .replace(/평점/g, '평점은');
+
+      // 3. 실수형 점수를 한국어로 변환합니다. (예: 4.5점 -> 4점5)
+      speech = speech.replace(/(\d+)\.(\d+)점/g, '$1점$2');
       
-      // 줄 시작의 번호를 한국어 서수로 변환
-      speech = speech.replace(/1\./g, '첫번째')
-                     .replace(/2\./g, '두번째')
-                     .replace(/3\./g, '셋번째')
-                     .replace(/4\./g, '네번째')
-                     .replace(/5\./g, '다섯번째');
-      
-      // 실수형 점수를 한국어로 변환 (예: 4.5점 -> 4점 5)
-      speech = speech.replace(/(\d+)\.(\d+)점/g, '$1점 $2');
-      
+      // 4. 서수나 평점으로 처리되지 않은, 본문에 남은 '숫자.' 형식의 점을 제거합니다.
+      speech = speech.replace(/(\d)\./g, '$1');
+
+      // 5. 마지막으로 줄바꿈과 여러 공백을 하나의 공백으로 통일합니다.
+      speech = speech.replace(/\n/g, ' ').replace(/\s{2,}/g, ' ').trim();
+        
       return speech;
     }
 
