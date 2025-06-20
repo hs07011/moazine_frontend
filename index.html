@@ -464,6 +464,12 @@
       showSummary('맛집', restaurants);
     };
 
+    function updateSummaryBoxText(text) {
+      const box = document.getElementById('summaryBox');
+      box.innerHTML = `<span class='close-btn' onclick="closeSummaryBox()">✕</span>` + text;
+      box.style.display = 'block';
+    }
+
     function showSummary(type, list) {
       const attractionBtn = document.getElementById('attractionSummaryBtn');
       const restaurantBtn = document.getElementById('restaurantSummaryBtn');
