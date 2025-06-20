@@ -10,6 +10,8 @@
       font-family: 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
       background: #f4f4f4;
       color: #222;
+      min-height: 100vh;
+      overflow-y: auto;
     }
     .header {
       background: #217093;
@@ -64,7 +66,8 @@
       align-items: stretch;
       padding: 32px 32px 0 32px;
       gap: 32px;
-      min-height: 80vh;
+      min-height: 0;
+      height: auto;
     }
     .map-container {
       flex: 1 1 0;
@@ -78,12 +81,13 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
-      height: 80vh;
+      height: auto;
+      min-height: 0;
     }
     #map {
       width: 100%;
-      height: 100%;
-      min-height: 420px;
+      height: 420px;
+      min-height: 180px;
       border-radius: 8px;
     }
     .side-tables {
@@ -93,7 +97,8 @@
       display: flex;
       flex-direction: column;
       gap: 24px;
-      height: 80vh;
+      height: auto;
+      min-height: 0;
     }
     .table-section {
       background: #fff;
@@ -104,6 +109,8 @@
       flex: 1 1 0;
       display: flex;
       flex-direction: column;
+      max-height: 480px;
+      overflow-y: auto;
     }
     .table-title {
       font-size: 2.86rem;
@@ -154,8 +161,9 @@
     }
     @media (max-width: 1000px) {
       .main { flex-direction: column; gap: 18px; padding: 18px 4vw 0 4vw; }
-      .map-container, .side-tables { max-width: 100vw; width: 100%; height: auto; }
-      .side-tables { max-width: 100vw; }
+      .map-container, .side-tables { max-width: 100vw; width: 100%; height: auto; min-width: 0; }
+      .side-tables { max-width: 100vw; min-width: 0; }
+      .table-section { max-height: 320px; }
     }
     @media (max-width: 600px) {
       .header { flex-direction: column; align-items: flex-start; padding: 12px 0 8px 0; }
@@ -164,8 +172,9 @@
       #destination { font-size: 1.1rem; padding: 8px 8px; width: 60vw; }
       #searchBtn { font-size: 1.1rem; padding: 8px 16px; margin-left: 10px; }
       .main { padding: 4px 1vw 0 1vw; }
-      .map-container, .side-tables { min-width: 0; }
-      #map { height: 180px; min-height: 120px; }
+      .map-container, .side-tables { min-width: 0; width: 100vw; }
+      #map { height: 140px; min-height: 100px; }
+      .table-section { max-height: 200px; }
       .table-title { font-size: 1.1rem; padding: 8px 0 8px 8px; }
       table { font-size: 1.1rem; }
       th, td { padding: 10px 6px; }
