@@ -468,14 +468,50 @@
       .catch(() => showSummaryBox('요약 정보를 가져오지 못했습니다.'));
     }
 
+    function getSpeechText(text) {
+      // 괄호와 괄호 안의 내용 전체 제거, 그 외 기호도 정리
+      let speech = text
+        .replace(/\([^\)]*\)/g, '') // ( ... ) 전체 제거
+        .replace(/[\[\]\-·\*=_~^|#@$%&+=]/g, ' ')
+        .replace(/:/g, '은')
+        .replace(/\//g, ' 또는 ')
+        .replace(/\s{2,}/g, ' ')
+        .replace(/\d+\./g, '') // 1. 2. 3. 등 번호 제거
+        .replace(/평점/g, '평점은')
+        .replace(/\n/g, ' ')
+        .trim();
+      return speech;
+    }
+
     function showSummaryBox(text) {
       const box = document.getElementById('summaryBox');
-      box.innerHTML = `<span class='close-btn' onclick="this.parentNode.style.display='none'">✕</span>` + text;
+      box.innerHTML = `<span class='close-btn' onclick="closeSummaryBox()">✕</span>` + text;
       box.style.display = 'block';
+      // 음성 출력 (여행 가이드 인트로, 옵션 조정)
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // 기존 음성 중지
+        const guideIntro = '안녕하세요, 여행 가이드입니다. 지금부터 추천 장소를 소개해드릴게요. ';
+        const speechText = guideIntro + getSpeechText(text);
+        const utter = new SpeechSynthesisUtterance(speechText);
+        utter.lang = 'ko-KR';
+        utter.rate = 1.05;
+        utter.pitch = 1.1;
+        // 자연스러운 한국어 voice 선택
+        const voices = window.speechSynthesis.getVoices();
+        const koVoice = voices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
+        if (koVoice) utter.voice = koVoice;
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    function closeSummaryBox() {
+      document.getElementById('summaryBox').style.display = 'none';
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
     }
 
     // 페이지 로드 시 Google Maps API 로드 시작
     window.onload = loadGoogleMapAPI;
   </script>
 </body>
-</html> 
