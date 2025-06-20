@@ -481,11 +481,11 @@
         .trim();
       
       // 줄 시작의 번호를 한국어 서수로 변환
-      speech = speech.replace(/^1\./g, '첫번째는')
-                     .replace(/^2\./g, '두번째는')
-                     .replace(/^3\./g, '셋번째는')
-                     .replace(/^4\./g, '네번째는')
-                     .replace(/^5\./g, '다섯번째는');
+      speech = speech.replace(/1\./g, '첫번째')
+                     .replace(/2\./g, '두번째')
+                     .replace(/3\./g, '셋번째')
+                     .replace(/4\./g, '네번째')
+                     .replace(/5\./g, '다섯번째');
       
       // 실수형 점수를 한국어로 변환 (예: 4.5점 -> 4점 5)
       speech = speech.replace(/(\d+)\.(\d+)점/g, '$1점 $2');
