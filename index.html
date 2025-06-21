@@ -33,20 +33,22 @@
       align-items: center;
       background: #fff;
       border-radius: 4px;
-      padding: 8px 16px;
+      padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2vw, 16px);
       flex-grow: 1;
       min-width: 280px;
       max-width: 600px;
       margin: 0;
+      transition: padding 0.2s;
     }
     #destination {
       border: none;
       outline: none;
       font-size: clamp(1.4rem, 2.5vw, 1.8rem);
-      padding: 12px 10px;
+      padding: clamp(8px, 1.5vw, 12px) clamp(10px, 2vw, 20px);
       width: 100%;
       background: transparent;
       flex-grow: 1;
+      transition: padding 0.2s;
     }
     #searchBtn {
       background: #217093;
