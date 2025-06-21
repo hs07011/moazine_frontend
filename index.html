@@ -118,11 +118,16 @@
     .restaurant-table {
       background: #ffe5e0;
     }
+    .table-container {
+      flex: 1;
+      overflow-y: auto;
+      max-height: calc(100% - 60px);
+    }
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 2.2rem;
-      height: 100%;
+      height: auto;
     }
     th, td {
       padding: 28px 18px;
@@ -152,6 +157,21 @@
     .restaurant-table tr.clickable:hover {
       background: #ffd6cc !important;
     }
+    /* 스크롤바 스타일링 */
+    .table-container::-webkit-scrollbar {
+      width: 8px;
+    }
+    .table-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    .table-container::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 4px;
+    }
+    .table-container::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
     @media (max-width: 1000px) {
       .main { flex-direction: column; gap: 18px; padding: 18px 4vw 0 4vw; }
       .map-container, .side-tables { max-width: 100vw; width: 100%; height: auto; }
@@ -171,6 +191,8 @@
       th, td { padding: 10px 6px; }
       .side-tables { gap: 10px; }
       .table-section img { width: 1.2rem !important; height: 1.2rem !important; }
+      .table-container { max-height: calc(100% - 40px); }
+      .table-container::-webkit-scrollbar { width: 4px; }
     }
     .summary-btn {
       font-size: 1.8rem;
@@ -219,6 +241,48 @@
       color: #888;
       font-weight: bold;
     }
+    .destination-intro-popup {
+      display: none;
+      position: absolute;
+      top: 5%;
+      left: 50%;
+      width: 48%;
+      min-width: 240px;
+      max-width: 98%;
+      min-height: 200px;
+      background: #fff;
+      border: 3px solid #217093;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px #0003;
+      padding: 36px 40px 32px 40px;
+      font-size: 2.2rem;
+      color: #222;
+      z-index: 1000;
+      line-height: 1.7;
+      overflow-y: auto;
+      transform: translateX(-2%);
+    }
+    .destination-intro-popup .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 18px;
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: #888;
+      font-weight: bold;
+    }
+    .destination-intro-popup .title {
+      font-size: 2.8rem;
+      font-weight: bold;
+      color: #217093;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .destination-intro-popup .guide-text {
+      font-size: 2.2rem;
+      line-height: 1.8;
+      text-align: justify;
+    }
     @media (max-width: 1000px) {
       .summary-popup {
         width: 96vw;
@@ -228,6 +292,23 @@
         padding: 18px 8px 14px 8px;
         font-size: 1.5rem;
         transform: none;
+      }
+      .destination-intro-popup {
+        width: 96vw;
+        left: 2vw;
+        min-width: 0;
+        max-width: 98vw;
+        padding: 18px 8px 14px 8px;
+        font-size: 1.5rem;
+        transform: none;
+      }
+      .destination-intro-popup .title {
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+      }
+      .destination-intro-popup .guide-text {
+        font-size: 1.5rem;
+        line-height: 1.6;
       }
     }
   </style>
@@ -244,27 +325,32 @@
     <div class="map-container">
       <div id="map"></div>
       <div id="summaryBox" class="summary-popup" style="display:none;"></div>
+      <div id="destinationIntroBox" class="destination-intro-popup" style="display:none;"></div>
     </div>
     <div class="side-tables">
       <div class="table-section attraction-table">
         <div class="table-title">
           <button id="attractionSummaryBtn" class="summary-btn">요약</button>
           <img src="/assets/attraction.png" alt="관광지" style="vertical-align:middle;width:3.52rem;height:3.52rem;margin:0 10px 0 10px;">
-          관광지 5선
+          관광지 10선
         </div>
-        <table id="attractionTable">
-          <tbody></tbody>
-        </table>
+        <div class="table-container">
+          <table id="attractionTable">
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
       <div class="table-section restaurant-table">
         <div class="table-title">
           <button id="restaurantSummaryBtn" class="summary-btn">요약</button>
           <img src="/assets/restaurant.png" alt="맛집" style="vertical-align:middle;width:3.52rem;height:3.52rem;margin:0 10px 0 10px;">
-          맛집 5선
+          맛집 10선
         </div>
-        <table id="restaurantTable">
-          <tbody></tbody>
-        </table>
+        <div class="table-container">
+          <table id="restaurantTable">
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -328,11 +414,14 @@
       .then(data => {
         if (data.results && data.results.length > 0) {
           const loc = data.results[0].geometry.location;
+          const placeName = data.results[0].formatted_address;
           destLatLng = { lat: loc.lat, lng: loc.lng };
           map.setCenter(destLatLng);
           if (marker) marker.setMap(null);
           marker = new google.maps.Marker({ position: destLatLng, map: map, title: '목적지' });
           document.getElementById('destination').style.color = '#222';
+          // 목적지 소개 표시
+          showDestinationIntro(dest, placeName);
           loadPlaces(false);
         } else {
           alert('목적지를 찾을 수 없습니다.');
@@ -409,11 +498,14 @@
     function renderTable(tableId, list, type) {
       const tbody = document.getElementById(tableId).querySelector('tbody');
       let html = '';
+      
       if (list.length === 0) {
+        // 데이터가 없을 때 5개의 빈 항목 표시
         for (let i = 0; i < 5; i++) {
           html += `<tr><td style='width:36px;text-align:center;color:#888;'>${i+1}.</td><td style='color:#888;'>현재 위치에서 추천할 곳이 없습니다</td><td class='score'></td></tr>`;
         }
       } else {
+        // 데이터가 있을 때 모든 항목 표시 (5개 이상이어도 모두 표시)
         html = list.map((item, i) =>
           `<tr class="clickable" onclick="showPlaceInfo('${type}', ${i})">
             <td style="width:36px;text-align:center;">${i+1}.</td>
@@ -421,6 +513,8 @@
             <td class="score">${item.rating ? item.rating.toFixed(1) + '점' : '-'}</td>
           </tr>`
         ).join('');
+        
+        // 5개 미만일 때만 빈 항목으로 채움
         if (list.length < 5) {
           for (let i = list.length; i < 5; i++) {
             html += `<tr><td style='width:36px;text-align:center;color:#888;'>${i+1}.</td><td style='color:#888;'>현재 위치에서 추천할 곳이 없습니다</td><td class='score'></td></tr>`;
@@ -528,6 +622,78 @@
 
     function closeSummaryBox() {
       document.getElementById('summaryBox').style.display = 'none';
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    function showDestinationIntro(searchQuery, placeName) {
+      // 여행 가이드 스타일의 소개 텍스트 생성
+      const introText = generateTravelGuideIntro(searchQuery, placeName);
+      
+      const box = document.getElementById('destinationIntroBox');
+      box.innerHTML = `
+        <span class='close-btn' onclick="closeDestinationIntro()">✕</span>
+        <div class="title">🎯 ${searchQuery} 여행 가이드</div>
+        <div class="guide-text">${introText}</div>
+      `;
+      box.style.display = 'block';
+      
+      // 음성 출력 (여행 가이드 인트로)
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // 기존 음성 중지
+        const speechText = getDestinationSpeechText(introText);
+        const utter = new SpeechSynthesisUtterance(speechText);
+        utter.lang = 'ko-KR';
+        utter.rate = 0.9; // 여행 가이드 느낌으로 약간 느리게
+        utter.pitch = 1.1; // 친근한 톤
+        // 자연스러운 한국어 voice 선택
+        const voices = window.speechSynthesis.getVoices();
+        const koVoice = voices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
+        if (koVoice) utter.voice = koVoice;
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    function generateTravelGuideIntro(searchQuery, placeName) {
+      const currentTime = new Date();
+      const hour = currentTime.getHours();
+      let timeGreeting = '';
+      
+      if (hour < 6) timeGreeting = '새벽';
+      else if (hour < 12) timeGreeting = '좋은 아침';
+      else if (hour < 18) timeGreeting = '좋은 오후';
+      else timeGreeting = '좋은 저녁';
+      
+      return `
+        안녕하세요! 여러분의 여행 가이드입니다. ${timeGreeting}이네요! 🌟
+        
+        오늘은 <strong>${searchQuery}</strong>에 대해 소개해드릴게요. 
+        이곳은 ${placeName}에 위치한 매력적인 여행지입니다.
+        
+        이 지역은 다양한 관광지와 맛집들이 있어서 여행자들에게 인기가 많아요. 
+        지금 주변의 추천 관광지와 맛집들을 확인해보시고, 
+        마음에 드는 곳이 있으면 클릭해서 상세 정보를 확인해보세요!
+        
+        각 장소를 클릭하시면 구글 맵스로 길안내를 받을 수 있고, 
+        요약 버튼을 누르시면 AI가 추천해드리는 여행 팁도 들을 수 있어요.
+        
+        즐거운 여행 되세요! 🎒✈️
+      `;
+    }
+
+    function getDestinationSpeechText(text) {
+      // HTML 태그 제거 및 음성용 텍스트 정리
+      let speech = text.replace(/<[^>]*>/g, '') // HTML 태그 제거
+                       .replace(/\n/g, ' ') // 줄바꿈을 공백으로
+                       .replace(/\s{2,}/g, ' ') // 여러 공백을 하나로
+                       .trim();
+      
+      return speech;
+    }
+
+    function closeDestinationIntro() {
+      document.getElementById('destinationIntroBox').style.display = 'none';
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
