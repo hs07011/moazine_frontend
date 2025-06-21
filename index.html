@@ -257,7 +257,7 @@
       padding: 36px 40px 32px 40px;
       font-size: 2.2rem;
       color: #222;
-      z-index: 1000;
+      z-index: 2000;
       line-height: 1.7;
       overflow-y: auto;
       transform: translateX(-2%);
@@ -409,9 +409,11 @@
     document.getElementById('searchBtn').onclick = function() {
       const dest = document.getElementById('destination').value;
       if (!dest) return alert('목적지를 입력하세요!');
+      console.log('검색 시작:', dest);
       fetch(`${PROXY}/geocode?query=${encodeURIComponent(dest)}`)
       .then(res => res.json())
       .then(data => {
+        console.log('지오코딩 결과:', data);
         if (data.results && data.results.length > 0) {
           const loc = data.results[0].geometry.location;
           const placeName = data.results[0].formatted_address;
@@ -421,11 +423,16 @@
           marker = new google.maps.Marker({ position: destLatLng, map: map, title: '목적지' });
           document.getElementById('destination').style.color = '#222';
           // 목적지 소개 표시
+          console.log('목적지 소개 함수 호출:', dest, placeName);
           showDestinationIntro(dest, placeName);
           loadPlaces(false);
         } else {
           alert('목적지를 찾을 수 없습니다.');
         }
+      })
+      .catch(error => {
+        console.error('지오코딩 에러:', error);
+        alert('검색 중 오류가 발생했습니다.');
       });
     };
 
@@ -628,16 +635,25 @@
     }
 
     function showDestinationIntro(searchQuery, placeName) {
+      console.log('showDestinationIntro 함수 실행:', searchQuery, placeName);
       // 여행 가이드 스타일의 소개 텍스트 생성
       const introText = generateTravelGuideIntro(searchQuery, placeName);
+      console.log('생성된 소개 텍스트:', introText);
       
       const box = document.getElementById('destinationIntroBox');
+      console.log('destinationIntroBox 요소:', box);
+      if (!box) {
+        console.error('destinationIntroBox 요소를 찾을 수 없습니다!');
+        return;
+      }
+      
       box.innerHTML = `
         <span class='close-btn' onclick="closeDestinationIntro()">✕</span>
         <div class="title">🎯 ${searchQuery} 여행 가이드</div>
         <div class="guide-text">${introText}</div>
       `;
       box.style.display = 'block';
+      console.log('팝업 표시 완료');
       
       // 음성 출력 (여행 가이드 인트로)
       if ('speechSynthesis' in window) {
@@ -652,6 +668,7 @@
         const koVoice = voices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
         if (koVoice) utter.voice = koVoice;
         window.speechSynthesis.speak(utter);
+        console.log('음성 출력 시작');
       }
     }
 
@@ -700,6 +717,11 @@
     }
 
     // 페이지 로드 시 Google Maps API 로드 시작
-    window.onload = loadGoogleMapAPI;
+    window.onload = function() {
+      console.log('페이지 로드 완료');
+      console.log('showDestinationIntro 함수 확인:', typeof showDestinationIntro);
+      console.log('destinationIntroBox 요소 확인:', document.getElementById('destinationIntroBox'));
+      loadGoogleMapAPI();
+    };
   </script>
 </body>
