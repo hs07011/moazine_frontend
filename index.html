@@ -206,9 +206,9 @@
       .table-container::-webkit-scrollbar { width: 4px; }
     }
     .summary-btn {
-      font-size: 1.8rem;
+      font-size: clamp(1.4rem, 2.2vw, 1.8rem);
       font-weight: bold;
-      padding: 8px 27px;
+      padding: clamp(6px, 1.5vw, 10px) clamp(15px, 3vw, 27px);
       border-radius: 9px;
       border: 3px solid #217093;
       background: #fff;
@@ -216,7 +216,8 @@
       cursor: pointer;
       margin-right: 4px;
       box-shadow: 2px 2px 4px #0001;
-      transition: background 0.2s, color 0.2s;
+      transition: background 0.2s, color 0.2s, font-size 0.2s, padding 0.2s;
+      white-space: nowrap;
     }
     .summary-btn:hover {
       background: #217093;
