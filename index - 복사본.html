@@ -451,8 +451,8 @@
           if (marker) marker.setMap(null);
           marker = new google.maps.Marker({ position: destLatLng, map: map, title: '목적지' });
           document.getElementById('destination').style.color = '#222';
-          // 목적지 소개 표시 (Gemini API 호출)
-          showDestinationIntro(dest, placeName, destLatLng);
+          // 목적지 소개 표시
+          showDestinationIntro(dest, placeName);
           loadPlaces(false);
         } else {
           alert('목적지를 찾을 수 없습니다.');
@@ -661,49 +661,65 @@
       }
     }
 
-    function showDestinationIntro(searchQuery, placeName, latLng) {
+    function showDestinationIntro(searchQuery, placeName) {
+      // 여행 가이드 스타일의 소개 텍스트 생성
+      const introText = generateTravelGuideIntro(searchQuery, placeName);
+      
       const box = document.getElementById('destinationIntroBox');
+      if (!box) {
+        console.error('destinationIntroBox 요소를 찾을 수 없습니다!');
+        return;
+      }
+      
       box.innerHTML = `
         <span class='close-btn' onclick="closeDestinationIntro()">✕</span>
         <div class="title">🎯 ${searchQuery} 여행 가이드</div>
-        <div class="guide-text">가이드 정보를 생성하는 중입니다... 잠시만 기다려주세요.</div>
+        <div class="guide-text">${introText}</div>
       `;
       box.style.display = 'block';
+      
+      // 음성 출력 (여행 가이드 인트로)
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // 기존 음성 중지
+        const speechText = getDestinationSpeechText(introText);
+        const utter = new SpeechSynthesisUtterance(speechText);
+        utter.lang = 'ko-KR';
+        utter.rate = 0.9; // 여행 가이드 느낌으로 약간 느리게
+        utter.pitch = 1.1; // 친근한 톤
+        // 자연스러운 한국어 voice 선택
+        const koVoice = speechVoices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
+        if (koVoice) {
+          utter.voice = koVoice;
+        }
+        window.speechSynthesis.speak(utter);
+      }
+    }
 
-      // 서버에 Gemini 소개 생성 요청
-      fetch(`${PROXY}/generate-intro`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: searchQuery, address: placeName, lat: latLng.lat, lng: latLng.lng })
-      })
-      .then(res => res.json())
-      .then(data => {
-        const introText = data.intro.replace(/\n/g, '<br>'); // 줄바꿈을 <br>로
-        const guideTextElement = box.querySelector('.guide-text');
-        if (guideTextElement) {
-          guideTextElement.innerHTML = introText;
-        }
-
-        // 음성 출력
-        if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-          const speechText = getDestinationSpeechText(introText);
-          const utter = new SpeechSynthesisUtterance(speechText);
-          utter.lang = 'ko-KR';
-          utter.rate = 1.0;
-          utter.pitch = 1.0;
-          const koVoice = speechVoices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
-          if (koVoice) utter.voice = koVoice;
-          window.speechSynthesis.speak(utter);
-        }
-      })
-      .catch(err => {
-        console.error('Failed to get destination intro:', err);
-        const guideTextElement = box.querySelector('.guide-text');
-        if (guideTextElement) {
-          guideTextElement.innerHTML = '가이드 정보 생성에 실패했습니다. 다시 시도해 주세요.';
-        }
-      });
+    function generateTravelGuideIntro(searchQuery, placeName) {
+      const currentTime = new Date();
+      const hour = currentTime.getHours();
+      let timeGreeting = '';
+      
+      if (hour < 6) timeGreeting = '새벽';
+      else if (hour < 12) timeGreeting = '좋은 아침';
+      else if (hour < 18) timeGreeting = '좋은 오후';
+      else timeGreeting = '좋은 저녁';
+      
+      return `
+        안녕하세요! 여러분의 여행 가이드입니다. ${timeGreeting}이네요! 🌟
+        
+        오늘은 <strong>${searchQuery}</strong>에 대해 소개해드릴게요. 
+        이곳은 ${placeName}에 위치한 매력적인 여행지입니다.
+        
+        이 지역은 다양한 관광지와 맛집들이 있어서 여행자들에게 인기가 많아요. 
+        지금 주변의 추천 관광지와 맛집들을 확인해보시고, 
+        마음에 드는 곳이 있으면 클릭해서 상세 정보를 확인해보세요!
+        
+        각 장소를 클릭하시면 구글 맵스로 길안내를 받을 수 있고, 
+        요약 버튼을 누르시면 AI가 추천해드리는 여행 팁도 들을 수 있어요.
+        
+        즐거운 여행 되세요! 🎒✈️
+      `;
     }
 
     function getDestinationSpeechText(text) {
