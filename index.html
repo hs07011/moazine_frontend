@@ -448,8 +448,22 @@
       background: #f1f1f1;
       border-bottom: 1px solid #ccc;
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       align-items: center;
+      gap: 15px;
+    }
+    .website-popup-header .open-new-tab-btn {
+      font-size: 1.4rem;
+      padding: 5px 12px;
+      background: #e0e0e0;
+      border-radius: 5px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .website-popup-header .open-new-tab-btn:hover {
+      background: #d0d0d0;
     }
     .website-popup-header .close-btn {
       font-size: 1.8rem;
@@ -516,6 +530,7 @@
   <div id="websitePopup" class="website-popup">
     <div class="website-popup-container">
       <div class="website-popup-header">
+        <a id="websitePopupLink" class="open-new-tab-btn" href="#" target="_blank" rel="noopener noreferrer">새 탭에서 열기</a>
         <span class="close-btn" onclick="closeWebsitePopup()">✕</span>
       </div>
       <iframe id="websiteIframe" src=""></iframe>
@@ -804,6 +819,7 @@
         fullUrl = 'https://' + url;
       }
       document.getElementById('websiteIframe').src = fullUrl;
+      document.getElementById('websitePopupLink').href = fullUrl; // '새 탭에서 열기' 버튼의 링크 설정
       document.getElementById('websitePopup').style.display = 'flex';
     }
 
