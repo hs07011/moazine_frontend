@@ -871,7 +871,7 @@
             <div class="details-header">
               <h2>${place.name}</h2>
               <div class="details-header-actions">
-                <button class="directions-btn" onclick="openDirectionsPopup(${place.geometry.location.lat}, ${place.geometry.location.lng})">📍 길안내</button>
+                <button class="directions-btn" onclick="openDirectionsPopup(${place.geometry.location.lat}, ${place.geometry.location.lng})">길안내</button>
                 <span class="close-btn" onclick="closeDetailsBox()">✕</span>
               </div>
             </div>
@@ -901,11 +901,9 @@
               infoItems.push(`<div><strong><i class="fas fa-dollar-sign"></i> 가격대</strong></div><div>${priceStr}</div>`);
           }
           
-          // 관광지/맛집에 따라 다른 안내 문구 표시
+          // 웹사이트가 있는 경우 안내 문구 표시
           if (place.website) {
-            const guidanceText = type === 'restaurants' 
-              ? '자세한 메뉴와 가격정보는 공식 웹사이트에서 확인해 주세요' 
-              : '자세한 입장료 정보는 공식 웹사이트에서 확인해주세요.';
+            const guidanceText = '자세한 정보는 웹사이트 방문하여 확인해 주세요';
             infoItems.push(`<div><strong><i class="fas fa-info-circle"></i> 안내</strong></div><div><small>${guidanceText}</small></div>`);
           }
 
