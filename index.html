@@ -641,9 +641,9 @@
 </head>
 <body>
   <div class="header">
-    <div class="header-title">주변 관광지 및 맛집 소개 HJM 서비스</div>
-    <div class="header-search">
-      <input id="destination" placeholder="현재 위치 검색 결과" style="color:#888;" />
+    <h1 style="margin:0; font-size:2.8rem;">Travel Here Service</h1>
+    <div class="search-bar">
+      <input id="destinationInput" type="text" placeholder="목적지 입력하면 주변 관광지, 맛집 검색됩니다." style="color:#888;" />
       <button id="searchBtn">검색</button>
     </div>
   </div>
@@ -743,9 +743,9 @@
           map.setCenter({ lat, lng });
           if (marker) marker.setMap(null);
           marker = new google.maps.Marker({ position: { lat, lng }, map: map, title: '현재 위치', icon: { url: '/assets/current.png', scaledSize: new google.maps.Size(48, 48) } });
-          document.getElementById('destination').value = '';
-          document.getElementById('destination').placeholder = '현재 위치 검색 결과';
-          document.getElementById('destination').style.color = '#888';
+          document.getElementById('destinationInput').value = '';
+          document.getElementById('destinationInput').placeholder = '현재 위치 검색 결과';
+          document.getElementById('destinationInput').style.color = '#888';
           loadPlaces(true);
         }, () => {
           // 위치 권한 거부 시 서울 기본
@@ -756,11 +756,11 @@
       }
     };
 
-    document.getElementById('destination').onfocus = function() {
+    document.getElementById('destinationInput').onfocus = function() {
       this.style.color = '#222';
       if (this.value === '') this.placeholder = '';
     };
-    document.getElementById('destination').onblur = function() {
+    document.getElementById('destinationInput').onblur = function() {
       if (this.value === '') {
         this.placeholder = '현재 위치 검색 결과';
         this.style.color = '#888';
@@ -768,7 +768,7 @@
     };
 
     document.getElementById('searchBtn').onclick = function() {
-      const dest = document.getElementById('destination').value;
+      const dest = document.getElementById('destinationInput').value;
       if (!dest) return alert('목적지를 입력하세요!');
       fetch(`${PROXY}/geocode?query=${encodeURIComponent(dest)}`)
       .then(res => res.json())
@@ -780,7 +780,7 @@
           map.setCenter(destLatLng);
           if (marker) marker.setMap(null);
           marker = new google.maps.Marker({ position: destLatLng, map: map, title: '목적지' });
-          document.getElementById('destination').style.color = '#222';
+          document.getElementById('destinationInput').style.color = '#222';
           // 목적지 소개 표시 (Gemini API 호출)
           showDestinationIntro(dest, placeName, destLatLng);
           loadPlaces(false);
@@ -795,7 +795,7 @@
     };
 
     // 검색창에서 엔터키 입력 시에도 검색 동작
-    document.getElementById('destination').addEventListener('keydown', function(e) {
+    document.getElementById('destinationInput').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         document.getElementById('searchBtn').click();
       }
@@ -853,9 +853,9 @@
         });
         // 검색창 표시
         if (isCurrentLocation) {
-          document.getElementById('destination').value = '';
-          document.getElementById('destination').placeholder = '현재 위치 검색 결과';
-          document.getElementById('destination').style.color = '#888';
+          document.getElementById('destinationInput').value = '';
+          document.getElementById('destinationInput').placeholder = '현재 위치 검색 결과';
+          document.getElementById('destinationInput').style.color = '#888';
         }
       });
     }
@@ -906,33 +906,30 @@
             <div class=\"details-header\">\n              <h2>${place.name}</h2>\n              <div class=\"details-header-actions\">\n                <button class=\"directions-btn\" onclick=\"openDirectionsPopup(${place.geometry.location.lat}, ${place.geometry.location.lng})\">길안내</button>\n              </div>\n            </div>\n          `;
           
           // Info items (address, rating, etc.)
-          const infoItems = [];
+          const infoLineItems = [];
           if (place.formatted_address) {
-            infoItems.push(`<div><strong><i class="fas fa-map-marker-alt"></i> 주소</strong></div><div>${place.formatted_address}</div>`);
+            infoLineItems.push(`<span><strong>주소</strong> ${place.formatted_address}</span>`);
           }
           if (place.rating) {
             let ratingText = `${place.rating}점`;
             if (place.user_ratings_total) {
               ratingText += ` (${place.user_ratings_total}개)`;
             }
-            infoItems.push(`<div><strong><i class="fas fa-star"></i> 평점</strong></div><div>${ratingText}</div>`);
+            infoLineItems.push(`<span><strong>평점</strong> ${ratingText}</span>`);
           }
           if (place.formatted_phone_number) {
-            infoItems.push(`<div><strong><i class="fas fa-phone"></i> 연락처</strong></div><div><a href="tel:${place.formatted_phone_number}">${place.formatted_phone_number}</a></div>`);
-          }
-          if (place.website) {
-            infoItems.push(`<div><strong><i class="fas fa-globe"></i> 웹사이트</strong></div><div><a href="#" onclick="event.preventDefault(); openWebsitePopup('${place.website}');">공식 웹사이트 방문</a></div>`);
+            infoLineItems.push(`<span><strong>연락처</strong> <a href="tel:${place.formatted_phone_number}">${place.formatted_phone_number}</a></span>`);
           }
           const priceLevel = place.price_level;
           if (priceLevel !== undefined && priceLevel !== null) {
-              const priceStr = '$'.repeat(priceLevel) + ' '.repeat(5 - priceLevel).replace(/ /g, '<span style="color:#eee;">$</span>');
-              infoItems.push(`<div><strong><i class="fas fa-dollar-sign"></i> 가격대</strong></div><div>${priceStr}</div>`);
+            const priceStr = '$'.repeat(priceLevel) + ' '.repeat(5 - priceLevel).replace(/ /g, '<span style="color:#eee;">$</span>');
+            infoLineItems.push(`<span><strong>가격대</strong> ${priceStr}</span>`);
           }
-          
           // 웹사이트가 있는 경우 안내 문구 표시
           if (place.website) {
             const guidanceText = '자세한 정보는 웹사이트 방문하여 확인해 주세요';
-            infoItems.push(`<div><strong><i class="fas fa-info-circle"></i> 안내</strong></div><div><small>${guidanceText}</small></div>`);
+            infoLineItems.push(`<span><strong>웹사이트</strong> <a href="#" onclick="event.preventDefault(); openWebsitePopup('${place.website}');">방문</a></span>`);
+            infoLineItems.push(`<span><i class=\"fas fa-info-circle\"></i> <small>${guidanceText}</small></span>`);
           }
 
           // Reviews
@@ -941,7 +938,6 @@
             reviewsHtml = place.reviews.map(review => `
               <div class="review">
                 <div class="review-author">
-                  <img src="${review.profile_photo_url}" alt="${review.author_name}" referrerpolicy="no-referrer">
                   <strong>${review.author_name}</strong> 
                   <span class="review-time">(${review.relative_time_description})</span>
                 </div>
@@ -953,9 +949,7 @@
           // Content with info and reviews
           const contentHtml = `
             <div class="details-content">
-              <div class="info-grid">
-                ${infoItems.join('')}
-              </div>
+              <div class="info-line" style="display:flex; flex-wrap:wrap; gap:18px; align-items:center; margin-bottom:18px;">${infoLineItems.join('<span style=\"color:#bbb;\">:</span>')}</div>
               <h3><i class="fas fa-comment-alt"></i> 방문자 리뷰</h3>
               <div class="reviews">
                 ${reviewsHtml}
