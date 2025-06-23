@@ -822,7 +822,7 @@
       } else {
         // 데이터가 있을 때 모든 항목 표시 (5개 이상이어도 모두 표시)
         html = list.map((item, i) =>
-          `<tr class="clickable" onclick="showPlaceInfo('${type}', '${item.place_id}')">
+          `<tr class="clickable" onclick="showPlaceInfo('${item.place_id}', '${type}')">
             <td style="width:36px;text-align:center;">${i+1}.</td>
             <td>${item.name}</td>
             <td class="score">${item.rating ? item.rating.toFixed(1) + '점' : '-'}</td>
@@ -839,76 +839,93 @@
       tbody.innerHTML = html;
     }
 
-    window.showPlaceInfo = function(type, placeId) {
-      if (!placeId) {
-        alert('장소 정보를 가져올 수 없습니다.');
-        return;
-      }
-
+    function showPlaceInfo(placeId, type) {
       const detailsBox = document.getElementById('placeDetailsBox');
-
-      // Header with title and buttons
-      const headerHtml = `
-        <div class="details-header">
-          <h2>${place.name}</h2>
-          <div class="details-header-actions">
-            <button class="directions-btn" onclick="openDirectionsPopup(${place.geometry.location.lat}, ${place.geometry.location.lng})">📍 길안내</button>
-            <span class="close-btn" onclick="closeDetailsBox()">✕</span>
-          </div>
-        </div>
-      `;
-      
-      // Info items (address, rating, etc.)
-      const infoItems = [];
-      if (place.formatted_address) {
-        infoItems.push(`<div><strong><i class="fas fa-map-marker-alt"></i> 주소</strong></div><div>${place.formatted_address}</div>`);
-      }
-      if (place.rating) {
-        infoItems.push(`<div><strong><i class="fas fa-star"></i> 평점</strong></div><div>${place.rating}점 (${place.user_ratings_total}개)</div>`);
-      }
-      if (place.formatted_phone_number) {
-        infoItems.push(`<div><strong><i class="fas fa-phone"></i> 연락처</strong></div><div>${place.formatted_phone_number}</div>`);
-      }
-      if (place.website) {
-        infoItems.push(`<div><strong><i class="fas fa-globe"></i> 웹사이트</strong></div><div><a href="#" onclick="event.preventDefault(); openWebsitePopup('${place.website}');">방문하기</a></div>`);
-      }
-      const priceLevel = place.price_level;
-      if (priceLevel !== undefined && priceLevel !== null) {
-          const priceStr = '$'.repeat(priceLevel) + ' '.repeat(5 - priceLevel).replace(/ /g, '<span style="color:#eee;">$</span>');
-          infoItems.push(`<div><strong><i class="fas fa-dollar-sign"></i> 가격대</strong></div><div>${priceStr}</div>`);
-      }
-
-      // Reviews
-      let reviewsHtml = '<p>리뷰 정보가 없습니다.</p>';
-      if (place.reviews && place.reviews.length > 0) {
-        reviewsHtml = place.reviews.map(review => `
-          <div class="review">
-            <div class="review-author">
-              <img src="${review.profile_photo_url}" alt="${review.author_name}" referrerpolicy="no-referrer">
-              <strong>${review.author_name}</strong> 
-              <span class="review-time">(${review.relative_time_description})</span>
-            </div>
-            <p>${review.text}</p>
-          </div>
-        `).join('');
-      }
-
-      // Content with info and reviews
-      const contentHtml = `
-        <div class="details-content">
-          <div class="info-grid">
-            ${infoItems.join('')}
-          </div>
-          <h3><i class="fas fa-comment-alt"></i> 방문자 리뷰</h3>
-          <div class="reviews">
-            ${reviewsHtml}
-          </div>
-        </div>
-      `;
-
-      detailsBox.innerHTML = headerHtml + contentHtml;
+      detailsBox.innerHTML = `<div style="padding: 40px; text-align:center;">상세 정보를 불러오는 중입니다...</div>`;
       detailsBox.style.display = 'block';
-      detailsBox.scrollTop = 0; // Ensure popup starts at the top
+
+      fetch(`${PROXY}/place-details?place_id=${placeId}`)
+        .then(res => res.json())
+        .then(place => {
+          if (place.error) throw new Error(place.error);
+
+          // Header with title and buttons
+          const headerHtml = `
+            <div class="details-header">
+              <h2>${place.name}</h2>
+              <div class="details-header-actions">
+                <button class="directions-btn" onclick="openDirectionsPopup(${place.geometry.location.lat}, ${place.geometry.location.lng})">📍 길안내</button>
+                <span class="close-btn" onclick="closeDetailsBox()">✕</span>
+              </div>
+            </div>
+          `;
+          
+          // Info items (address, rating, etc.)
+          const infoItems = [];
+          if (place.formatted_address) {
+            infoItems.push(`<div><strong><i class="fas fa-map-marker-alt"></i> 주소</strong></div><div>${place.formatted_address}</div>`);
+          }
+          if (place.rating) {
+            infoItems.push(`<div><strong><i class="fas fa-star"></i> 평점</strong></div><div>${place.rating}점 (${place.user_ratings_total}개)</div>`);
+          }
+          if (place.formatted_phone_number) {
+            infoItems.push(`<div><strong><i class="fas fa-phone"></i> 연락처</strong></div><div>${place.formatted_phone_number}</div>`);
+          }
+          if (place.website) {
+            infoItems.push(`<div><strong><i class="fas fa-globe"></i> 웹사이트</strong></div><div><a href="#" onclick="event.preventDefault(); openWebsitePopup('${place.website}');">방문하기</a></div>`);
+          }
+          const priceLevel = place.price_level;
+          if (priceLevel !== undefined && priceLevel !== null) {
+              const priceStr = '$'.repeat(priceLevel) + ' '.repeat(5 - priceLevel).replace(/ /g, '<span style="color:#eee;">$</span>');
+              infoItems.push(`<div><strong><i class="fas fa-dollar-sign"></i> 가격대</strong></div><div>${priceStr}</div>`);
+          }
+
+          // Reviews
+          let reviewsHtml = '<p>리뷰 정보가 없습니다.</p>';
+          if (place.reviews && place.reviews.length > 0) {
+            reviewsHtml = place.reviews.map(review => `
+              <div class="review">
+                <div class="review-author">
+                  <img src="${review.profile_photo_url}" alt="${review.author_name}" referrerpolicy="no-referrer">
+                  <strong>${review.author_name}</strong> 
+                  <span class="review-time">(${review.relative_time_description})</span>
+                </div>
+                <p>${review.text}</p>
+              </div>
+            `).join('');
+          }
+
+          // Content with info and reviews
+          const contentHtml = `
+            <div class="details-content">
+              <div class="info-grid">
+                ${infoItems.join('')}
+              </div>
+              <h3><i class="fas fa-comment-alt"></i> 방문자 리뷰</h3>
+              <div class="reviews">
+                ${reviewsHtml}
+              </div>
+            </div>
+          `;
+
+          detailsBox.innerHTML = headerHtml + contentHtml;
+          detailsBox.style.display = 'block';
+          detailsBox.scrollTop = 0; // Ensure popup starts at the top
+        })
+        .catch(err => {
+          console.error('Failed to get place details:', err);
+          detailsBox.innerHTML = `
+            <div class="details-header">
+              <h2>오류</h2>
+              <div class="details-header-actions">
+                <span class="close-btn" onclick="closeDetailsBox()">✕</span>
+              </div>
+            </div>
+            <div class="details-content" style="text-align:center; padding: 40px;">
+              상세 정보를 불러오지 못했습니다.
+            </div>
+          `;
+        });
     }
 
     function closeDetailsBox() {
