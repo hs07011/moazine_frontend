@@ -335,27 +335,47 @@
     }
     .details-popup {
       display: none;
-      position: fixed; /* 다른 요소들 위에 고정 */
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 90vw;
-      max-width: 600px;
-      max-height: 80vh;
-      background: #fff;
-      border: 3px solid #333;
-      border-radius: 12px;
-      box-shadow: 0 8px 30px #0000004d;
-      font-size: 1.6rem;
-      color: #333;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: white;
+      box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
       z-index: 2000;
-      line-height: 1.7;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      box-sizing: border-box;
+      max-height: 80vh;
       overflow-y: auto;
     }
-    .details-popup-content {
-      padding: 24px;
+    .details-header {
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background: #f9f9f9;
+      border-bottom: 1px solid #eee;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .details-header h2 {
+      margin: 0;
+      font-size: 2.2rem;
+      flex-grow: 1;
+      margin-right: 15px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .details-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-shrink: 0;
+    }
+    .details-content {
+      padding: 0 20px 20px 20px;
     }
     .details-popup .close-btn {
       position: absolute;
@@ -365,7 +385,7 @@
       font-size: 2rem;
       color: #aaa;
       font-weight: bold;
-      z-index: 1; /* 다른 내용 위에 있도록 */
+      z-index: 1;
     }
     .details-popup-header {
       font-size: 2.4rem;
@@ -553,6 +573,7 @@
       width: 100%;
       height: 100%;
       border: none;
+      background: #14516b;
     }
     .directions-btn {
       font-size: 1.6rem;
@@ -568,25 +589,6 @@
     }
     .directions-btn:hover {
       background: #14516b;
-    }
-    .details-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 20px;
-      background: #f9f9f9;
-      border-bottom: 1px solid #eee;
-      position: relative;
-    }
-    .details-header-actions {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      flex-shrink: 0;
-    }
-    .details-header h2 {
-      margin: 0;
-      font-size: 2.2rem;
     }
   </style>
 </head>
@@ -631,18 +633,7 @@
       </div>
     </div>
   </div>
-  <div id="placeDetailsBox" class="details-box">
-    <div class="details-header">
-      <h2 id="detailsName"></h2>
-      <div class="details-header-actions">
-        <button id="detailsDirectionsBtn" class="directions-btn">📍 길안내</button>
-        <span class="close-btn" onclick="closeDetailsBox()">✕</span>
-      </div>
-    </div>
-    <div class="details-content">
-      <div id="detailsInfo" class="info-grid"></div>
-    </div>
-  </div>
+  <div id="placeDetailsBox" class="details-popup" style="display:none;"></div>
   <div id="websitePopup" class="website-popup">
     <div class="website-popup-container">
       <div class="website-popup-header">
@@ -854,97 +845,71 @@
         return;
       }
 
-      const box = document.getElementById('placeDetailsBox');
-      box.innerHTML = `<div style="padding: 40px; text-align:center;">상세 정보를 불러오는 중입니다...</div>`;
-      box.style.display = 'block';
+      const detailsBox = document.getElementById('placeDetailsBox');
 
-      fetch(`${PROXY}/place-details?place_id=${placeId}`)
-        .then(res => res.json())
-        .then(details => {
-          if (details.error) throw new Error(details.error);
-          
-          let contentHtml = `<span class='close-btn' onclick="closeDetailsBox()">✕</span>`;
-          
-          let detailsHtml = `<div class="details-popup-content">`;
-          
-          detailsHtml += `<div class="details-popup-header">`;
-          detailsHtml += `<div class="place-name">${details.name || '이름 정보 없음'}</div>`;
-          // 길안내 버튼 추가
-          if (details.geometry && details.geometry.location) {
-            const destLat = details.geometry.location.lat;
-            const destLng = details.geometry.location.lng;
-            detailsHtml += `<button class="directions-btn" onclick="openDirectionsPopup(${destLat}, ${destLng})">📍 길안내</button>`;
-          }
-          detailsHtml += `</div>`;
+      // Header with title and buttons
+      const headerHtml = `
+        <div class="details-header">
+          <h2>${place.name}</h2>
+          <div class="details-header-actions">
+            <button class="directions-btn" onclick="openDirectionsPopup(${place.geometry.location.lat}, ${place.geometry.location.lng})">📍 길안내</button>
+            <span class="close-btn" onclick="closeDetailsBox()">✕</span>
+          </div>
+        </div>
+      `;
+      
+      // Info items (address, rating, etc.)
+      const infoItems = [];
+      if (place.formatted_address) {
+        infoItems.push(`<div><strong><i class="fas fa-map-marker-alt"></i> 주소</strong></div><div>${place.formatted_address}</div>`);
+      }
+      if (place.rating) {
+        infoItems.push(`<div><strong><i class="fas fa-star"></i> 평점</strong></div><div>${place.rating}점 (${place.user_ratings_total}개)</div>`);
+      }
+      if (place.formatted_phone_number) {
+        infoItems.push(`<div><strong><i class="fas fa-phone"></i> 연락처</strong></div><div>${place.formatted_phone_number}</div>`);
+      }
+      if (place.website) {
+        infoItems.push(`<div><strong><i class="fas fa-globe"></i> 웹사이트</strong></div><div><a href="#" onclick="event.preventDefault(); openWebsitePopup('${place.website}');">방문하기</a></div>`);
+      }
+      const priceLevel = place.price_level;
+      if (priceLevel !== undefined && priceLevel !== null) {
+          const priceStr = '$'.repeat(priceLevel) + ' '.repeat(5 - priceLevel).replace(/ /g, '<span style="color:#eee;">$</span>');
+          infoItems.push(`<div><strong><i class="fas fa-dollar-sign"></i> 가격대</strong></div><div>${priceStr}</div>`);
+      }
 
-          const detailsContent = [
-            { icon: '📍', text: '주소', value: details.formatted_address },
-            { icon: '⭐', text: '평점', value: details.rating ? `${details.rating.toFixed(1)}점` : null },
-            { icon: '📞', text: '연락처', value: details.formatted_phone_number, link: `tel:${details.formatted_phone_number}` },
-            { icon: '💰', text: '가격대', value: details.price_level ? '₩'.repeat(details.price_level) : null },
-            { icon: '🌐', text: '웹사이트', value: details.website, isWebsite: true }
-          ];
+      // Reviews
+      let reviewsHtml = '<p>리뷰 정보가 없습니다.</p>';
+      if (place.reviews && place.reviews.length > 0) {
+        reviewsHtml = place.reviews.map(review => `
+          <div class="review">
+            <div class="review-author">
+              <img src="${review.profile_photo_url}" alt="${review.author_name}" referrerpolicy="no-referrer">
+              <strong>${review.author_name}</strong> 
+              <span class="review-time">(${review.relative_time_description})</span>
+            </div>
+            <p>${review.text}</p>
+          </div>
+        `).join('');
+      }
 
-          detailsContent.forEach(item => {
-            if (item.value) {
-              let valueHtml = item.value;
-              if (item.link) { // 전화번호 링크
-                valueHtml = `<a href="${item.link}">${item.value}</a>`;
-              } else if (item.isWebsite) { // 웹사이트 팝업 링크
-                valueHtml = `<a href="#" onclick="event.preventDefault(); openWebsitePopup('${item.value}');">${item.value}</a>`;
-              }
+      // Content with info and reviews
+      const contentHtml = `
+        <div class="details-content">
+          <div class="info-grid">
+            ${infoItems.join('')}
+          </div>
+          <h3><i class="fas fa-comment-alt"></i> 방문자 리뷰</h3>
+          <div class="reviews">
+            ${reviewsHtml}
+          </div>
+        </div>
+      `;
 
-              detailsHtml += `
-                <div class="detail-item">
-                  <div class="label">
-                    <span class="icon">${item.icon}</span>
-                    <span>${item.text}</span>
-                  </div>
-                  <div class="value">${valueHtml}</div>
-                </div>`;
-            }
-          });
-
-          // 웹사이트가 있는 경우에만 메뉴/입장료 안내 문구 추가
-          if (details.website) {
-            const guidanceText = `자세한 ${type === '맛집' ? '메뉴' : '입장료'} 정보는 위 공식 웹사이트를 확인해주세요.`;
-            detailsHtml += `
-              <div class="detail-item">
-                <div class="label">
-                  <span class="icon">ℹ️</span>
-                  <span>안내</span>
-                </div>
-                <div class="value"><small>${guidanceText}</small></div>
-              </div>`;
-          }
-
-          detailsHtml += '</div>';
-
-          if (details.reviews && details.reviews.length > 0) {
-            detailsHtml += `<div class="reviews-section details-popup-content">`;
-            detailsHtml += `
-              <div class="detail-item">
-                <div class="label" style="color: #217093;">
-                  <span class="icon">🗣️</span>
-                  <span>방문자 리뷰</span>
-                </div>
-              </div>`;
-            details.reviews.slice(0, 2).forEach(review => {
-              detailsHtml += `<div class="review">
-                <div><span class="review-author">${review.author_name}</span> (${review.relative_time_description})</div>
-                <p style="margin: 5px 0 0; white-space: pre-wrap;">${review.text}</p>
-              </div>`;
-            });
-            detailsHtml += `</div>`;
-          }
-          
-          box.innerHTML = contentHtml + detailsHtml;
-        })
-        .catch(err => {
-          console.error('Failed to get place details:', err);
-          box.innerHTML = `<span class='close-btn' onclick="closeDetailsBox()">✕</span><div style="padding: 40px; text-align:center;">상세 정보를 불러오지 못했습니다.</div>`;
-        });
-    };
+      detailsBox.innerHTML = headerHtml + contentHtml;
+      detailsBox.style.display = 'block';
+      detailsBox.scrollTop = 0; // Ensure popup starts at the top
+    }
 
     function closeDetailsBox() {
       document.getElementById('placeDetailsBox').style.display = 'none';
