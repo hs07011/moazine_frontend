@@ -373,6 +373,9 @@
       margin-bottom: 16px;
       border-bottom: 2px solid #eee;
       padding-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .details-popup-content .detail-item {
       margin-bottom: 12px;
@@ -483,6 +486,69 @@
       height: 100%;
       border: none;
     }
+    .directions-popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 3000;
+      justify-content: center;
+      align-items: center;
+    }
+    .directions-popup-container {
+      width: 95%;
+      height: 90%;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .directions-popup-header {
+      padding: 10px 15px;
+      background: #f1f1f1;
+      border-bottom: 1px solid #ccc;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    .directions-popup-header .close-btn {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #555;
+      cursor: pointer;
+      background: #ddd;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .directions-popup iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .directions-btn {
+      font-size: 1.6rem;
+      font-weight: bold;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      background: #217093;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .directions-btn:hover {
+      background: #14516b;
+    }
   </style>
 </head>
 <body>
@@ -534,6 +600,14 @@
         <span class="close-btn" onclick="closeWebsitePopup()">✕</span>
       </div>
       <iframe id="websiteIframe" src=""></iframe>
+    </div>
+  </div>
+  <div id="directionsPopup" class="directions-popup">
+    <div class="directions-popup-container">
+      <div class="directions-popup-header">
+        <span class="close-btn" onclick="closeDirectionsPopup()">✕</span>
+      </div>
+      <iframe id="directionsIframe" src=""></iframe>
     </div>
   </div>
   <script>
@@ -737,8 +811,15 @@
           let contentHtml = `<span class='close-btn' onclick="closeDetailsBox()">✕</span>`;
           
           let detailsHtml = `<div class="details-popup-content">`;
-          detailsHtml += `<div class="details-popup-header">${details.name || '이름 정보 없음'}</div>`;
-          
+          detailsHtml += `<div class="details-popup-header">${details.name || '이름 정보 없음'}`;
+          // 길안내 버튼 추가
+          if (details.geometry && details.geometry.location) {
+            const destLat = details.geometry.location.lat;
+            const destLng = details.geometry.location.lng;
+            detailsHtml += `<button class="directions-btn" onclick="openDirectionsPopup(${destLat}, ${destLng})">📍 길안내</button>`;
+          }
+          detailsHtml += `</div>`;
+
           const detailsContent = [
             { icon: '📍', text: '주소', value: details.formatted_address },
             { icon: '⭐', text: '평점', value: details.rating ? `${details.rating.toFixed(1)}점` : null },
@@ -810,6 +891,24 @@
 
     function closeDetailsBox() {
       document.getElementById('placeDetailsBox').style.display = 'none';
+    }
+
+    function openDirectionsPopup(destLat, destLng) {
+      if (!destLatLng) {
+        alert('현재 위치를 알 수 없어 길안내를 시작할 수 없습니다.');
+        return;
+      }
+      const origin = `${destLatLng.lat},${destLatLng.lng}`;
+      const destination = `${destLat},${destLng}`;
+      const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=driving`;
+      
+      document.getElementById('directionsIframe').src = mapsUrl;
+      document.getElementById('directionsPopup').style.display = 'flex';
+    }
+
+    function closeDirectionsPopup() {
+      document.getElementById('directionsIframe').src = 'about:blank';
+      document.getElementById('directionsPopup').style.display = 'none';
     }
 
     function openWebsitePopup(url) {
