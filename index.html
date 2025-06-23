@@ -338,8 +338,8 @@
       position: fixed;
       top: 20px;
       left: 20px;
-      width: 45vw;
-      max-width: 550px;
+      width: 42vw;
+      max-width: 525px;
       background: white;
       box-shadow: 0 5px 20px rgba(0,0,0,0.25);
       z-index: 2000;
@@ -348,6 +348,12 @@
       max-height: 80vh;
       overflow-y: auto;
       font-size: clamp(1.4rem, 1.5vw, 1.7rem);
+      flex-grow: 1;
+      margin-right: 15px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
     }
     .details-header {
       display: flex;
@@ -368,6 +374,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      min-width: 0;
     }
     .details-header-actions {
       display: flex;
@@ -882,7 +889,11 @@
             infoItems.push(`<div><strong><i class="fas fa-map-marker-alt"></i> 주소</strong></div><div>${place.formatted_address}</div>`);
           }
           if (place.rating) {
-            infoItems.push(`<div><strong><i class="fas fa-star"></i> 평점</strong></div><div>${place.rating}점 (${place.user_ratings_total}개)</div>`);
+            let ratingText = `${place.rating}점`;
+            if (place.user_ratings_total) {
+              ratingText += ` (${place.user_ratings_total}개)`;
+            }
+            infoItems.push(`<div><strong><i class="fas fa-star"></i> 평점</strong></div><div>${ratingText}</div>`);
           }
           if (place.formatted_phone_number) {
             infoItems.push(`<div><strong><i class="fas fa-phone"></i> 연락처</strong></div><div><a href="tel:${place.formatted_phone_number}">${place.formatted_phone_number}</a></div>`);
