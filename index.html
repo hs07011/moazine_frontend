@@ -869,15 +869,22 @@
             infoItems.push(`<div><strong><i class="fas fa-star"></i> 평점</strong></div><div>${place.rating}점 (${place.user_ratings_total}개)</div>`);
           }
           if (place.formatted_phone_number) {
-            infoItems.push(`<div><strong><i class="fas fa-phone"></i> 연락처</strong></div><div>${place.formatted_phone_number}</div>`);
+            infoItems.push(`<div><strong><i class="fas fa-phone"></i> 연락처</strong></div><div><a href="tel:${place.formatted_phone_number}">${place.formatted_phone_number}</a></div>`);
           }
           if (place.website) {
-            infoItems.push(`<div><strong><i class="fas fa-globe"></i> 웹사이트</strong></div><div><a href="#" onclick="event.preventDefault(); openWebsitePopup('${place.website}');">방문하기</a></div>`);
+            infoItems.push(`<div><strong><i class="fas fa-globe"></i> 웹사이트</strong></div><div><a href="#" onclick="event.preventDefault(); openWebsitePopup('${place.website}');">공식 웹사이트 방문</a></div>`);
           }
           const priceLevel = place.price_level;
           if (priceLevel !== undefined && priceLevel !== null) {
               const priceStr = '$'.repeat(priceLevel) + ' '.repeat(5 - priceLevel).replace(/ /g, '<span style="color:#eee;">$</span>');
               infoItems.push(`<div><strong><i class="fas fa-dollar-sign"></i> 가격대</strong></div><div>${priceStr}</div>`);
+          }
+          
+          if (place.website) {
+            const guidanceText = type === 'restaurants' 
+              ? '자세한 메뉴 정보는 공식 웹사이트에서 확인해주세요.' 
+              : '자세한 입장료 정보는 공식 웹사이트에서 확인해주세요.';
+            infoItems.push(`<div><strong><i class="fas fa-info-circle"></i> 안내</strong></div><div><small>${guidanceText}</small></div>`);
           }
 
           // Reviews
