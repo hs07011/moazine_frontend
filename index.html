@@ -333,6 +333,93 @@
         line-height: 1.6;
       }
     }
+    .details-popup {
+      display: none;
+      position: fixed; /* 다른 요소들 위에 고정 */
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90vw;
+      max-width: 600px;
+      max-height: 80vh;
+      background: #fff;
+      border: 3px solid #333;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px #0000004d;
+      font-size: 1.6rem;
+      color: #333;
+      z-index: 2000;
+      line-height: 1.7;
+      overflow-y: auto;
+    }
+    .details-popup-content {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+    }
+    .details-popup .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      cursor: pointer;
+      font-size: 2rem;
+      color: #aaa;
+      font-weight: bold;
+    }
+    .details-popup-header {
+      font-size: 2.4rem;
+      font-weight: bold;
+      color: #217093;
+      margin-bottom: 16px;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 12px;
+    }
+    .details-popup-content .detail-item {
+      margin-bottom: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .details-popup-content .detail-item .label {
+      font-weight: bold;
+      width: 80px;
+      flex-shrink: 0;
+      color: #555;
+    }
+    .details-popup-content .detail-item .value {
+      flex-grow: 1;
+      word-break: break-all;
+    }
+    .details-popup-content .detail-item .value a {
+      color: #1a0dab;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .details-popup-content .detail-item .value a:hover {
+      text-decoration: underline;
+    }
+    .details-popup .reviews-section {
+      margin-top: 20px;
+      border-top: 2px solid #eee;
+      padding-top: 15px;
+    }
+    .details-popup .reviews-section .review {
+      margin-bottom: 15px;
+      font-size: 1.4rem;
+      line-height: 1.6;
+    }
+    .details-popup .reviews-section .review-author {
+      font-weight: bold;
+      color: #217093;
+    }
+    @media (max-width: 600px) {
+      .details-popup {
+        font-size: 1.4rem;
+      }
+      .details-popup-header {
+        font-size: 2rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -376,6 +463,7 @@
       </div>
     </div>
   </div>
+  <div id="placeDetailsBox" class="details-popup" style="display:none;"></div>
   <script>
     const PROXY = 'https://moazine.onrender.com';
     let map, marker, destLatLng, attractions = [], restaurants = [];
@@ -542,7 +630,7 @@
       } else {
         // 데이터가 있을 때 모든 항목 표시 (5개 이상이어도 모두 표시)
         html = list.map((item, i) =>
-          `<tr class="clickable" onclick="showPlaceInfo('${type}', ${i})">
+          `<tr class="clickable" onclick="showPlaceInfo('${type}', '${item.place_id}')">
             <td style="width:36px;text-align:center;">${i+1}.</td>
             <td>${item.name}</td>
             <td class="score">${item.rating ? item.rating.toFixed(1) + '점' : '-'}</td>
@@ -559,25 +647,64 @@
       tbody.innerHTML = html;
     }
 
-    window.showPlaceInfo = function(type, idx) {
-      const place = type === '관광지' ? attractions[idx] : restaurants[idx];
-      if (!place || !place.geometry || !place.geometry.location) {
+    window.showPlaceInfo = function(type, placeId) {
+      if (!placeId) {
         alert('장소 정보를 가져올 수 없습니다.');
         return;
       }
 
-      const name = place.name;
-      const addr = place.vicinity || place.formatted_address || '';
-      const rating = place.rating ? `평점: ${place.rating.toFixed(1)}점` : '평점 정보 없음';
-      
-      const infoText = `${name}\n${addr}\n${rating}\n\n이 장소로 길안내를 시작할까요?`;
+      const box = document.getElementById('placeDetailsBox');
+      box.innerHTML = `<div style="padding: 40px; text-align:center;">상세 정보를 불러오는 중입니다...</div>`;
+      box.style.display = 'block';
 
-      if (confirm(infoText)) {
-        const destination = `${place.geometry.location.lat},${place.geometry.location.lng}`;
-        const origin = `${destLatLng.lat},${destLatLng.lng}`;
-        const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=driving`;
-        window.open(mapsUrl, '_blank');
-      }
+      fetch(`${PROXY}/place-details?place_id=${placeId}`)
+        .then(res => res.json())
+        .then(details => {
+          if (details.error) throw new Error(details.error);
+          
+          let contentHtml = `<span class='close-btn' onclick="closeDetailsBox()">✕</span>`;
+          
+          let detailsHtml = `<div class="details-popup-content">`;
+          detailsHtml += `<div class="details-popup-header">${details.name || '이름 정보 없음'}</div>`;
+          
+          const detailsContent = [
+            { label: '📍 주소', value: details.formatted_address },
+            { label: '⭐ 평점', value: details.rating ? `${details.rating.toFixed(1)}점` : null },
+            { label: '📞 연락처', value: details.formatted_phone_number, link: `tel:${details.formatted_phone_number}` },
+            { label: '💰 가격대', value: details.price_level ? '₩'.repeat(details.price_level) : null },
+            { label: '🌐 웹사이트', value: '공식 웹사이트 방문', link: details.website, guidance: `자세한 ${type === '맛집' ? '메뉴' : '입장료'} 정보는 공식 웹사이트를 확인해주세요.` }
+          ];
+
+          detailsContent.forEach(item => {
+            if (item.value) {
+              detailsHtml += `<div class="detail-item"><span class="label">${item.label}</span><span class="value">${item.link ? `<a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.value}</a>` : item.value}${item.guidance ? `<br><small>${item.guidance}</small>` : ''}</span></div>`;
+            }
+          });
+
+          detailsHtml += '</div>';
+
+          if (details.reviews && details.reviews.length > 0) {
+            detailsHtml += `<div class="reviews-section details-popup-content">`;
+            detailsHtml += `<div class="detail-item"><span class="label" style="font-weight: bold; color: #217093;">🗣️ 방문자 리뷰</span></div>`;
+            details.reviews.slice(0, 2).forEach(review => {
+              detailsHtml += `<div class="review">
+                <div><span class="review-author">${review.author_name}</span> (${review.relative_time_description})</div>
+                <p style="margin: 5px 0 0; white-space: pre-wrap;">${review.text}</p>
+              </div>`;
+            });
+            detailsHtml += `</div>`;
+          }
+          
+          box.innerHTML = contentHtml + detailsHtml;
+        })
+        .catch(err => {
+          console.error('Failed to get place details:', err);
+          box.innerHTML = `<span class='close-btn' onclick="closeDetailsBox()">✕</span><div style="padding: 40px; text-align:center;">상세 정보를 불러오지 못했습니다.</div>`;
+        });
+    };
+
+    function closeDetailsBox() {
+      document.getElementById('placeDetailsBox').style.display = 'none';
     }
 
     // 요약 정보 보기 버튼 이벤트
