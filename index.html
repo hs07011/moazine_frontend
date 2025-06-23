@@ -385,10 +385,11 @@
       width: 80px;
       flex-shrink: 0;
       color: #555;
+      white-space: nowrap;
     }
     .details-popup-content .detail-item .value {
       flex-grow: 1;
-      word-break: break-all;
+      overflow-wrap: break-word;
     }
     .details-popup-content .detail-item .value a {
       color: #1a0dab;
@@ -672,14 +673,20 @@
             { label: '⭐ 평점', value: details.rating ? `${details.rating.toFixed(1)}점` : null },
             { label: '📞 연락처', value: details.formatted_phone_number, link: `tel:${details.formatted_phone_number}` },
             { label: '💰 가격대', value: details.price_level ? '₩'.repeat(details.price_level) : null },
-            { label: '🌐 웹사이트', value: '공식 웹사이트 방문', link: details.website, guidance: `자세한 ${type === '맛집' ? '메뉴' : '입장료'} 정보는 공식 웹사이트를 확인해주세요.` }
+            { label: '🌐 웹사이트', value: details.website, link: details.website }
           ];
 
           detailsContent.forEach(item => {
             if (item.value) {
-              detailsHtml += `<div class="detail-item"><span class="label">${item.label}</span><span class="value">${item.link ? `<a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.value}</a>` : item.value}${item.guidance ? `<br><small>${item.guidance}</small>` : ''}</span></div>`;
+              detailsHtml += `<div class="detail-item"><span class="label">${item.label}</span><span class="value">${item.link ? `<a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.value}</a>` : item.value}</span></div>`;
             }
           });
+
+          // 웹사이트가 있는 경우에만 메뉴/입장료 안내 문구 추가
+          if (details.website) {
+            const guidanceText = `자세한 ${type === '맛집' ? '메뉴' : '입장료'} 정보는 위 공식 웹사이트를 확인해주세요.`;
+            detailsHtml += `<div class="detail-item"><span class="label">ℹ️ 안내</span><span class="value"><small>${guidanceText}</small></span></div>`;
+          }
 
           detailsHtml += '</div>';
 
