@@ -421,6 +421,54 @@
         font-size: 2rem;
       }
     }
+    .website-popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 3000;
+      justify-content: center;
+      align-items: center;
+    }
+    .website-popup-container {
+      width: 95%;
+      height: 90%;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .website-popup-header {
+      padding: 10px 15px;
+      background: #f1f1f1;
+      border-bottom: 1px solid #ccc;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    .website-popup-header .close-btn {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #555;
+      cursor: pointer;
+      background: #ddd;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .website-popup iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
   </style>
 </head>
 <body>
@@ -465,6 +513,14 @@
     </div>
   </div>
   <div id="placeDetailsBox" class="details-popup" style="display:none;"></div>
+  <div id="websitePopup" class="website-popup">
+    <div class="website-popup-container">
+      <div class="website-popup-header">
+        <span class="close-btn" onclick="closeWebsitePopup()">✕</span>
+      </div>
+      <iframe id="websiteIframe" src=""></iframe>
+    </div>
+  </div>
   <script>
     const PROXY = 'https://moazine.onrender.com';
     let map, marker, destLatLng, attractions = [], restaurants = [];
@@ -673,18 +729,25 @@
             { icon: '⭐', text: '평점', value: details.rating ? `${details.rating.toFixed(1)}점` : null },
             { icon: '📞', text: '연락처', value: details.formatted_phone_number, link: `tel:${details.formatted_phone_number}` },
             { icon: '💰', text: '가격대', value: details.price_level ? '₩'.repeat(details.price_level) : null },
-            { icon: '🌐', text: '웹사이트', value: details.website, link: details.website }
+            { icon: '🌐', text: '웹사이트', value: details.website, isWebsite: true }
           ];
 
           detailsContent.forEach(item => {
             if (item.value) {
+              let valueHtml = item.value;
+              if (item.link) { // 전화번호 링크
+                valueHtml = `<a href="${item.link}">${item.value}</a>`;
+              } else if (item.isWebsite) { // 웹사이트 팝업 링크
+                valueHtml = `<a href="#" onclick="event.preventDefault(); openWebsitePopup('${item.value}');">${item.value}</a>`;
+              }
+
               detailsHtml += `
                 <div class="detail-item">
                   <div class="label">
                     <span class="icon">${item.icon}</span>
                     <span>${item.text}</span>
                   </div>
-                  <div class="value">${item.link ? `<a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.value}</a>` : item.value}</div>
+                  <div class="value">${valueHtml}</div>
                 </div>`;
             }
           });
@@ -732,6 +795,21 @@
 
     function closeDetailsBox() {
       document.getElementById('placeDetailsBox').style.display = 'none';
+    }
+
+    function openWebsitePopup(url) {
+      // 일부 웹사이트는 http/https가 없으면 iframe에서 열리지 않으므로 추가
+      let fullUrl = url;
+      if (!/^https?:\/\//i.test(url)) {
+        fullUrl = 'https://' + url;
+      }
+      document.getElementById('websiteIframe').src = fullUrl;
+      document.getElementById('websitePopup').style.display = 'flex';
+    }
+
+    function closeWebsitePopup() {
+      document.getElementById('websiteIframe').src = 'about:blank'; // iframe 내용 비우기
+      document.getElementById('websitePopup').style.display = 'none';
     }
 
     // 요약 정보 보기 버튼 이벤트
