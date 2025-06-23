@@ -347,7 +347,7 @@
       box-sizing: border-box;
       max-height: 80vh;
       overflow-y: auto;
-      font-size: clamp(1.8rem, 2vw, 2.2rem);
+      font-size: clamp(1.4rem, 1.5vw, 1.7rem);
     }
     .details-header {
       display: flex;
@@ -362,7 +362,7 @@
     }
     .details-header h2 {
       margin: 0;
-      font-size: clamp(2.2rem, 2.5vw, 2.8rem);
+      font-size: clamp(1.7rem, 1.9vw, 2.1rem);
       flex-grow: 1;
       margin-right: 15px;
       overflow: hidden;
@@ -372,8 +372,23 @@
     .details-header-actions {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 10px;
       flex-shrink: 0;
+    }
+    .details-header-actions .close-btn {
+      font-size: 1.6rem;
+      font-weight: bold;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      background-color: #6c757d;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      white-space: nowrap;
+    }
+    .details-header-actions .close-btn:hover {
+      background-color: #5a6268;
     }
     .details-content {
       padding: 0 20px 20px 20px;
@@ -856,7 +871,7 @@
               <h2>${place.name}</h2>
               <div class="details-header-actions">
                 <button class="directions-btn" onclick="openDirectionsPopup(${place.geometry.location.lat}, ${place.geometry.location.lng})">📍 길안내</button>
-                <span class="close-btn" onclick="closeDetailsBox()">✕</span>
+                <button class="close-btn" onclick="closeDetailsBox()">닫힘</button>
               </div>
             </div>
           `;
@@ -926,7 +941,7 @@
             <div class="details-header">
               <h2>오류</h2>
               <div class="details-header-actions">
-                <span class="close-btn" onclick="closeDetailsBox()">✕</span>
+                <button class="close-btn" onclick="closeDetailsBox()">닫힘</button>
               </div>
             </div>
             <div class="details-content" style="text-align:center; padding: 40px;">
