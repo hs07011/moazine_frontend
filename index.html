@@ -341,11 +341,17 @@
       width: 63vw;
       max-width: 790px;
       height: auto;
-      pointer-events: none; /* 내부 팝업만 클릭 가능하게 */
     }
     .details-popup {
-      position: relative;
-      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      background: white;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+      border-radius: 20px;
+      box-sizing: border-box;
+      max-height: 80vh;
+      font-size: clamp(1.4rem, 1.5vw, 1.7rem);
+      overflow: hidden;
     }
     .popup-outer-close-btn {
       position: absolute;
@@ -675,8 +681,8 @@
     </div>
   </div>
   <div class="details-popup-wrapper" id="detailsPopupWrapper" style="display:none;">
-    <span class="popup-outer-close-btn" onclick="closeDetailsBox()">✕</span>
     <div id="placeDetailsBox" class="details-popup"></div>
+    <span class="popup-outer-close-btn" onclick="closeDetailsBox()">✕</span>
   </div>
   <div id="websitePopup" class="website-popup">
     <div class="website-popup-container">
