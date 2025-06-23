@@ -910,30 +910,35 @@
       })
       .then(res => res.json())
       .then(data => {
-        const introText = data.intro.replace(/\n/g, '<br>'); // 줄바꿈을 <br>로
-        const guideTextElement = box.querySelector('.guide-text');
-        if (guideTextElement) {
-          guideTextElement.innerHTML = introText;
-        }
+        // 응답이 왔을 때, 팝업이 여전히 열려있는지 확인
+        if (box.style.display !== 'none') {
+          const introText = data.intro.replace(/\n/g, '<br>'); // 줄바꿈을 <br>로
+          const guideTextElement = box.querySelector('.guide-text');
+          if (guideTextElement) {
+            guideTextElement.innerHTML = introText;
+          }
 
-        // 음성 출력
-        if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-          const speechText = getDestinationSpeechText(introText);
-          const utter = new SpeechSynthesisUtterance(speechText);
-          utter.lang = 'ko-KR';
-          utter.rate = 1.0;
-          utter.pitch = 1.0;
-          const koVoice = speechVoices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
-          if (koVoice) utter.voice = koVoice;
-          window.speechSynthesis.speak(utter);
+          // 음성 출력
+          if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const speechText = getDestinationSpeechText(introText);
+            const utter = new SpeechSynthesisUtterance(speechText);
+            utter.lang = 'ko-KR';
+            utter.rate = 1.0;
+            utter.pitch = 1.0;
+            const koVoice = speechVoices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
+            if (koVoice) utter.voice = koVoice;
+            window.speechSynthesis.speak(utter);
+          }
         }
       })
       .catch(err => {
         console.error('Failed to get destination intro:', err);
-        const guideTextElement = box.querySelector('.guide-text');
-        if (guideTextElement) {
-          guideTextElement.innerHTML = '가이드 정보 생성에 실패했습니다. 다시 시도해 주세요.';
+        if (box.style.display !== 'none') {
+          const guideTextElement = box.querySelector('.guide-text');
+          if (guideTextElement) {
+            guideTextElement.innerHTML = '가이드 정보 생성에 실패했습니다. 다시 시도해 주세요.';
+          }
         }
       });
     }
