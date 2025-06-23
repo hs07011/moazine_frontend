@@ -347,6 +347,7 @@
       box-sizing: border-box;
       max-height: 80vh;
       overflow-y: auto;
+      overflow-x: auto;
       font-size: clamp(1.4rem, 1.5vw, 1.7rem);
       flex-grow: 1;
       margin-right: 15px;
@@ -384,19 +385,16 @@
       flex-shrink: 0;
     }
     .details-header-actions .close-btn {
-      font-size: 1.6rem;
-      font-weight: bold;
-      padding: 8px 16px;
-      border-radius: 8px;
-      border: none;
-      background-color: #6c757d;
-      color: white;
+      font-size: 2.8rem;
+      font-weight: 300;
+      color: #999;
       cursor: pointer;
-      transition: background-color 0.2s;
-      white-space: nowrap;
+      line-height: 1;
+      padding: 0 5px;
+      transition: color 0.2s;
     }
     .details-header-actions .close-btn:hover {
-      background-color: #5a6268;
+      color: #333;
     }
     .details-content {
       padding: 0 20px 20px 20px;
@@ -876,10 +874,10 @@
           // Header with title and buttons
           const headerHtml = `
             <div class="details-header">
-              <h2 style="font-weight: bold; flex-grow: 1; margin-right: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;">${place.name}</h2>
+              <h2>${place.name}</h2>
               <div class="details-header-actions">
                 <button class="directions-btn" onclick="openDirectionsPopup(${place.geometry.location.lat}, ${place.geometry.location.lng})">📍 길안내</button>
-                <button class="close-btn" onclick="closeDetailsBox()">닫힘</button>
+                <span class="close-btn" onclick="closeDetailsBox()">✕</span>
               </div>
             </div>
           `;
@@ -953,7 +951,7 @@
             <div class="details-header">
               <h2>오류</h2>
               <div class="details-header-actions">
-                <button class="close-btn" onclick="closeDetailsBox()">닫힘</button>
+                <span class="close-btn" onclick="closeDetailsBox()">✕</span>
               </div>
             </div>
             <div class="details-content" style="text-align:center; padding: 40px;">
