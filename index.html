@@ -569,6 +569,25 @@
     .directions-btn:hover {
       background: #14516b;
     }
+    .details-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background: #f9f9f9;
+      border-bottom: 1px solid #eee;
+      position: relative;
+    }
+    .details-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-shrink: 0;
+    }
+    .details-header h2 {
+      margin: 0;
+      font-size: 2.2rem;
+    }
   </style>
 </head>
 <body>
@@ -612,7 +631,18 @@
       </div>
     </div>
   </div>
-  <div id="placeDetailsBox" class="details-popup" style="display:none;"></div>
+  <div id="placeDetailsBox" class="details-box">
+    <div class="details-header">
+      <h2 id="detailsName"></h2>
+      <div class="details-header-actions">
+        <button id="detailsDirectionsBtn" class="directions-btn">📍 길안내</button>
+        <span class="close-btn" onclick="closeDetailsBox()">✕</span>
+      </div>
+    </div>
+    <div class="details-content">
+      <div id="detailsInfo" class="info-grid"></div>
+    </div>
+  </div>
   <div id="websitePopup" class="website-popup">
     <div class="website-popup-container">
       <div class="website-popup-header">
