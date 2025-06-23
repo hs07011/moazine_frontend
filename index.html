@@ -910,8 +910,8 @@
       }
       const origin = `${originLatLng.lat},${originLatLng.lng}`;
       const destination = `${destLat},${destLng}`;
-      // 임베딩 전용 URL로 변경
-      const mapsUrl = `https://www.google.com/maps/embed/v1/directions?key=${GOOGLE_MAPS_API_KEY}&origin=${origin}&destination=${destination}&mode=driving`;
+      // 임베딩 전용 URL에서 불필요한 파라미터 제거
+      const mapsUrl = `https://www.google.com/maps/embed/v1/directions?key=${GOOGLE_MAPS_API_KEY}&origin=${origin}&destination=${destination}`;
       
       document.getElementById('directionsIframe').src = mapsUrl;
       document.getElementById('directionsPopup').style.display = 'flex';
