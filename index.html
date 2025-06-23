@@ -376,21 +376,19 @@
     }
     .details-popup-content .detail-item {
       margin-bottom: 12px;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      align-items: center;
+      gap: 15px;
     }
     .details-popup-content .detail-item .label {
       display: flex;
       align-items: center;
       gap: 8px;
       font-weight: bold;
-      width: 90px;
-      flex-shrink: 0;
       color: #555;
     }
     .details-popup-content .detail-item .value {
-      flex-grow: 1;
       overflow-wrap: break-word;
     }
     .details-popup-content .detail-item .value a {
