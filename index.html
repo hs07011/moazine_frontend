@@ -29,12 +29,40 @@
       flex-shrink: 0;
       white-space: nowrap;
     }
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
     .search-bar {
       display: flex;
       align-items: center;
       gap: 12px;
       margin-top: 0;
       flex: unset;
+    }
+    .schedule-btn {
+      background: #28a745;
+      color: #fff;
+      border: 2px solid #28a745;
+      font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+      font-weight: bold;
+      padding: 12px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    .schedule-btn:hover {
+      background: #fff !important;
+      color: #28a745 !important;
+      border: 2px solid #28a745 !important;
+    }
+    .schedule-btn:disabled {
+      background: #6c757d !important;
+      color: #fff !important;
+      border: 2px solid #6c757d !important;
+      cursor: not-allowed;
     }
     #destination {
       border: none;
@@ -689,16 +717,175 @@
     .directions-btn:hover {
       background: #14516b;
     }
+    .schedule-popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 3000;
+      justify-content: center;
+      align-items: center;
+    }
+    .schedule-popup-container {
+      width: 95%;
+      height: 90%;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .schedule-popup-header {
+      padding: 15px 20px;
+      background: #28a745;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+    .schedule-popup-header h2 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    .schedule-popup-header .close-btn {
+      font-size: 2.4rem;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .schedule-popup-content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    .schedule-map-container {
+      flex: 1;
+      position: relative;
+    }
+    .schedule-map {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .schedule-list-container {
+      width: 400px;
+      background: #f8f9fa;
+      border-left: 1px solid #dee2e6;
+      overflow-y: auto;
+    }
+    .schedule-summary {
+      padding: 20px;
+      background: #fff;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .schedule-summary h3 {
+      margin: 0 0 15px 0;
+      color: #28a745;
+      font-size: 1.8rem;
+    }
+    .schedule-summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 1.4rem;
+    }
+    .schedule-summary-item strong {
+      color: #495057;
+    }
+    .schedule-timeline {
+      padding: 20px;
+    }
+    .schedule-timeline h3 {
+      margin: 0 0 15px 0;
+      color: #495057;
+      font-size: 1.6rem;
+    }
+    .schedule-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .schedule-time {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #28a745;
+      min-width: 60px;
+      margin-right: 15px;
+    }
+    .schedule-item-content {
+      flex: 1;
+    }
+    .schedule-item-name {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #212529;
+      margin-bottom: 5px;
+    }
+    .schedule-item-type {
+      font-size: 1.2rem;
+      color: #6c757d;
+      margin-bottom: 5px;
+    }
+    .schedule-item-description {
+      font-size: 1.3rem;
+      color: #495057;
+    }
+    .schedule-item-rating {
+      font-size: 1.2rem;
+      color: #ffc107;
+      font-weight: bold;
+    }
+    @media (max-width: 768px) {
+      .schedule-popup-content {
+        flex-direction: column;
+      }
+      .schedule-list-container {
+        width: 100%;
+        height: 40%;
+      }
+      .schedule-map-container {
+        height: 60%;
+      }
+      .header-controls {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .schedule-btn {
+        font-size: 1.2rem !important;
+        padding: 8px 16px !important;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="header">
     <h1>Travel Here Service</h1>
-    <div class="search-bar">
-      <input id="destinationInput" type="text" 
-        placeholder="목적지 입력하시면 주변 관광지, 맛집 검색됩니다" 
-        style="color:#888; font-size:2.2rem; padding:18px 28px; height:56px; width:800px; border-radius:10px; border:1.5px solid #bbb; box-sizing:border-box;" />
-      <button id="searchBtn" style="font-size:2.2rem; height:56px; padding:0 48px; border-radius:10px; background:#217093; color:#fff; border:2px solid #217093; font-weight:bold; cursor:pointer; transition:background 0.2s, color 0.2s;">검색</button>
+    <div class="header-controls">
+      <div class="search-bar">
+        <input id="destinationInput" type="text" 
+          placeholder="목적지 입력하시면 주변 관광지, 맛집 검색됩니다" 
+          style="color:#888; font-size:2.2rem; padding:18px 28px; height:56px; width:800px; border-radius:10px; border:1.5px solid #bbb; box-sizing:border-box;" />
+        <button id="searchBtn" style="font-size:2.2rem; height:56px; padding:0 48px; border-radius:10px; background:#217093; color:#fff; border:2px solid #217093; font-weight:bold; cursor:pointer; transition:background 0.2s, color 0.2s;">검색</button>
+      </div>
+      <button class="schedule-btn">여행 스케줄 생성</button>
     </div>
   </div>
   <div class="main">
@@ -756,6 +943,29 @@
       <iframe id="directionsIframe" src=""></iframe>
     </div>
   </div>
+  <div id="schedulePopup" class="schedule-popup">
+    <div class="schedule-popup-container">
+      <div class="schedule-popup-header">
+        <h2>여행 스케줄 생성</h2>
+        <span class="close-btn" onclick="closeSchedulePopup()">✕</span>
+      </div>
+      <div class="schedule-popup-content">
+        <div class="schedule-map-container">
+          <div id="scheduleMap"></div>
+        </div>
+        <div class="schedule-list-container">
+          <div class="schedule-summary">
+            <h3>일정 요약</h3>
+            <div id="scheduleSummary"></div>
+          </div>
+          <div class="schedule-timeline">
+            <h3>일정 상세</h3>
+            <div id="scheduleTimeline"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
     const PROXY = 'https://moazine.onrender.com';
     let map, marker, destLatLng, attractions = [], restaurants = [];
@@ -778,7 +988,7 @@
       const { apiKey } = await response.json();
       GOOGLE_MAPS_API_KEY = apiKey; // API 키를 전역 변수에 저장
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=places,geometry`;
       script.async = true;
       document.head.appendChild(script);
     }
@@ -1043,6 +1253,8 @@
       const origin = `${originLatLng.lat},${originLatLng.lng}`;
       const destination = `${destLat},${destLng}`;
       
+      console.log('Directions API 호출:', { origin, destination });
+      
       // 1. Iframe용 Embed URL
       const embedUrl = `https://www.google.com/maps/embed/v1/directions?key=${GOOGLE_MAPS_API_KEY}&origin=${origin}&destination=${destination}&mode=transit`;
       document.getElementById('directionsIframe').src = embedUrl;
@@ -1230,5 +1442,223 @@
       // 페이지 로드시 입력란 value를 빈 값으로 초기화하여 placeholder가 항상 보이게
       document.getElementById('destinationInput').value = '';
     };
+
+    // 여행 스케줄 생성 버튼 이벤트
+    document.querySelector('.schedule-btn').onclick = function() {
+      generateTravelSchedule();
+    };
+
+    // 여행 스케줄 생성 함수
+    function generateTravelSchedule() {
+      // 목적지가 설정되어 있는지 확인
+      if (!destLatLng) {
+        alert('먼저 목적지를 검색해 주세요.');
+        return;
+      }
+
+      // 관광지와 맛집 데이터가 있는지 확인
+      if ((!attractions || attractions.length === 0) && (!restaurants || restaurants.length === 0)) {
+        alert('관광지나 맛집 정보가 없습니다. 먼저 목적지를 검색해 주세요.');
+        return;
+      }
+
+      // 버튼 비활성화
+      const scheduleBtn = document.querySelector('.schedule-btn');
+      scheduleBtn.disabled = true;
+      scheduleBtn.textContent = '스케줄 생성 중...';
+
+      // 출발지 설정 (현재 위치 또는 목적지)
+      const origin = currentPositionLatLng || destLatLng;
+      const destination = destLatLng;
+
+      // 스케줄 팝업 표시
+      document.getElementById('schedulePopup').style.display = 'flex';
+      document.getElementById('scheduleSummary').innerHTML = '<p>스케줄을 생성하는 중입니다...</p>';
+      document.getElementById('scheduleTimeline').innerHTML = '<p>잠시만 기다려주세요...</p>';
+
+      // 관광지 3개 선택 (평점 높은 순)
+      const topAttractions = (attractions || []).filter(a => a.geometry && a.geometry.location && a.geometry.location.lat && a.geometry.location.lng).slice(0, 3);
+      // 맛집 2개 선택 (평점 높은 순)
+      const topRestaurants = (restaurants || []).filter(r => r.geometry && r.geometry.location && r.geometry.location.lat && r.geometry.location.lng).slice(0, 2);
+
+      // 서버에 스케줄 생성 요청
+      fetch(`${PROXY}/generate-travel-schedule`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          origin: `${origin.lat},${origin.lng}`,
+          destination: `${destination.lat},${destination.lng}`,
+          attractions: topAttractions,
+          restaurants: topRestaurants
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        
+        // 스케줄 표시
+        displayTravelSchedule(data);
+      })
+      .catch(error => {
+        console.error('스케줄 생성 오류:', error);
+        document.getElementById('scheduleSummary').innerHTML = '<p style="color: red;">스케줄 생성에 실패했습니다.</p>';
+        document.getElementById('scheduleTimeline').innerHTML = '<p style="color: red;">다시 시도해 주세요.</p>';
+      })
+      .finally(() => {
+        // 버튼 활성화
+        scheduleBtn.disabled = false;
+        scheduleBtn.textContent = '여행 스케줄 생성';
+      });
+    }
+
+    // 여행 스케줄 표시 함수
+    function displayTravelSchedule(scheduleData) {
+      // 요약 정보 표시
+      const summaryHtml = `
+        <div class="schedule-summary-item">
+          <span>총 소요 시간:</span>
+          <strong>${scheduleData.summary.totalDuration}</strong>
+        </div>
+        <div class="schedule-summary-item">
+          <span>총 이동 거리:</span>
+          <strong>${scheduleData.summary.totalDistance}</strong>
+        </div>
+        <div class="schedule-summary-item">
+          <span>경유지 수:</span>
+          <strong>${scheduleData.summary.waypointsCount}개</strong>
+        </div>
+        <div class="schedule-summary-item">
+          <span>직선 거리:</span>
+          <strong>${scheduleData.summary.baseDistance} (${scheduleData.summary.baseDuration})</strong>
+        </div>
+      `;
+      document.getElementById('scheduleSummary').innerHTML = summaryHtml;
+
+      // 타임라인 표시
+      const timelineHtml = scheduleData.schedule.map(item => {
+        const typeIcon = getTypeIcon(item.item.type);
+        const typeText = getTypeText(item.item.type);
+        const ratingText = item.item.rating ? `⭐ ${item.item.rating}점` : '';
+        
+        return `
+          <div class="schedule-item">
+            <div class="schedule-time">${item.time}</div>
+            <div class="schedule-item-content">
+              <div class="schedule-item-name">${item.item.name}</div>
+              <div class="schedule-item-type">${typeIcon} ${typeText}</div>
+              <div class="schedule-item-description">${item.item.description}</div>
+              ${ratingText ? `<div class="schedule-item-rating">${ratingText}</div>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      document.getElementById('scheduleTimeline').innerHTML = timelineHtml;
+
+      // 스케줄 지도 표시
+      displayScheduleMap(scheduleData);
+    }
+
+    // 타입별 아이콘 반환
+    function getTypeIcon(type) {
+      switch(type) {
+        case 'start': return '🚀';
+        case 'attraction': return '🏛️';
+        case 'restaurant': return '🍽️';
+        case 'destination': return '🎯';
+        default: return '📍';
+      }
+    }
+
+    // 타입별 텍스트 반환
+    function getTypeText(type) {
+      switch(type) {
+        case 'start': return '출발';
+        case 'attraction': return '관광지';
+        case 'restaurant': return '맛집';
+        case 'destination': return '목적지';
+        default: return '장소';
+      }
+    }
+
+    // 스케줄 지도 표시
+    function displayScheduleMap(scheduleData) {
+      // 스케줄 전용 지도 생성
+      const scheduleMap = new google.maps.Map(document.getElementById('scheduleMap'), {
+        zoom: 12,
+        center: destLatLng
+      });
+
+      // 경로 표시
+      if (scheduleData.route.polyline) {
+        const path = google.maps.geometry.encoding.decodePath(scheduleData.route.polyline);
+        new google.maps.Polyline({
+          path: path,
+          geodesic: true,
+          strokeColor: '#28a745',
+          strokeOpacity: 1.0,
+          strokeWeight: 4,
+          map: scheduleMap
+        });
+      }
+
+      // 각 경유지에 마커 표시
+      scheduleData.waypoints.forEach((waypoint, index) => {
+        if (waypoint.location) {
+          const marker = new google.maps.Marker({
+            position: waypoint.location,
+            map: scheduleMap,
+            title: `${index + 1}. ${waypoint.name}`,
+            label: {
+              text: (index + 1).toString(),
+              color: '#fff',
+              fontSize: '14px',
+              fontWeight: 'bold'
+            },
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 12,
+              fillColor: getMarkerColor(waypoint.type),
+              fillOpacity: 1,
+              strokeColor: '#fff',
+              strokeWeight: 2
+            }
+          });
+
+          // 마커 클릭 시 정보창 표시
+          const infoWindow = new google.maps.InfoWindow({
+            content: `
+              <div style="padding: 10px;">
+                <h3 style="margin: 0 0 5px 0; color: #28a745;">${waypoint.name}</h3>
+                <p style="margin: 0; color: #666;">${getTypeText(waypoint.type)}</p>
+                <p style="margin: 5px 0 0 0; color: #333;">${waypoint.description}</p>
+                ${waypoint.rating ? `<p style="margin: 5px 0 0 0; color: #ffc107;">⭐ ${waypoint.rating}점</p>` : ''}
+              </div>
+            `
+          });
+
+          marker.addListener('click', () => {
+            infoWindow.open(scheduleMap, marker);
+          });
+        }
+      });
+    }
+
+    // 마커 색상 반환
+    function getMarkerColor(type) {
+      switch(type) {
+        case 'start': return '#28a745';
+        case 'attraction': return '#007bff';
+        case 'restaurant': return '#fd7e14';
+        case 'destination': return '#dc3545';
+        default: return '#6c757d';
+      }
+    }
+
+    function closeSchedulePopup() {
+      document.getElementById('schedulePopup').style.display = 'none';
+    }
   </script>
 </body>
