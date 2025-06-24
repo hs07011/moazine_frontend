@@ -442,6 +442,7 @@
     <div class="header-search">
       <input id="destination" placeholder="현재 위치 검색 결과" style="color:#888;" />
       <button id="searchBtn">검색</button>
+      <button id="scheduleBtn" style="margin-left:8px;background:#4caf50;color:#fff;font-weight:bold;">여행스케줄 작성</button>
     </div>
   </div>
   <div class="main">
@@ -449,6 +450,7 @@
       <div id="map"></div>
       <div id="summaryBox" class="summary-popup" style="display:none;"></div>
       <div id="destinationIntroBox" class="destination-intro-popup" style="display:none;"></div>
+      <div id="scheduleBox" class="destination-intro-popup" style="display:none;"></div>
     </div>
     <div class="side-tables">
       <div class="table-section attraction-table">
@@ -889,6 +891,57 @@
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
+    }
+
+    document.getElementById('scheduleBtn').onclick = function() {
+      const dest = document.getElementById('destination').value;
+      if (!destLatLng || (!dest && !destLatLng.lat)) {
+        alert('목적지를 먼저 입력하고 검색해 주세요!');
+        return;
+      }
+      if (!attractions.length && !restaurants.length) {
+        alert('주변 관광지와 맛집 정보가 없습니다.');
+        return;
+      }
+      showScheduleBox('여행 스케줄을 생성하는 중입니다...');
+      fetch('https://moazine.onrender.com/generate-schedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          destination: dest || '현재 위치',
+          attractions,
+          restaurants
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        const scheduleText = (data.schedule || '여행 스케줄을 가져오지 못했습니다.').replace(/\n/g, '<br>');
+        showScheduleBox(scheduleText);
+      })
+      .catch(() => showScheduleBox('여행 스케줄을 가져오지 못했습니다.'));
+    };
+
+    function showScheduleBox(text) {
+      const box = document.getElementById('scheduleBox');
+      box.innerHTML = `<span class='close-btn' onclick="closeScheduleBox()">✕</span><div class="title">🗓️ 여행 스케줄</div><div class="guide-text">${text}</div>`;
+      box.style.display = 'block';
+      // 음성 안내
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const speechText = text.replace(/<[^>]*>/g, '').replace(/\n/g, ' ').replace(/\s{2,}/g, ' ').trim();
+        const utter = new SpeechSynthesisUtterance(speechText);
+        utter.lang = 'ko-KR';
+        utter.rate = 1.0;
+        utter.pitch = 1.0;
+        const koVoice = speechVoices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
+        if (koVoice) utter.voice = koVoice;
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    function closeScheduleBox() {
+      document.getElementById('scheduleBox').style.display = 'none';
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     }
 
     // 페이지 로드 시 Google Maps API 로드 시작
