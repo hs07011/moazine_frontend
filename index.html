@@ -894,39 +894,105 @@
     }
 
     document.getElementById('scheduleBtn').onclick = function() {
+      const scheduleBtn = this;
+      const originalText = scheduleBtn.textContent;
+      
+      // 로딩 상태 표시
+      scheduleBtn.textContent = '생성 중...';
+      scheduleBtn.disabled = true;
+      scheduleBtn.style.background = '#ccc';
+      
       const dest = document.getElementById('destination').value;
-      if (!destLatLng || (!dest && !destLatLng.lat)) {
-        alert('목적지를 먼저 입력하고 검색해 주세요!');
+      
+      // 1. 더 구체적인 검증
+      if (!destLatLng) {
+        alert('위치 정보를 가져올 수 없습니다. 페이지를 새로고침하거나 목적지를 다시 검색해 주세요.');
+        resetScheduleBtn();
         return;
       }
+      
       if (!attractions.length && !restaurants.length) {
-        alert('주변 관광지와 맛집 정보가 없습니다.');
+        alert('주변 관광지와 맛집 정보가 없습니다. 다른 위치를 검색해 보세요.');
+        resetScheduleBtn();
         return;
       }
-      showScheduleBox('여행 스케줄을 생성하는 중입니다...');
-      fetch('https://moazine.onrender.com/generate-schedule', {
+      
+      // 2. 로딩 상태 표시 개선
+      showScheduleBox('여행 스케줄을 생성하는 중입니다...<br><small>잠시만 기다려주세요.</small>');
+      
+      // 3. 데이터 준비 및 검증
+      const scheduleData = {
+        destination: dest || '현재 위치',
+        attractions: attractions.slice(0, 5), // 상위 5개만 사용
+        restaurants: restaurants.slice(0, 5),  // 상위 5개만 사용
+        coordinates: destLatLng
+      };
+      
+      // 4. 에러 처리 개선된 API 호출
+      fetch(`${PROXY}/generate-schedule`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          destination: dest || '현재 위치',
-          attractions,
-          restaurants
-        })
+        body: JSON.stringify(scheduleData)
       })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        return res.json();
+      })
       .then(data => {
+        if (data.error) {
+          throw new Error(data.error);
+        }
         const scheduleText = (data.schedule || '여행 스케줄을 가져오지 못했습니다.').replace(/\n/g, '<br>');
         showScheduleBox(scheduleText);
+        resetScheduleBtn();
       })
-      .catch(() => showScheduleBox('여행 스케줄을 가져오지 못했습니다.'));
+      .catch(error => {
+        console.error('Schedule generation error:', error);
+        let errorMessage = '여행 스케줄을 가져오지 못했습니다.';
+        
+        if (error.message.includes('HTTP')) {
+          errorMessage = '서버 연결에 문제가 있습니다. 잠시 후 다시 시도해 주세요.';
+        } else if (error.message.includes('Failed to fetch')) {
+          errorMessage = '인터넷 연결을 확인해 주세요.';
+        }
+        
+        showScheduleBox(errorMessage);
+        resetScheduleBtn();
+      });
+      
+      // 버튼 상태 초기화 함수
+      function resetScheduleBtn() {
+        scheduleBtn.textContent = originalText;
+        scheduleBtn.disabled = false;
+        scheduleBtn.style.background = '#4caf50';
+      }
     };
 
     function showScheduleBox(text) {
       const box = document.getElementById('scheduleBox');
-      box.innerHTML = `<span class='close-btn' onclick="closeScheduleBox()">✕</span><div class="title">🗓️ 여행 스케줄</div><div class="guide-text">${text}</div>`;
+      
+      // 에러 메시지인지 확인
+      const isError = text.includes('실패') || text.includes('문제') || text.includes('연결');
+      
+      let content = `<span class='close-btn' onclick="closeScheduleBox()">✕</span>`;
+      content += `<div class="title">🗓️ 여행 스케줄</div>`;
+      
+      if (isError) {
+        content += `<div class="guide-text" style="color: #d32f2f; text-align: center; padding: 20px;">`;
+        content += `<div style="font-size: 1.2em; margin-bottom: 10px;">⚠️ ${text}</div>`;
+        content += `<button onclick="retryScheduleGeneration()" style="background: #217093; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">다시 시도</button>`;
+        content += `</div>`;
+      } else {
+        content += `<div class="guide-text">${text}</div>`;
+      }
+      
+      box.innerHTML = content;
       box.style.display = 'block';
-      // 음성 안내
-      if ('speechSynthesis' in window) {
+      
+      // 음성 안내 (에러가 아닐 때만)
+      if (!isError && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const speechText = text.replace(/<[^>]*>/g, '').replace(/\n/g, ' ').replace(/\s{2,}/g, ' ').trim();
         const utter = new SpeechSynthesisUtterance(speechText);
@@ -937,6 +1003,11 @@
         if (koVoice) utter.voice = koVoice;
         window.speechSynthesis.speak(utter);
       }
+    }
+
+    // 다시 시도 함수 추가
+    function retryScheduleGeneration() {
+      document.getElementById('scheduleBtn').click();
     }
 
     function closeScheduleBox() {
