@@ -55,18 +55,20 @@
     #searchBtn {
       background: #217093;
       color: #fff;
-      border: none;
+      border: 2px solid #217093;
       font-size: clamp(1.4rem, 2.5vw, 1.8rem);
       font-weight: bold;
       padding: 12px 24px;
       border-radius: 4px;
       margin-left: 10px;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, color 0.2s;
       white-space: nowrap;
     }
     #searchBtn:hover {
-      background: #14516b;
+      background: #fff !important;
+      color: #217093 !important;
+      border: 2px solid #217093 !important;
     }
     .main {
       display: flex;
@@ -645,8 +647,8 @@
     <div class="search-bar" style="display:flex; align-items:center; gap:12px; margin-top:18px;">
       <input id="destinationInput" type="text" 
         placeholder="목적지 입력하시면 주변 관광지, 맛집 검색됩니다" 
-        style="color:#888; font-size:2.2rem; padding:18px 28px; height:56px; width:600px; border-radius:10px; border:1.5px solid #bbb; box-sizing:border-box;" />
-      <button id="searchBtn" style="font-size:2.2rem; height:56px; padding:0 40px; border-radius:10px; background:#217093; color:#fff; border:none; font-weight:bold; cursor:pointer; transition:background 0.2s;">검색</button>
+        style="color:#888; font-size:2.2rem; padding:18px 28px; height:56px; width:800px; border-radius:10px; border:1.5px solid #bbb; box-sizing:border-box;" />
+      <button id="searchBtn" style="font-size:2.2rem; height:56px; padding:0 48px; border-radius:10px; background:#217093; color:#fff; border:2px solid #217093; font-weight:bold; cursor:pointer; transition:background 0.2s, color 0.2s;">검색</button>
     </div>
   </div>
   <div class="main">
@@ -1175,6 +1177,8 @@
     // 페이지 로드 시 Google Maps API 로드 시작
     window.onload = function() {
       loadGoogleMapAPI();
+      // 페이지 로드시 입력란 value를 빈 값으로 초기화하여 placeholder가 항상 보이게
+      document.getElementById('destinationInput').value = '';
     };
   </script>
 </body>
