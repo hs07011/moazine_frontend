@@ -14,55 +14,33 @@
     .header {
       background: #217093;
       color: #fff;
-      border-top-left-radius: 12px;
-      border-top-right-radius: 12px;
-      padding: 18px 18px 18px 18px;
+      padding: clamp(16px, 3vw, 36px) clamp(20px, 5vw, 60px);
       display: flex;
-      flex-direction: row;
       align-items: center;
-      gap: 24px;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
     }
-    .header h1 {
-      margin: 0;
-      font-size: 5.6rem;
-      flex-shrink: 0;
-      white-space: nowrap;
-    }
-    .header-controls {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .search-bar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 0;
-      flex: unset;
-    }
-    .schedule-btn {
-      background: #28a745;
-      color: #fff;
-      border: 2px solid #28a745;
-      font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+    .header-title {
+      font-size: clamp(2.4rem, 5vw, 4.2rem);
       font-weight: bold;
-      padding: 12px 24px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+      letter-spacing: 2px;
+      margin: 0;
       white-space: nowrap;
+      word-break: keep-all;
+      min-width: 0;
     }
-    .schedule-btn:hover {
-      background: #fff !important;
-      color: #28a745 !important;
-      border: 2px solid #28a745 !important;
-    }
-    .schedule-btn:disabled {
-      background: #6c757d !important;
-      color: #fff !important;
-      border: 2px solid #6c757d !important;
-      cursor: not-allowed;
+    .header-search {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border-radius: 4px;
+      padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2vw, 16px);
+      flex-grow: 1;
+      min-width: 0;
+      max-width: 600px;
+      margin: 0;
+      transition: padding 0.2s;
     }
     #destination {
       border: none;
@@ -77,20 +55,18 @@
     #searchBtn {
       background: #217093;
       color: #fff;
-      border: 2px solid #217093;
+      border: none;
       font-size: clamp(1.4rem, 2.5vw, 1.8rem);
       font-weight: bold;
       padding: 12px 24px;
       border-radius: 4px;
       margin-left: 10px;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+      transition: background 0.2s;
       white-space: nowrap;
     }
     #searchBtn:hover {
-      background: #fff !important;
-      color: #217093 !important;
-      border: 2px solid #217093 !important;
+      background: #14516b;
     }
     .main {
       display: flex;
@@ -223,39 +199,9 @@
       .side-tables { max-width: 100vw; }
     }
     @media (max-width: 768px) {
-      .header {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 10px !important;
-        justify-content: flex-start !important;
-      }
-      .header h1 {
-        font-size: 2.2rem !important;
-        text-align: left;
-      }
-      .search-bar {
-        flex-direction: row !important;
-        gap: 8px !important;
-        align-items: center !important;
-        width: 100% !important;
-      }
-      .search-bar input {
-        width: 0 !important;
-        min-width: 0 !important;
-        flex: 1 1 0%;
-        font-size: 1.2rem !important;
-        height: 40px !important;
-        padding: 10px 12px !important;
-      }
-      .search-bar button {
-        font-size: 1.2rem !important;
-        height: 40px !important;
-        padding: 0 16px !important;
-        flex-shrink: 0;
-      }
-      .container {
-        padding: 8px !important;
-      }
+      .header { flex-direction: column; align-items: stretch; }
+      .header-title { text-align: center; white-space: normal; }
+      .header-search { width: auto; max-width: none; }
     }
     @media (max-width: 600px) {
       .main { padding: 4px 1vw 16px 1vw; }
@@ -268,32 +214,6 @@
       .table-section img { width: 1.2rem !important; height: 1.2rem !important; }
       .table-container { max-height: 250px; }
       .table-container::-webkit-scrollbar { width: 4px; }
-      .header h1 {
-        font-size: 2.2rem !important;
-        text-align: left;
-      }
-      .search-bar {
-        flex-direction: row !important;
-        gap: 8px !important;
-        align-items: center !important;
-      }
-      .search-bar input {
-        width: 0 !important;
-        min-width: 0 !important;
-        flex: 1 1 0%;
-        font-size: 1.2rem !important;
-        height: 40px !important;
-        padding: 10px 12px !important;
-      }
-      .search-bar button {
-        font-size: 1.2rem !important;
-        height: 40px !important;
-        padding: 0 16px !important;
-        flex-shrink: 0;
-      }
-      .container {
-        padding: 8px !important;
-      }
     }
     .summary-btn {
       font-size: clamp(1.4rem, 2.2vw, 1.8rem);
@@ -413,96 +333,29 @@
         line-height: 1.6;
       }
     }
-    .details-popup-wrapper {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 2100;
-      width: 63vw;
-      max-width: 790px;
-      height: auto;
-    }
     .details-popup {
+      display: none;
+      position: fixed; /* 다른 요소들 위에 고정 */
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90vw;
+      max-width: 600px;
+      max-height: 80vh;
+      background: #fff;
+      border: 3px solid #333;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px #0000004d;
+      font-size: 1.6rem;
+      color: #333;
+      z-index: 2000;
+      line-height: 1.7;
+      overflow-y: auto;
+    }
+    .details-popup-content {
+      padding: 24px;
       display: flex;
       flex-direction: column;
-      background: white;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.25);
-      border-radius: 20px;
-      box-sizing: border-box;
-      max-height: 80vh;
-      font-size: clamp(1.4rem, 1.5vw, 1.7rem);
-      overflow: hidden;
-    }
-    .popup-outer-close-btn {
-      position: absolute;
-      top: -18px;
-      right: -18px;
-      width: 38px;
-      height: 38px;
-      background: #fff;
-      border: 2px solid #bbb;
-      border-radius: 50%;
-      font-size: 2.2rem;
-      color: #888;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-      z-index: 2200;
-      transition: background 0.2s, color 0.2s;
-    }
-    .popup-outer-close-btn:hover {
-      background: #eee;
-      color: #333;
-    }
-    .details-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 20px;
-      background: #f9f9f9;
-      border-bottom: 1px solid #eee;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      flex-shrink: 0;
-      min-width: 0;
-    }
-    .details-header h2 {
-      margin: 0;
-      font-size: clamp(1.8rem, 2vw, 2.2rem);
-      font-weight: bold;
-      flex-grow: 1;
-      margin-right: 15px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      min-width: 0;
-    }
-    .details-header-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-shrink: 0;
-      position: relative;
-      left: -25px;
-    }
-    .details-header-actions .close-btn {
-      font-size: 2.8rem;
-      font-weight: 300;
-      color: #999;
-      cursor: pointer;
-      line-height: 1;
-      padding: 0 5px;
-      transition: color 0.2s;
-    }
-    .details-header-actions .close-btn:hover {
-      color: #333;
-    }
-    .details-content {
-      padding: 0 20px 20px 20px;
-      overflow: auto;
     }
     .details-popup .close-btn {
       position: absolute;
@@ -512,7 +365,6 @@
       font-size: 2rem;
       color: #aaa;
       font-weight: bold;
-      z-index: 1;
     }
     .details-popup-header {
       font-size: 2.4rem;
@@ -521,14 +373,6 @@
       margin-bottom: 16px;
       border-bottom: 2px solid #eee;
       padding-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
-    }
-    .place-name {
-      overflow-wrap: break-word;
-      word-break: keep-all;
     }
     .details-popup-content .detail-item {
       margin-bottom: 12px;
@@ -577,315 +421,14 @@
         font-size: 2rem;
       }
     }
-    .website-popup {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 3000;
-      justify-content: center;
-      align-items: center;
-    }
-    .website-popup-container {
-      width: 95%;
-      height: 90%;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.4);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .website-popup-header {
-      padding: 10px 15px;
-      background: #f1f1f1;
-      border-bottom: 1px solid #ccc;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
-    }
-    .website-popup-header .open-new-tab-btn {
-      font-size: 1.4rem;
-      padding: 5px 12px;
-      background: #e0e0e0;
-      border-radius: 5px;
-      text-decoration: none;
-      color: #333;
-      font-weight: 500;
-      white-space: nowrap;
-    }
-    .website-popup-header .open-new-tab-btn:hover {
-      background: #d0d0d0;
-    }
-    .website-popup-header .close-btn {
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: #555;
-      cursor: pointer;
-      background: #ddd;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .website-popup iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-    .directions-popup {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 3000;
-      justify-content: center;
-      align-items: center;
-    }
-    .directions-popup-container {
-      width: 95%;
-      height: 90%;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.4);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .directions-popup-header {
-      padding: 10px 15px;
-      background: #f1f1f1;
-      border-bottom: 1px solid #ccc;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
-    }
-    .directions-popup-header .open-new-tab-btn {
-      font-size: 1.4rem;
-      padding: 5px 12px;
-      background: #e0e0e0;
-      border-radius: 5px;
-      text-decoration: none;
-      color: #333;
-      font-weight: 500;
-      white-space: nowrap;
-    }
-    .directions-popup-header .open-new-tab-btn:hover {
-      background: #d0d0d0;
-    }
-    .directions-popup-header .close-btn {
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: #555;
-      cursor: pointer;
-      background: #ddd;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .directions-popup iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: #14516b;
-    }
-    .directions-btn {
-      font-size: 1.6rem;
-      font-weight: bold;
-      padding: 8px 16px;
-      border-radius: 8px;
-      border: none;
-      background: #217093;
-      color: #fff;
-      cursor: pointer;
-      transition: background 0.2s;
-      white-space: nowrap;
-    }
-    .directions-btn:hover {
-      background: #14516b;
-    }
-    .schedule-popup {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 3000;
-      justify-content: center;
-      align-items: center;
-    }
-    .schedule-popup-container {
-      width: 95%;
-      height: 90%;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.4);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .schedule-popup-header {
-      padding: 15px 20px;
-      background: #28a745;
-      color: #fff;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
-    }
-    .schedule-popup-header h2 {
-      margin: 0;
-      font-size: 2rem;
-      font-weight: bold;
-    }
-    .schedule-popup-header .close-btn {
-      font-size: 2.4rem;
-      font-weight: bold;
-      color: #fff;
-      cursor: pointer;
-      background: none;
-      border: none;
-      padding: 0;
-      width: 30px;
-      height: 30px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .schedule-popup-content {
-      flex: 1;
-      display: flex;
-      overflow: hidden;
-    }
-    .schedule-map-container {
-      flex: 1;
-      position: relative;
-    }
-    .schedule-map {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-    .schedule-list-container {
-      width: 400px;
-      background: #f8f9fa;
-      border-left: 1px solid #dee2e6;
-      overflow-y: auto;
-    }
-    .schedule-summary {
-      padding: 20px;
-      background: #fff;
-      border-bottom: 1px solid #dee2e6;
-    }
-    .schedule-summary h3 {
-      margin: 0 0 15px 0;
-      color: #28a745;
-      font-size: 1.8rem;
-    }
-    .schedule-summary-item {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      font-size: 1.4rem;
-    }
-    .schedule-summary-item strong {
-      color: #495057;
-    }
-    .schedule-timeline {
-      padding: 20px;
-    }
-    .schedule-timeline h3 {
-      margin: 0 0 15px 0;
-      color: #495057;
-      font-size: 1.6rem;
-    }
-    .schedule-item {
-      display: flex;
-      align-items: flex-start;
-      margin-bottom: 20px;
-      padding: 15px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .schedule-time {
-      font-size: 1.4rem;
-      font-weight: bold;
-      color: #28a745;
-      min-width: 60px;
-      margin-right: 15px;
-    }
-    .schedule-item-content {
-      flex: 1;
-    }
-    .schedule-item-name {
-      font-size: 1.6rem;
-      font-weight: bold;
-      color: #212529;
-      margin-bottom: 5px;
-    }
-    .schedule-item-type {
-      font-size: 1.2rem;
-      color: #6c757d;
-      margin-bottom: 5px;
-    }
-    .schedule-item-description {
-      font-size: 1.3rem;
-      color: #495057;
-    }
-    .schedule-item-rating {
-      font-size: 1.2rem;
-      color: #ffc107;
-      font-weight: bold;
-    }
-    @media (max-width: 768px) {
-      .schedule-popup-content {
-        flex-direction: column;
-      }
-      .schedule-list-container {
-        width: 100%;
-        height: 40%;
-      }
-      .schedule-map-container {
-        height: 60%;
-      }
-      .header-controls {
-        flex-direction: column;
-        gap: 10px;
-      }
-      .schedule-btn {
-        font-size: 1.2rem !important;
-        padding: 8px 16px !important;
-      }
-    }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>Travel Here Service</h1>
-    <div class="header-controls">
-      <div class="search-bar">
-        <input id="destinationInput" type="text" 
-          placeholder="목적지 입력하시면 주변 관광지, 맛집 검색됩니다" 
-          style="color:#888; font-size:2.2rem; padding:18px 28px; height:56px; width:800px; border-radius:10px; border:1.5px solid #bbb; box-sizing:border-box;" />
-        <button id="searchBtn" style="font-size:2.2rem; height:56px; padding:0 48px; border-radius:10px; background:#217093; color:#fff; border:2px solid #217093; font-weight:bold; cursor:pointer; transition:background 0.2s, color 0.2s;">검색</button>
-      </div>
-      <button class="schedule-btn">여행 스케줄 생성</button>
+    <div class="header-title">주변 관광지 및 맛집 소개 HJM 서비스</div>
+    <div class="header-search">
+      <input id="destination" placeholder="현재 위치 검색 결과" style="color:#888;" />
+      <button id="searchBtn">검색</button>
     </div>
   </div>
   <div class="main">
@@ -921,58 +464,12 @@
       </div>
     </div>
   </div>
-  <div class="details-popup-wrapper" id="detailsPopupWrapper" style="display:none;">
-    <div id="placeDetailsBox" class="details-popup"></div>
-    <span class="popup-outer-close-btn" onclick="closeDetailsBox()">✕</span>
-  </div>
-  <div id="websitePopup" class="website-popup">
-    <div class="website-popup-container">
-      <div class="website-popup-header">
-        <a id="websitePopupLink" class="open-new-tab-btn" href="#" target="_blank" rel="noopener noreferrer">새 탭에서 열기</a>
-        <span class="close-btn" onclick="closeWebsitePopup()">✕</span>
-      </div>
-      <iframe id="websiteIframe" src=""></iframe>
-    </div>
-  </div>
-  <div id="directionsPopup" class="directions-popup">
-    <div class="directions-popup-container">
-      <div class="directions-popup-header">
-        <a id="directionsPopupLink" class="open-new-tab-btn" href="#" target="_blank" rel="noopener noreferrer">새 탭에서 열기</a>
-        <span class="close-btn" onclick="closeDirectionsPopup()">✕</span>
-      </div>
-      <iframe id="directionsIframe" src=""></iframe>
-    </div>
-  </div>
-  <div id="schedulePopup" class="schedule-popup">
-    <div class="schedule-popup-container">
-      <div class="schedule-popup-header">
-        <h2>여행 스케줄 생성</h2>
-        <span class="close-btn" onclick="closeSchedulePopup()">✕</span>
-      </div>
-      <div class="schedule-popup-content">
-        <div class="schedule-map-container">
-          <div id="scheduleMap"></div>
-        </div>
-        <div class="schedule-list-container">
-          <div class="schedule-summary">
-            <h3>일정 요약</h3>
-            <div id="scheduleSummary"></div>
-          </div>
-          <div class="schedule-timeline">
-            <h3>일정 상세</h3>
-            <div id="scheduleTimeline"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div id="placeDetailsBox" class="details-popup" style="display:none;"></div>
   <script>
     const PROXY = 'https://moazine.onrender.com';
     let map, marker, destLatLng, attractions = [], restaurants = [];
     let placeMarkers = [];
     let speechVoices = [];
-    let GOOGLE_MAPS_API_KEY = ''; // API 키를 저장할 변수
-    let currentPositionLatLng = null; // 사용자의 실제 현재 위치 저장
 
     function loadVoices() {
       speechVoices = window.speechSynthesis.getVoices();
@@ -986,9 +483,8 @@
     async function loadGoogleMapAPI() {
       const response = await fetch(`${PROXY}/map-key`);
       const { apiKey } = await response.json();
-      GOOGLE_MAPS_API_KEY = apiKey; // API 키를 전역 변수에 저장
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=places,geometry`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=places`;
       script.async = true;
       document.head.appendChild(script);
     }
@@ -1002,14 +498,13 @@
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
           const lat = pos.coords.latitude, lng = pos.coords.longitude;
-          currentPositionLatLng = { lat, lng }; // 실제 현재 위치 저장
-          destLatLng = { lat, lng }; // 초기 검색 기준 위치 설정
           map.setCenter({ lat, lng });
           if (marker) marker.setMap(null);
           marker = new google.maps.Marker({ position: { lat, lng }, map: map, title: '현재 위치', icon: { url: '/assets/current.png', scaledSize: new google.maps.Size(48, 48) } });
-          document.getElementById('destinationInput').value = '';
-          document.getElementById('destinationInput').placeholder = '현재 위치 검색 결과';
-          document.getElementById('destinationInput').style.color = '#888';
+          destLatLng = { lat, lng };
+          document.getElementById('destination').value = '';
+          document.getElementById('destination').placeholder = '현재 위치 검색 결과';
+          document.getElementById('destination').style.color = '#888';
           loadPlaces(true);
         }, () => {
           // 위치 권한 거부 시 서울 기본
@@ -1020,11 +515,11 @@
       }
     };
 
-    document.getElementById('destinationInput').onfocus = function() {
+    document.getElementById('destination').onfocus = function() {
       this.style.color = '#222';
       if (this.value === '') this.placeholder = '';
     };
-    document.getElementById('destinationInput').onblur = function() {
+    document.getElementById('destination').onblur = function() {
       if (this.value === '') {
         this.placeholder = '현재 위치 검색 결과';
         this.style.color = '#888';
@@ -1032,7 +527,7 @@
     };
 
     document.getElementById('searchBtn').onclick = function() {
-      const dest = document.getElementById('destinationInput').value;
+      const dest = document.getElementById('destination').value;
       if (!dest) return alert('목적지를 입력하세요!');
       fetch(`${PROXY}/geocode?query=${encodeURIComponent(dest)}`)
       .then(res => res.json())
@@ -1044,7 +539,7 @@
           map.setCenter(destLatLng);
           if (marker) marker.setMap(null);
           marker = new google.maps.Marker({ position: destLatLng, map: map, title: '목적지' });
-          document.getElementById('destinationInput').style.color = '#222';
+          document.getElementById('destination').style.color = '#222';
           // 목적지 소개 표시 (Gemini API 호출)
           showDestinationIntro(dest, placeName, destLatLng);
           loadPlaces(false);
@@ -1059,7 +554,7 @@
     };
 
     // 검색창에서 엔터키 입력 시에도 검색 동작
-    document.getElementById('destinationInput').addEventListener('keydown', function(e) {
+    document.getElementById('destination').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         document.getElementById('searchBtn').click();
       }
@@ -1117,9 +612,9 @@
         });
         // 검색창 표시
         if (isCurrentLocation) {
-          document.getElementById('destinationInput').value = '';
-          document.getElementById('destinationInput').placeholder = '현재 위치 검색 결과';
-          document.getElementById('destinationInput').style.color = '#888';
+          document.getElementById('destination').value = '';
+          document.getElementById('destination').placeholder = '현재 위치 검색 결과';
+          document.getElementById('destination').style.color = '#888';
         }
       });
     }
@@ -1136,7 +631,7 @@
       } else {
         // 데이터가 있을 때 모든 항목 표시 (5개 이상이어도 모두 표시)
         html = list.map((item, i) =>
-          `<tr class="clickable" onclick="showPlaceInfo('${item.place_id}', '${type}')">
+          `<tr class="clickable" onclick="showPlaceInfo('${type}', '${item.place_id}')">
             <td style="width:36px;text-align:center;">${i+1}.</td>
             <td>${item.name}</td>
             <td class="score">${item.rating ? item.rating.toFixed(1) + '점' : '-'}</td>
@@ -1153,138 +648,90 @@
       tbody.innerHTML = html;
     }
 
-    function showPlaceInfo(placeId, type) {
-      const wrapper = document.getElementById('detailsPopupWrapper');
-      const detailsBox = document.getElementById('placeDetailsBox');
-      detailsBox.innerHTML = `<div style=\"padding: 40px; text-align:center;\">상세 정보를 불러오는 중입니다...</div>`;
-      wrapper.style.display = 'block';
-      detailsBox.style.display = 'flex';
-
-      fetch(`${PROXY}/place-details?place_id=${placeId}`)
-        .then(res => res.json())
-        .then(place => {
-          if (place.error) throw new Error(place.error);
-
-          // Header with title and buttons
-          const headerHtml = `
-            <div class=\"details-header\">\n              <h2>${place.name}</h2>\n              <div class=\"details-header-actions\">\n                <button class=\"directions-btn\" onclick=\"openDirectionsPopup(${place.geometry.location.lat}, ${place.geometry.location.lng})\">길안내</button>\n              </div>\n            </div>\n          `;
-          
-          // Info items (address, rating, etc.)
-          const infoDivs = [];
-          if (place.formatted_address) {
-            infoDivs.push(`<div><strong>주소:</strong> ${place.formatted_address}</div>`);
-          }
-          if (place.rating) {
-            let ratingText = `${place.rating}점`;
-            if (place.user_ratings_total) {
-              ratingText += ` (${place.user_ratings_total}개)`;
-            }
-            infoDivs.push(`<div><strong>평점:</strong> ${ratingText}</div>`);
-          }
-          if (place.formatted_phone_number) {
-            infoDivs.push(`<div><strong>연락처:</strong> <a href=\"tel:${place.formatted_phone_number}\">${place.formatted_phone_number}</a></div>`);
-          }
-          const priceLevel = place.price_level;
-          if (priceLevel !== undefined && priceLevel !== null) {
-            const priceStr = '$'.repeat(priceLevel) + ' '.repeat(5 - priceLevel).replace(/ /g, '<span style=\"color:#eee;\">$</span>');
-            infoDivs.push(`<div><strong>가격대:</strong> ${priceStr}</div>`);
-          }
-          if (place.website) {
-            infoDivs.push(`<div><strong>웹사이트:</strong> <a href=\"#\" onclick=\"event.preventDefault(); openWebsitePopup('${place.website}');\">방문</a></div>`);
-            const guidanceText = '자세한 정보는 웹사이트 방문하여 확인해 주세요';
-            infoDivs.push(`<div><i class=\"fas fa-info-circle\"></i> <small>${guidanceText}</small></div>`);
-          }
-
-          // Reviews
-          let reviewsHtml = '<p>리뷰 정보가 없습니다.</p>';
-          if (place.reviews && place.reviews.length > 0) {
-            reviewsHtml = place.reviews.map(review => `
-              <div class="review">
-                <div class="review-author">
-                  <strong>${review.author_name}</strong> 
-                  <span class="review-time">(${review.relative_time_description})</span>
-                </div>
-                <p>${review.text}</p>
-              </div>
-            `).join('');
-          }
-
-          // Content with info and reviews
-          const contentHtml = `
-            <div class="details-content">
-              <div class="info-block" style="margin-bottom:18px;">${infoDivs.join('')}</div>
-              <h3><i class="fas fa-comment-alt"></i> 방문자 리뷰</h3>
-              <div class="reviews">
-                ${reviewsHtml}
-              </div>
-            </div>
-          `;
-
-          detailsBox.innerHTML = headerHtml + contentHtml;
-          wrapper.style.display = 'block';
-          detailsBox.style.display = 'flex';
-          
-          const contentScroller = detailsBox.querySelector('.details-content');
-          if (contentScroller) {
-            contentScroller.scrollTop = 0;
-            contentScroller.scrollLeft = 0;
-          }
-        })
-        .catch(err => {
-          console.error('Failed to get place details:', err);
-          detailsBox.innerHTML = `\n            <div class=\"details-header\">\n              <h2>오류</h2>\n              <div class=\"details-header-actions\">\n              </div>\n            </div>\n            <div class=\"details-content\" style=\"text-align:center; padding: 40px;\">\n              상세 정보를 불러오지 못했습니다.\n            </div>\n          `;
-          wrapper.style.display = 'block';
-          detailsBox.style.display = 'flex';
-        });
-    }
-
-    function closeDetailsBox() {
-      document.getElementById('detailsPopupWrapper').style.display = 'none';
-    }
-
-    function openDirectionsPopup(destLat, destLng) {
-      const originLatLng = currentPositionLatLng || destLatLng; // 실제 현재 위치를 우선 사용
-
-      if (!originLatLng) {
-        alert('현재 위치 또는 기준 위치를 알 수 없어 길안내를 시작할 수 없습니다. 위치 권한을 허용했는지 확인해주세요.');
+    window.showPlaceInfo = function(type, placeId) {
+      if (!placeId) {
+        alert('장소 정보를 가져올 수 없습니다.');
         return;
       }
 
-      const origin = `${originLatLng.lat},${originLatLng.lng}`;
-      const destination = `${destLat},${destLng}`;
-      
-      console.log('Directions API 호출:', { origin, destination });
-      
-      // 1. Iframe용 Embed URL
-      const embedUrl = `https://www.google.com/maps/embed/v1/directions?key=${GOOGLE_MAPS_API_KEY}&origin=${origin}&destination=${destination}&mode=transit`;
-      document.getElementById('directionsIframe').src = embedUrl;
+      const box = document.getElementById('placeDetailsBox');
+      box.innerHTML = `<div style="padding: 40px; text-align:center;">상세 정보를 불러오는 중입니다...</div>`;
+      box.style.display = 'block';
 
-      // 2. '새 탭에서 열기'용 공식 URL
-      const officialUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=transit`;
-      document.getElementById('directionsPopupLink').href = officialUrl;
-      
-      document.getElementById('directionsPopup').style.display = 'flex';
-    }
+      fetch(`${PROXY}/place-details?place_id=${placeId}`)
+        .then(res => res.json())
+        .then(details => {
+          if (details.error) throw new Error(details.error);
+          
+          let contentHtml = `<span class='close-btn' onclick="closeDetailsBox()">✕</span>`;
+          
+          let detailsHtml = `<div class="details-popup-content">`;
+          detailsHtml += `<div class="details-popup-header">${details.name || '이름 정보 없음'}</div>`;
+          
+          const detailsContent = [
+            { icon: '📍', text: '주소', value: details.formatted_address },
+            { icon: '⭐', text: '평점', value: details.rating ? `${details.rating.toFixed(1)}점` : null },
+            { icon: '📞', text: '연락처', value: details.formatted_phone_number, link: `tel:${details.formatted_phone_number}` },
+            { icon: '💰', text: '가격대', value: details.price_level ? '₩'.repeat(details.price_level) : null },
+            { icon: '🌐', text: '웹사이트', value: details.website, link: details.website }
+          ];
 
-    function closeDirectionsPopup() {
-      document.getElementById('directionsIframe').src = 'about:blank';
-      document.getElementById('directionsPopup').style.display = 'none';
-    }
+          detailsContent.forEach(item => {
+            if (item.value) {
+              detailsHtml += `
+                <div class="detail-item">
+                  <div class="label">
+                    <span class="icon">${item.icon}</span>
+                    <span>${item.text}</span>
+                  </div>
+                  <div class="value">${item.link ? `<a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.value}</a>` : item.value}</div>
+                </div>`;
+            }
+          });
 
-    function openWebsitePopup(url) {
-      // 일부 웹사이트는 http/https가 없으면 iframe에서 열리지 않으므로 추가
-      let fullUrl = url;
-      if (!/^https?:\/\//i.test(url)) {
-        fullUrl = 'https://' + url;
-      }
-      document.getElementById('websiteIframe').src = fullUrl;
-      document.getElementById('websitePopupLink').href = fullUrl; // '새 탭에서 열기' 버튼의 링크 설정
-      document.getElementById('websitePopup').style.display = 'flex';
-    }
+          // 웹사이트가 있는 경우에만 메뉴/입장료 안내 문구 추가
+          if (details.website) {
+            const guidanceText = `자세한 ${type === '맛집' ? '메뉴' : '입장료'} 정보는 위 공식 웹사이트를 확인해주세요.`;
+            detailsHtml += `
+              <div class="detail-item">
+                <div class="label">
+                  <span class="icon">ℹ️</span>
+                  <span>안내</span>
+                </div>
+                <div class="value"><small>${guidanceText}</small></div>
+              </div>`;
+          }
 
-    function closeWebsitePopup() {
-      document.getElementById('websiteIframe').src = 'about:blank'; // iframe 내용 비우기
-      document.getElementById('websitePopup').style.display = 'none';
+          detailsHtml += '</div>';
+
+          if (details.reviews && details.reviews.length > 0) {
+            detailsHtml += `<div class="reviews-section details-popup-content">`;
+            detailsHtml += `
+              <div class="detail-item">
+                <div class="label" style="color: #217093;">
+                  <span class="icon">🗣️</span>
+                  <span>방문자 리뷰</span>
+                </div>
+              </div>`;
+            details.reviews.slice(0, 2).forEach(review => {
+              detailsHtml += `<div class="review">
+                <div><span class="review-author">${review.author_name}</span> (${review.relative_time_description})</div>
+                <p style="margin: 5px 0 0; white-space: pre-wrap;">${review.text}</p>
+              </div>`;
+            });
+            detailsHtml += `</div>`;
+          }
+          
+          box.innerHTML = contentHtml + detailsHtml;
+        })
+        .catch(err => {
+          console.error('Failed to get place details:', err);
+          box.innerHTML = `<span class='close-btn' onclick="closeDetailsBox()">✕</span><div style="padding: 40px; text-align:center;">상세 정보를 불러오지 못했습니다.</div>`;
+        });
+    };
+
+    function closeDetailsBox() {
+      document.getElementById('placeDetailsBox').style.display = 'none';
     }
 
     // 요약 정보 보기 버튼 이벤트
@@ -1385,35 +832,30 @@
       })
       .then(res => res.json())
       .then(data => {
-        // 응답이 왔을 때, 팝업이 여전히 열려있는지 확인
-        if (box.style.display !== 'none') {
-          const introText = data.intro.replace(/\n/g, '<br>'); // 줄바꿈을 <br>로
-          const guideTextElement = box.querySelector('.guide-text');
-          if (guideTextElement) {
-            guideTextElement.innerHTML = introText;
-          }
+        const introText = data.intro.replace(/\n/g, '<br>'); // 줄바꿈을 <br>로
+        const guideTextElement = box.querySelector('.guide-text');
+        if (guideTextElement) {
+          guideTextElement.innerHTML = introText;
+        }
 
-          // 음성 출력
-          if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const speechText = getDestinationSpeechText(introText);
-            const utter = new SpeechSynthesisUtterance(speechText);
-            utter.lang = 'ko-KR';
-            utter.rate = 1.0;
-            utter.pitch = 1.0;
-            const koVoice = speechVoices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
-            if (koVoice) utter.voice = koVoice;
-            window.speechSynthesis.speak(utter);
-          }
+        // 음성 출력
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const speechText = getDestinationSpeechText(introText);
+          const utter = new SpeechSynthesisUtterance(speechText);
+          utter.lang = 'ko-KR';
+          utter.rate = 1.0;
+          utter.pitch = 1.0;
+          const koVoice = speechVoices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
+          if (koVoice) utter.voice = koVoice;
+          window.speechSynthesis.speak(utter);
         }
       })
       .catch(err => {
         console.error('Failed to get destination intro:', err);
-        if (box.style.display !== 'none') {
-          const guideTextElement = box.querySelector('.guide-text');
-          if (guideTextElement) {
-            guideTextElement.innerHTML = '가이드 정보 생성에 실패했습니다. 다시 시도해 주세요.';
-          }
+        const guideTextElement = box.querySelector('.guide-text');
+        if (guideTextElement) {
+          guideTextElement.innerHTML = '가이드 정보 생성에 실패했습니다. 다시 시도해 주세요.';
         }
       });
     }
@@ -1439,226 +881,6 @@
     // 페이지 로드 시 Google Maps API 로드 시작
     window.onload = function() {
       loadGoogleMapAPI();
-      // 페이지 로드시 입력란 value를 빈 값으로 초기화하여 placeholder가 항상 보이게
-      document.getElementById('destinationInput').value = '';
     };
-
-    // 여행 스케줄 생성 버튼 이벤트
-    document.querySelector('.schedule-btn').onclick = function() {
-      generateTravelSchedule();
-    };
-
-    // 여행 스케줄 생성 함수
-    function generateTravelSchedule() {
-      // 목적지가 설정되어 있는지 확인
-      if (!destLatLng) {
-        alert('먼저 목적지를 검색해 주세요.');
-        return;
-      }
-
-      // 관광지와 맛집 데이터가 있는지 확인
-      if ((!attractions || attractions.length === 0) && (!restaurants || restaurants.length === 0)) {
-        alert('관광지나 맛집 정보가 없습니다. 먼저 목적지를 검색해 주세요.');
-        return;
-      }
-
-      // 버튼 비활성화
-      const scheduleBtn = document.querySelector('.schedule-btn');
-      scheduleBtn.disabled = true;
-      scheduleBtn.textContent = '스케줄 생성 중...';
-
-      // 출발지 설정 (현재 위치 또는 목적지)
-      const origin = currentPositionLatLng || destLatLng;
-      const destination = destLatLng;
-
-      // 스케줄 팝업 표시
-      document.getElementById('schedulePopup').style.display = 'flex';
-      document.getElementById('scheduleSummary').innerHTML = '<p>스케줄을 생성하는 중입니다...</p>';
-      document.getElementById('scheduleTimeline').innerHTML = '<p>잠시만 기다려주세요...</p>';
-
-      // 관광지 3개 선택 (평점 높은 순)
-      const topAttractions = (attractions || []).filter(a => a.geometry && a.geometry.location && a.geometry.location.lat && a.geometry.location.lng).slice(0, 3);
-      // 맛집 2개 선택 (평점 높은 순)
-      const topRestaurants = (restaurants || []).filter(r => r.geometry && r.geometry.location && r.geometry.location.lat && r.geometry.location.lng).slice(0, 2);
-
-      // 서버에 스케줄 생성 요청
-      fetch(`${PROXY}/generate-travel-schedule`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          origin: `${origin.lat},${origin.lng}`,
-          destination: `${destination.lat},${destination.lng}`,
-          attractions: topAttractions,
-          restaurants: topRestaurants
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) {
-          throw new Error(data.error);
-        }
-        
-        // 스케줄 표시
-        displayTravelSchedule(data);
-      })
-      .catch(error => {
-        console.error('스케줄 생성 오류:', error);
-        document.getElementById('scheduleSummary').innerHTML = '<p style="color: red;">스케줄 생성에 실패했습니다.</p>';
-        document.getElementById('scheduleTimeline').innerHTML = '<p style="color: red;">다시 시도해 주세요.</p>';
-      })
-      .finally(() => {
-        // 버튼 활성화
-        scheduleBtn.disabled = false;
-        scheduleBtn.textContent = '여행 스케줄 생성';
-      });
-    }
-
-    // 여행 스케줄 표시 함수
-    function displayTravelSchedule(scheduleData) {
-      // 요약 정보 표시
-      const summaryHtml = `
-        <div class="schedule-summary-item">
-          <span>총 소요 시간:</span>
-          <strong>${scheduleData.summary.totalDuration}</strong>
-        </div>
-        <div class="schedule-summary-item">
-          <span>총 이동 거리:</span>
-          <strong>${scheduleData.summary.totalDistance}</strong>
-        </div>
-        <div class="schedule-summary-item">
-          <span>경유지 수:</span>
-          <strong>${scheduleData.summary.waypointsCount}개</strong>
-        </div>
-        <div class="schedule-summary-item">
-          <span>직선 거리:</span>
-          <strong>${scheduleData.summary.baseDistance} (${scheduleData.summary.baseDuration})</strong>
-        </div>
-      `;
-      document.getElementById('scheduleSummary').innerHTML = summaryHtml;
-
-      // 타임라인 표시
-      const timelineHtml = scheduleData.schedule.map(item => {
-        const typeIcon = getTypeIcon(item.item.type);
-        const typeText = getTypeText(item.item.type);
-        const ratingText = item.item.rating ? `⭐ ${item.item.rating}점` : '';
-        
-        return `
-          <div class="schedule-item">
-            <div class="schedule-time">${item.time}</div>
-            <div class="schedule-item-content">
-              <div class="schedule-item-name">${item.item.name}</div>
-              <div class="schedule-item-type">${typeIcon} ${typeText}</div>
-              <div class="schedule-item-description">${item.item.description}</div>
-              ${ratingText ? `<div class="schedule-item-rating">${ratingText}</div>` : ''}
-            </div>
-          </div>
-        `;
-      }).join('');
-      
-      document.getElementById('scheduleTimeline').innerHTML = timelineHtml;
-
-      // 스케줄 지도 표시
-      displayScheduleMap(scheduleData);
-    }
-
-    // 타입별 아이콘 반환
-    function getTypeIcon(type) {
-      switch(type) {
-        case 'start': return '🚀';
-        case 'attraction': return '🏛️';
-        case 'restaurant': return '🍽️';
-        case 'destination': return '🎯';
-        default: return '📍';
-      }
-    }
-
-    // 타입별 텍스트 반환
-    function getTypeText(type) {
-      switch(type) {
-        case 'start': return '출발';
-        case 'attraction': return '관광지';
-        case 'restaurant': return '맛집';
-        case 'destination': return '목적지';
-        default: return '장소';
-      }
-    }
-
-    // 스케줄 지도 표시
-    function displayScheduleMap(scheduleData) {
-      // 스케줄 전용 지도 생성
-      const scheduleMap = new google.maps.Map(document.getElementById('scheduleMap'), {
-        zoom: 12,
-        center: destLatLng
-      });
-
-      // 경로 표시
-      if (scheduleData.route.polyline) {
-        const path = google.maps.geometry.encoding.decodePath(scheduleData.route.polyline);
-        new google.maps.Polyline({
-          path: path,
-          geodesic: true,
-          strokeColor: '#28a745',
-          strokeOpacity: 1.0,
-          strokeWeight: 4,
-          map: scheduleMap
-        });
-      }
-
-      // 각 경유지에 마커 표시
-      scheduleData.waypoints.forEach((waypoint, index) => {
-        if (waypoint.location) {
-          const marker = new google.maps.Marker({
-            position: waypoint.location,
-            map: scheduleMap,
-            title: `${index + 1}. ${waypoint.name}`,
-            label: {
-              text: (index + 1).toString(),
-              color: '#fff',
-              fontSize: '14px',
-              fontWeight: 'bold'
-            },
-            icon: {
-              path: google.maps.SymbolPath.CIRCLE,
-              scale: 12,
-              fillColor: getMarkerColor(waypoint.type),
-              fillOpacity: 1,
-              strokeColor: '#fff',
-              strokeWeight: 2
-            }
-          });
-
-          // 마커 클릭 시 정보창 표시
-          const infoWindow = new google.maps.InfoWindow({
-            content: `
-              <div style="padding: 10px;">
-                <h3 style="margin: 0 0 5px 0; color: #28a745;">${waypoint.name}</h3>
-                <p style="margin: 0; color: #666;">${getTypeText(waypoint.type)}</p>
-                <p style="margin: 5px 0 0 0; color: #333;">${waypoint.description}</p>
-                ${waypoint.rating ? `<p style="margin: 5px 0 0 0; color: #ffc107;">⭐ ${waypoint.rating}점</p>` : ''}
-              </div>
-            `
-          });
-
-          marker.addListener('click', () => {
-            infoWindow.open(scheduleMap, marker);
-          });
-        }
-      });
-    }
-
-    // 마커 색상 반환
-    function getMarkerColor(type) {
-      switch(type) {
-        case 'start': return '#28a745';
-        case 'attraction': return '#007bff';
-        case 'restaurant': return '#fd7e14';
-        case 'destination': return '#dc3545';
-        default: return '#6c757d';
-      }
-    }
-
-    function closeSchedulePopup() {
-      document.getElementById('schedulePopup').style.display = 'none';
-    }
   </script>
 </body>
