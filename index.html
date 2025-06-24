@@ -645,8 +645,8 @@
     <div class="search-bar" style="display:flex; align-items:center; gap:12px; margin-top:18px;">
       <input id="destinationInput" type="text" 
         placeholder="목적지 입력하시면 주변 관광지, 맛집 검색됩니다" 
-        style="color:#888; font-size:2.2rem; padding:18px 28px; height:56px; width:420px; border-radius:10px; border:1.5px solid #bbb; box-sizing:border-box;" />
-      <button id="searchBtn" style="font-size:2.2rem; height:56px; padding:0 32px; border-radius:10px;">검색</button>
+        style="color:#888; font-size:2.2rem; padding:18px 28px; height:56px; width:600px; border-radius:10px; border:1.5px solid #bbb; box-sizing:border-box;" />
+      <button id="searchBtn" style="font-size:2.2rem; height:56px; padding:0 40px; border-radius:10px; background:#217093; color:#fff; border:none; font-weight:bold; cursor:pointer; transition:background 0.2s;">검색</button>
     </div>
   </div>
   <div class="main">
@@ -910,25 +910,25 @@
           // Info items (address, rating, etc.)
           const infoDivs = [];
           if (place.formatted_address) {
-            infoDivs.push(`<div><strong>주소</strong> ${place.formatted_address}</div>`);
+            infoDivs.push(`<div><strong>주소:</strong> ${place.formatted_address}</div>`);
           }
           if (place.rating) {
             let ratingText = `${place.rating}점`;
             if (place.user_ratings_total) {
               ratingText += ` (${place.user_ratings_total}개)`;
             }
-            infoDivs.push(`<div><strong>평점</strong> ${ratingText}</div>`);
+            infoDivs.push(`<div><strong>평점:</strong> ${ratingText}</div>`);
           }
           if (place.formatted_phone_number) {
-            infoDivs.push(`<div><strong>연락처</strong> <a href="tel:${place.formatted_phone_number}">${place.formatted_phone_number}</a></div>`);
+            infoDivs.push(`<div><strong>연락처:</strong> <a href=\"tel:${place.formatted_phone_number}\">${place.formatted_phone_number}</a></div>`);
           }
           const priceLevel = place.price_level;
           if (priceLevel !== undefined && priceLevel !== null) {
             const priceStr = '$'.repeat(priceLevel) + ' '.repeat(5 - priceLevel).replace(/ /g, '<span style=\"color:#eee;\">$</span>');
-            infoDivs.push(`<div><strong>가격대</strong> ${priceStr}</div>`);
+            infoDivs.push(`<div><strong>가격대:</strong> ${priceStr}</div>`);
           }
           if (place.website) {
-            infoDivs.push(`<div><strong>웹사이트</strong> <a href=\"#\" onclick=\"event.preventDefault(); openWebsitePopup('${place.website}');\">방문</a></div>`);
+            infoDivs.push(`<div><strong>웹사이트:</strong> <a href=\"#\" onclick=\"event.preventDefault(); openWebsitePopup('${place.website}');\">방문</a></div>`);
             const guidanceText = '자세한 정보는 웹사이트 방문하여 확인해 주세요';
             infoDivs.push(`<div><i class=\"fas fa-info-circle\"></i> <small>${guidanceText}</small></div>`);
           }
