@@ -1253,6 +1253,8 @@
       const origin = `${originLatLng.lat},${originLatLng.lng}`;
       const destination = `${destLat},${destLng}`;
       
+      console.log('Directions API 호출:', { origin, destination });
+      
       // 1. Iframe용 Embed URL
       const embedUrl = `https://www.google.com/maps/embed/v1/directions?key=${GOOGLE_MAPS_API_KEY}&origin=${origin}&destination=${destination}&mode=transit`;
       document.getElementById('directionsIframe').src = embedUrl;
@@ -1474,6 +1476,11 @@
       document.getElementById('scheduleSummary').innerHTML = '<p>스케줄을 생성하는 중입니다...</p>';
       document.getElementById('scheduleTimeline').innerHTML = '<p>잠시만 기다려주세요...</p>';
 
+      // 관광지 3개 선택 (평점 높은 순)
+      const topAttractions = (attractions || []).filter(a => a.geometry && a.geometry.location && a.geometry.location.lat && a.geometry.location.lng).slice(0, 3);
+      // 맛집 2개 선택 (평점 높은 순)
+      const topRestaurants = (restaurants || []).filter(r => r.geometry && r.geometry.location && r.geometry.location.lat && r.geometry.location.lng).slice(0, 2);
+
       // 서버에 스케줄 생성 요청
       fetch(`${PROXY}/generate-travel-schedule`, {
         method: 'POST',
@@ -1481,8 +1488,8 @@
         body: JSON.stringify({
           origin: `${origin.lat},${origin.lng}`,
           destination: `${destination.lat},${destination.lng}`,
-          attractions: attractions || [],
-          restaurants: restaurants || []
+          attractions: topAttractions,
+          restaurants: topRestaurants
         })
       })
       .then(res => res.json())
