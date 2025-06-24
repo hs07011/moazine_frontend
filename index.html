@@ -18,30 +18,23 @@
       border-top-right-radius: 12px;
       padding: 18px 18px 18px 18px;
       display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: flex-start;
+      flex-direction: row;
+      align-items: center;
+      gap: 24px;
+      justify-content: flex-start;
     }
-    .header-title {
-      font-size: clamp(2.4rem, 5vw, 4.2rem);
-      font-weight: bold;
-      letter-spacing: 2px;
+    .header h1 {
       margin: 0;
+      font-size: 5.6rem;
+      flex-shrink: 0;
       white-space: nowrap;
-      word-break: keep-all;
-      min-width: 0;
     }
-    .header-search {
+    .search-bar {
       display: flex;
       align-items: center;
-      background: #fff;
-      border-radius: 4px;
-      padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2vw, 16px);
-      flex-grow: 1;
-      min-width: 0;
-      max-width: 600px;
-      margin: 0;
-      transition: padding 0.2s;
+      gap: 12px;
+      margin-top: 0;
+      flex: 1;
     }
     #destination {
       border: none;
@@ -202,9 +195,38 @@
       .side-tables { max-width: 100vw; }
     }
     @media (max-width: 768px) {
-      .header { flex-direction: column; align-items: stretch; }
-      .header-title { text-align: center; white-space: normal; }
-      .header-search { width: auto; max-width: none; }
+      .header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+      }
+      .header h1 {
+        font-size: 2.2rem !important;
+        text-align: left;
+      }
+      .search-bar {
+        flex-direction: row !important;
+        gap: 8px !important;
+        align-items: center !important;
+        width: 100% !important;
+      }
+      .search-bar input {
+        width: 0 !important;
+        min-width: 0 !important;
+        flex: 1 1 0%;
+        font-size: 1.2rem !important;
+        height: 40px !important;
+        padding: 10px 12px !important;
+      }
+      .search-bar button {
+        font-size: 1.2rem !important;
+        height: 40px !important;
+        padding: 0 16px !important;
+        flex-shrink: 0;
+      }
+      .container {
+        padding: 8px !important;
+      }
     }
     @media (max-width: 600px) {
       .main { padding: 4px 1vw 16px 1vw; }
@@ -670,8 +692,8 @@
 </head>
 <body>
   <div class="header">
-    <h1 style="margin:0; font-size:5.6rem;">Travel Here Service</h1>
-    <div class="search-bar" style="display:flex; align-items:center; gap:12px; margin-top:18px;">
+    <h1>Travel Here Service</h1>
+    <div class="search-bar">
       <input id="destinationInput" type="text" 
         placeholder="목적지 입력하시면 주변 관광지, 맛집 검색됩니다" 
         style="color:#888; font-size:2.2rem; padding:18px 28px; height:56px; width:800px; border-radius:10px; border:1.5px solid #bbb; box-sizing:border-box;" />
