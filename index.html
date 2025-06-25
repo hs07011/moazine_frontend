@@ -473,7 +473,7 @@
     .course-block blockquote { border-left: 4px solid #217093; background: #eef6fa; margin: 12px 0; padding: 8px 16px; color: #217093; font-size: 1.1em; }
     .course-block p { margin: 8px 0; }
     .course-intro {
-      font-size: 2.8rem;
+      font-size: 2.1rem;
       font-weight: 900;
       color: #222;
       margin-bottom: 32px;
@@ -492,8 +492,6 @@
       cursor: pointer;
       transition: background 0.2s;
       white-space: nowrap;
-      height: 48px;
-      min-height: 48px;
       box-sizing: border-box;
       display: inline-block;
       vertical-align: middle;
@@ -854,7 +852,7 @@
       // 2. 괄호와 괄호 안의 내용, 그 외 기호를 정리합니다.
       speech = speech
         .replace(/\([^\)]*\)/g, '') // ( ... ) 전체 제거
-        .replace(/[\[\]\-·*=_~^|#@$%&+=→•▪︎🎯🌟🎒✈️👍✅✔💯❣️]/g, ' ') // 음성 출력에 불필요한 특수기호 및 이모지 제거
+        .replace(/[\[\]\-·*=_~^|#@$%&+=→•▪︎🎯🌟🎒✈️👍✅✔��❣️]/g, ' ') // 음성 출력에 불필요한 특수기호 및 이모지 제거
         .replace(/:/g, '은')
         .replace(/\//g, ' 또는 ')
         .replace(/평점/g, '평점은');
