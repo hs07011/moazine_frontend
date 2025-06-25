@@ -318,6 +318,16 @@
       line-height: 1.8;
       text-align: justify;
     }
+    /* 스케줄 팝업 전용 스타일 */
+    #scheduleBox {
+      width: 80% !important;
+      max-width: 1200px !important;
+      min-height: 400px !important;
+      max-height: 85vh !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      padding: 20px !important;
+    }
     @media (max-width: 1000px) {
       .summary-popup {
         width: 96vw;
@@ -344,6 +354,15 @@
       .destination-intro-popup .guide-text {
         font-size: 1.5rem;
         line-height: 1.6;
+      }
+      /* 모바일에서 스케줄 팝업 조정 */
+      #scheduleBox {
+        width: 95vw !important;
+        max-width: 95vw !important;
+        left: 2.5vw !important;
+        transform: none !important;
+        padding: 10px !important;
+        max-height: 80vh !important;
       }
     }
     .details-popup {
@@ -517,15 +536,39 @@
           if (marker) marker.setMap(null);
           marker = new google.maps.Marker({ position: { lat, lng }, map: map, title: '현재 위치', icon: { url: '/assets/current.png', scaledSize: new google.maps.Size(48, 48) } });
           destLatLng = { lat, lng };
+          
+          // 현재 위치의 행정주소 가져오기
+          fetch(`${PROXY}/reverse-geocode?lat=${lat}&lng=${lng}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.results && data.results.length > 0) {
+              const address = data.results[0].formatted_address;
+              document.getElementById('destination').value = address;
+              document.getElementById('destination').style.color = '#222';
+            } else {
+              document.getElementById('destination').value = '';
+              document.getElementById('destination').placeholder = '현재 위치 검색 결과';
+              document.getElementById('destination').style.color = '#888';
+            }
+            loadPlaces(true);
+          })
+          .catch(() => {
+            document.getElementById('destination').value = '';
+            document.getElementById('destination').placeholder = '현재 위치 검색 결과';
+            document.getElementById('destination').style.color = '#888';
+            loadPlaces(true);
+          });
+        }, () => {
+          // 위치 권한 거부 시 서울 기본
           document.getElementById('destination').value = '';
           document.getElementById('destination').placeholder = '현재 위치 검색 결과';
           document.getElementById('destination').style.color = '#888';
           loadPlaces(true);
-        }, () => {
-          // 위치 권한 거부 시 서울 기본
-          loadPlaces(true);
         });
       } else {
+        document.getElementById('destination').value = '';
+        document.getElementById('destination').placeholder = '현재 위치 검색 결과';
+        document.getElementById('destination').style.color = '#888';
         loadPlaces(true);
       }
     };
@@ -555,6 +598,8 @@
           if (marker) marker.setMap(null);
           marker = new google.maps.Marker({ position: destLatLng, map: map, title: '목적지' });
           document.getElementById('destination').style.color = '#222';
+          // 목적지명을 행정주소로 표시
+          document.getElementById('destination').value = placeName;
           // 목적지 소개 표시 (Gemini API 호출)
           showDestinationIntro(dest, placeName, destLatLng);
           loadPlaces(false);
@@ -627,9 +672,9 @@
         });
         // 검색창 표시
         if (isCurrentLocation) {
-          document.getElementById('destination').value = '';
-          document.getElementById('destination').placeholder = '현재 위치 검색 결과';
-          document.getElementById('destination').style.color = '#888';
+          // 현재 위치인 경우 이미 행정주소가 설정되어 있으므로 추가 설정 불필요
+        } else {
+          // 검색한 목적지인 경우 이미 행정주소가 설정되어 있음
         }
       });
     }
@@ -924,8 +969,7 @@
       const scheduleData = {
         destination: dest || '현재 위치',
         attractions: attractions.slice(0, 5), // 상위 5개만 사용
-        restaurants: restaurants.slice(0, 5),  // 상위 5개만 사용
-        coordinates: destLatLng
+        restaurants: restaurants.slice(0, 5)  // 상위 5개만 사용
       };
       
       // 4. 에러 처리 개선된 API 호출
@@ -985,24 +1029,66 @@
         content += `<button onclick="retryScheduleGeneration()" style="background: #217093; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">다시 시도</button>`;
         content += `</div>`;
       } else {
-        content += `<div class="guide-text">${text}</div>`;
+        // 표 형식 스타일링을 위한 CSS 추가
+        content += `<style>
+          .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 1.4rem;
+          }
+          .schedule-table th,
+          .schedule-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            vertical-align: top;
+          }
+          .schedule-table th {
+            background-color: #217093;
+            color: white;
+            font-weight: bold;
+          }
+          .schedule-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+          }
+          .schedule-table tr:hover {
+            background-color: #f0f0f0;
+          }
+          .schedule-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #217093;
+            margin: 20px 0 10px 0;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-left: 4px solid #217093;
+          }
+          .schedule-container {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 10px;
+          }
+          @media (max-width: 600px) {
+            .schedule-table {
+              font-size: 1.2rem;
+            }
+            .schedule-table th,
+            .schedule-table td {
+              padding: 8px;
+            }
+            .schedule-title {
+              font-size: 1.5rem;
+            }
+          }
+        </style>`;
+        content += `<div class="schedule-container">${text}</div>`;
       }
       
       box.innerHTML = content;
       box.style.display = 'block';
       
-      // 음성 안내 (에러가 아닐 때만)
-      if (!isError && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const speechText = text.replace(/<[^>]*>/g, '').replace(/\n/g, ' ').replace(/\s{2,}/g, ' ').trim();
-        const utter = new SpeechSynthesisUtterance(speechText);
-        utter.lang = 'ko-KR';
-        utter.rate = 1.0;
-        utter.pitch = 1.0;
-        const koVoice = speechVoices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
-        if (koVoice) utter.voice = koVoice;
-        window.speechSynthesis.speak(utter);
-      }
+      // 음성 안내 제거 (에러가 아닐 때도 음성 출력하지 않음)
     }
 
     // 다시 시도 함수 추가
