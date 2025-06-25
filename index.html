@@ -445,6 +445,20 @@
         font-size: 2rem;
       }
     }
+    /* 코스 추천 팝업 내 각 코스 구분 스타일 */
+    .course-block {
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      background: #f9f9fc;
+      margin-bottom: 28px;
+      padding: 22px 18px 18px 18px;
+      box-shadow: 0 2px 8px #0001;
+    }
+    .course-block:last-child { margin-bottom: 0; }
+    .course-title { font-size: 2.1rem; font-weight: bold; margin-bottom: 10px; color: #217093; display: flex; align-items: center; gap: 8px; }
+    .course-rating { font-weight: bold; color: #e6b800; margin-top: 8px; }
+    .course-block blockquote { border-left: 4px solid #217093; background: #eef6fa; margin: 12px 0; padding: 8px 16px; color: #217093; font-size: 1.1em; }
+    .course-block p { margin: 8px 0; }
   </style>
 </head>
 <body>
@@ -930,7 +944,15 @@
 
     function showCourseBox(text) {
       const box = document.getElementById('coursePopup');
-      box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>` + text;
+      // Gemini 응답을 3가지 코스로 분리 (###, --- 등으로 구분)
+      let courseHtml = '';
+      const blocks = text.split(/(?:^|\n)[#\-]{2,}[^\n]*\n?/g).map(s => s.trim()).filter(Boolean);
+      if (blocks.length > 1) {
+        courseHtml = blocks.map(block => `<div class="course-block">${block.replace(/\n/g, '<br>')}</div>`).join('');
+      } else {
+        courseHtml = `<div class="course-block">${text.replace(/\n/g, '<br>')}</div>`;
+      }
+      box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>` + courseHtml;
       box.style.display = 'block';
     }
 
