@@ -92,17 +92,34 @@
     #scheduleBtn:hover {
       background: #388e3c;
     }
-    #scheduleBox {
-      width: 100% !important;
-      max-width: 640px !important;
-      min-width: 320px !important;
-      left: 50% !important;
-      transform: translateX(-50%) !important;
-      padding: 20px 0 20px 0 !important;
-      box-sizing: border-box;
-      position: relative;
+    #scheduleBox, #summaryBox, #destinationIntroBox {
+      display: none;
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      width: 520px;
+      max-width: 95vw;
+      min-width: 320px;
+      max-height: 80vh;
+      background: #fff;
+      border: 3px solid #217093;
+      border-radius: 14px;
+      box-shadow: 0 8px 30px #0003;
+      z-index: 3000;
+      padding: 32px 32px 24px 32px;
+      overflow-y: auto;
+      transform: translateX(-50%);
     }
-    #scheduleBox .close-btn {
+    @media (max-width: 600px) {
+      #scheduleBox, #summaryBox, #destinationIntroBox {
+        width: 98vw;
+        left: 1vw;
+        padding: 12px 4px 10px 4px;
+        min-width: 0;
+        max-width: 99vw;
+      }
+    }
+    #scheduleBox .close-btn, #summaryBox .close-btn, #destinationIntroBox .close-btn {
       position: absolute;
       right: -24px;
       top: -24px;
@@ -122,42 +139,9 @@
       cursor: pointer;
       transition: background 0.2s, color 0.2s;
     }
-    #scheduleBox .close-btn:hover {
+    #scheduleBox .close-btn:hover, #summaryBox .close-btn:hover, #destinationIntroBox .close-btn:hover {
       background: #217093;
       color: #fff;
-    }
-    @media (max-width: 1000px) {
-      .summary-popup {
-        width: 96vw;
-        left: 2vw;
-        min-width: 0;
-        max-width: 98vw;
-        padding: 18px 8px 14px 8px;
-        font-size: 1.5rem;
-        transform: none;
-      }
-      .destination-intro-popup {
-        width: 96vw;
-        left: 2vw;
-        min-width: 0;
-        max-width: 98vw;
-        padding: 18px 8px 14px 8px;
-        font-size: 1.5rem;
-        transform: none;
-      }
-      .destination-intro-popup .title {
-        font-size: 1.8rem;
-        margin-bottom: 15px;
-      }
-      .destination-intro-popup .guide-text {
-        font-size: 1.5rem;
-        line-height: 1.6;
-      }
-      #scheduleBox {
-        max-width: 99vw !important;
-        min-width: 0 !important;
-        padding: 8px 0 8px 0 !important;
-      }
     }
     .details-popup {
       display: none;
