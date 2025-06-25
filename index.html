@@ -41,7 +41,6 @@
       max-width: 600px;
       margin: 0;
       transition: padding 0.2s;
-      gap: 0;
     }
     #destination {
       border: none;
@@ -65,83 +64,287 @@
       cursor: pointer;
       transition: background 0.2s;
       white-space: nowrap;
-      height: 100%;
-      display: flex;
-      align-items: center;
     }
     #searchBtn:hover {
       background: #14516b;
     }
-    #scheduleBtn {
-      background: #4caf50;
-      color: #fff;
-      font-weight: bold;
-      border: none;
-      font-size: clamp(1.4rem, 2.5vw, 1.8rem);
-      padding: 12px 24px;
-      border-radius: 4px;
-      margin-left: auto;
-      margin-right: 0;
-      cursor: pointer;
-      transition: background 0.2s;
-      white-space: nowrap;
-      height: 100%;
+    .main {
       display: flex;
-      align-items: center;
+      justify-content: space-between;
+      padding: 32px 32px 0 32px;
+      gap: 32px;
     }
-    #scheduleBtn:hover {
-      background: #388e3c;
-    }
-    #scheduleBox, #summaryBox, #destinationIntroBox, .details-popup {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 520px;
-      max-width: 95vw;
-      min-width: 320px;
-      max-height: 80vh;
+    .map-container {
+      flex: 1 1 0;
+      min-width: 280px;
+      max-width: 50vw;
       background: #fff;
-      border: 3px solid #217093;
-      border-radius: 14px;
-      box-shadow: 0 8px 30px #0003;
-      z-index: 3000;
-      padding: 32px 32px 24px 32px;
-      overflow-y: auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px #0002;
+      padding: 0;
+      margin-right: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      position: relative;
     }
-    @media (max-width: 600px) {
-      #scheduleBox, #summaryBox, #destinationIntroBox, .details-popup {
-        width: 98vw;
-        left: 1vw;
-        padding: 12px 4px 10px 4px;
-        min-width: 0;
-        max-width: 99vw;
+    #map {
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+    }
+    .side-tables {
+      flex: 1 1 0;
+      min-width: 280px;
+      max-width: 50vw;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .table-section {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px #0001;
+      padding: 0 0 12px 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .table-title {
+      font-size: 2.86rem;
+      font-weight: bold;
+      padding: 12px 0 12px 18px;
+      text-align: left;
+      letter-spacing: 1px;
+    }
+    .attraction-table {
+      background: #d6f5d6;
+    }
+    .restaurant-table {
+      background: #ffe5e0;
+    }
+    .table-container {
+      flex: 1;
+      overflow-y: auto;
+      max-height: calc(100% - 60px);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 2.2rem;
+      height: auto;
+    }
+    th, td {
+      padding: 28px 18px;
+      text-align: left;
+      height: 1%;
+    }
+    th {
+      background: #f0f0f0;
+      font-weight: bold;
+    }
+    tr {
+      border-bottom: 1px solid #ccc;
+      height: 1%;
+    }
+    tr:last-child {
+      border-bottom: none;
+    }
+    td.score {
+      text-align: right;
+      font-weight: bold;
+      font-size: 1em;
+    }
+    tr.clickable:hover {
+      background: #b2e6b2 !important;
+      cursor: pointer;
+    }
+    .restaurant-table tr.clickable:hover {
+      background: #ffd6cc !important;
+    }
+    /* 스크롤바 스타일링 */
+    .table-container::-webkit-scrollbar {
+      width: 8px;
+    }
+    .table-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    .table-container::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 4px;
+    }
+    .table-container::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+    @media (min-width: 1001px) {
+      .main {
+        align-items: stretch;
+        min-height: 80vh;
+      }
+      .map-container, .side-tables {
+        height: 80vh;
+      }
+      #map {
+        min-height: 420px;
+      }
+      .table-section {
+        flex: 1 1 0;
       }
     }
-    #scheduleBox .close-btn, #summaryBox .close-btn, #destinationIntroBox .close-btn, .details-popup .close-btn {
-      position: absolute;
-      right: -24px;
-      top: -24px;
-      z-index: 10000;
-      background: #fff;
-      border-radius: 50%;
-      width: 38px;
-      height: 38px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.1rem;
-      color: #888;
-      font-weight: bold;
-      box-shadow: 0 2px 8px #0002;
-      border: 1.5px solid #e0e0e0;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+    @media (max-width: 1000px) {
+      .main { flex-direction: column; gap: 18px; padding: 18px 4vw 32px 4vw; }
+      .map-container, .side-tables { max-width: 100vw; width: 100%; height: auto; flex: none; }
+      #map { height: 40vh; min-height: 300px; }
+      .table-container { max-height: 300px; }
+      .side-tables { max-width: 100vw; }
     }
-    #scheduleBox .close-btn:hover, #summaryBox .close-btn:hover, #destinationIntroBox .close-btn:hover, .details-popup .close-btn:hover {
+    @media (max-width: 768px) {
+      .header { flex-direction: column; align-items: stretch; }
+      .header-title { text-align: center; white-space: normal; }
+      .header-search { width: auto; max-width: none; }
+    }
+    @media (max-width: 600px) {
+      .main { padding: 4px 1vw 16px 1vw; }
+      .map-container, .side-tables { min-width: 0; }
+      #map { height: 200px; min-height: 200px; }
+      .table-title { font-size: 1.1rem; padding: 8px 0 8px 8px; }
+      table { font-size: 1.1rem; }
+      th, td { padding: 10px 6px; }
+      .side-tables { gap: 10px; }
+      .table-section img { width: 1.2rem !important; height: 1.2rem !important; }
+      .table-container { max-height: 250px; }
+      .table-container::-webkit-scrollbar { width: 4px; }
+      .details-popup {
+        position: fixed !important;
+        width: 96vw !important;
+        max-width: 98vw !important;
+        left: 50% !important;
+        top: 30px !important;
+        transform: translateX(-50%) !important;
+        border-width: 2px !important;
+        font-size: 1.2rem !important;
+        padding: 0 !important;
+        z-index: 3000 !important;
+      }
+    }
+    .summary-btn {
+      font-size: clamp(1.4rem, 2.2vw, 1.8rem);
+      font-weight: bold;
+      padding: clamp(6px, 1.5vw, 10px) clamp(15px, 3vw, 27px);
+      border-radius: 9px;
+      border: 3px solid #217093;
+      background: #fff;
+      color: #217093;
+      cursor: pointer;
+      margin-right: 4px;
+      box-shadow: 2px 2px 4px #0001;
+      transition: background 0.2s, color 0.2s, font-size 0.2s, padding 0.2s;
+      white-space: nowrap;
+    }
+    .summary-btn:hover {
       background: #217093;
       color: #fff;
+    }
+    .summary-popup {
+      display: none;
+      position: absolute;
+      top: 5%;
+      left: 50%;
+      width: 48%;
+      min-width: 240px;
+      max-width: 98%;
+      min-height: 200px;
+      background: #fff;
+      border: 3px solid #222;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px #0003;
+      padding: 36px 40px 32px 40px;
+      font-size: 2.2rem;
+      color: #222;
+      z-index: 1000;
+      line-height: 1.7;
+      overflow-y: auto;
+      transform: translateX(-2%);
+    }
+    .summary-popup .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 18px;
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: #888;
+      font-weight: bold;
+    }
+    .destination-intro-popup {
+      display: none;
+      position: absolute;
+      top: 5%;
+      left: 50%;
+      width: 48%;
+      min-width: 240px;
+      max-width: 98%;
+      min-height: 200px;
+      background: #fff;
+      border: 3px solid #217093;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px #0003;
+      padding: 36px 40px 32px 40px;
+      font-size: 2.2rem;
+      color: #222;
+      z-index: 2000;
+      line-height: 1.7;
+      overflow-y: auto;
+      transform: translateX(-2%);
+    }
+    .destination-intro-popup .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 18px;
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: #888;
+      font-weight: bold;
+    }
+    .destination-intro-popup .title {
+      font-size: 2.8rem;
+      font-weight: bold;
+      color: #217093;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .destination-intro-popup .guide-text {
+      font-size: 2.2rem;
+      line-height: 1.8;
+      text-align: justify;
+    }
+    @media (max-width: 1000px) {
+      .summary-popup {
+        width: 96vw;
+        left: 2vw;
+        min-width: 0;
+        max-width: 98vw;
+        padding: 18px 8px 14px 8px;
+        font-size: 1.5rem;
+        transform: none;
+      }
+      .destination-intro-popup {
+        width: 96vw;
+        left: 2vw;
+        min-width: 0;
+        max-width: 98vw;
+        padding: 18px 8px 14px 8px;
+        font-size: 1.5rem;
+        transform: none;
+      }
+      .destination-intro-popup .title {
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+      }
+      .destination-intro-popup .guide-text {
+        font-size: 1.5rem;
+        line-height: 1.6;
+      }
     }
     .details-popup {
       display: none;
@@ -231,237 +434,6 @@
         font-size: 2rem;
       }
     }
-    .schedule-container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 0 8px;
-      box-sizing: border-box;
-    }
-    .schedule-card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 4px 16px #0001;
-      margin: 18px 0;
-      padding: 28px 28px 22px 28px;
-      max-width: 600px;
-      border-left: 6px solid #217093;
-      box-sizing: border-box;
-    }
-    .schedule-title {
-      font-size: 1.35rem;
-      font-weight: bold;
-      color: #217093;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .schedule-desc p {
-      margin: 0 0 14px 0;
-      line-height: 1.35;
-      color: #222;
-      font-size: 1.13rem;
-      word-break: keep-all;
-    }
-    .schedule-desc blockquote {
-      background: #f4f8fa;
-      border-left: 4px solid #4caf50;
-      margin: 12px 0 12px 0;
-      padding: 10px 18px;
-      color: #217093;
-      font-style: italic;
-      font-size: 1.04rem;
-    }
-    .schedule-rating {
-      margin-top: 10px;
-      color: #ff9800;
-      font-weight: bold;
-      font-size: 1.13rem;
-    }
-    .schedule-section-title {
-      font-size: 1.13rem;
-      font-weight: bold;
-      color: #217093;
-      background: #e3f2fd;
-      border-radius: 8px;
-      padding: 8px 12px;
-      margin: 24px 0 10px 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .main {
-      display: flex;
-      justify-content: space-between;
-      padding: 32px 32px 0 32px;
-      gap: 32px;
-    }
-    .map-container {
-      flex: 1 1 0;
-      min-width: 280px;
-      max-width: 50vw;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 12px #0002;
-      padding: 0;
-      margin-right: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      position: relative;
-    }
-    #map {
-      width: 100%;
-      height: 100%;
-      border-radius: 8px;
-      min-height: 420px;
-    }
-    .side-tables {
-      flex: 1 1 0;
-      min-width: 280px;
-      max-width: 50vw;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-    .table-section {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 12px #0001;
-      padding: 0 0 12px 0;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-    .table-title {
-      font-size: 2.86rem;
-      font-weight: bold;
-      padding: 12px 0 12px 18px;
-      text-align: left;
-      letter-spacing: 1px;
-    }
-    .attraction-table {
-      background: #d6f5d6;
-    }
-    .restaurant-table {
-      background: #ffe5e0;
-    }
-    .table-container {
-      flex: 1;
-      overflow-y: auto;
-      height: 240px;
-      min-height: 240px;
-      max-height: 240px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 2.2rem;
-      height: 100%;
-    }
-    th, td {
-      padding: 16px 12px;
-      text-align: left;
-      height: 48px;
-    }
-    th {
-      background: #f0f0f0;
-      font-weight: bold;
-    }
-    tr {
-      border-bottom: 1px solid #ccc;
-      height: 1%;
-    }
-    tr:last-child {
-      border-bottom: none;
-    }
-    td.score {
-      text-align: right;
-      font-weight: bold;
-      font-size: 1em;
-    }
-    tr.clickable:hover {
-      background: #b2e6b2 !important;
-      cursor: pointer;
-    }
-    .restaurant-table tr.clickable:hover {
-      background: #ffd6cc !important;
-    }
-    @media (max-width: 1000px) {
-      .main { flex-direction: column; gap: 18px; padding: 18px 4vw 32px 4vw; }
-      .map-container, .side-tables { max-width: 100vw; width: 100%; height: auto; flex: none; }
-      #map { height: 40vh; min-height: 300px; }
-      .side-tables { max-width: 100vw; }
-    }
-    .common-popup {
-      position: fixed;
-      top: 60px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 520px;
-      max-width: 95vw;
-      min-width: 320px;
-      max-height: 80vh;
-      background: #fff;
-      border: 3px solid #217093;
-      border-radius: 14px;
-      box-shadow: 0 8px 30px #0003;
-      z-index: 3000;
-      padding: 32px 32px 24px 32px;
-      overflow-y: auto;
-      display: block;
-    }
-    @media (max-width: 600px) {
-      .common-popup {
-        width: 98vw;
-        left: 1vw;
-        padding: 12px 4px 10px 4px;
-        min-width: 0;
-        max-width: 99vw;
-      }
-    }
-    .common-popup .close-btn {
-      position: absolute;
-      right: -24px;
-      top: -24px;
-      z-index: 10000;
-      background: #fff;
-      border-radius: 50%;
-      width: 38px;
-      height: 38px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.1rem;
-      color: #888;
-      font-weight: bold;
-      box-shadow: 0 2px 8px #0002;
-      border: 1.5px solid #e0e0e0;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-    }
-    .common-popup .close-btn:hover {
-      background: #217093;
-      color: #fff;
-    }
-    /* 기존 팝업 위치/크기 스타일 제거 또는 최소화 */
-    #scheduleBox, #summaryBox, #destinationIntroBox, .details-popup {
-      position: static !important;
-      width: auto !important;
-      max-width: none !important;
-      min-width: 0 !important;
-      left: auto !important;
-      top: auto !important;
-      transform: none !important;
-      padding: 0 !important;
-      border: none !important;
-      box-shadow: none !important;
-      background: none !important;
-      border-radius: 0 !important;
-      z-index: auto !important;
-      max-height: none !important;
-      overflow: visible !important;
-    }
   </style>
 </head>
 <body>
@@ -470,15 +442,13 @@
     <div class="header-search">
       <input id="destination" placeholder="현재 위치 검색 결과" style="color:#888;" />
       <button id="searchBtn">검색</button>
-      <button id="scheduleBtn" style="margin-left:8px;background:#4caf50;color:#fff;font-weight:bold;">여행스케줄 작성</button>
     </div>
   </div>
   <div class="main">
     <div class="map-container">
       <div id="map"></div>
-      <div id="summaryBox" class="common-popup" style="display:none;"></div>
-      <div id="destinationIntroBox" class="common-popup" style="display:none;"></div>
-      <div id="scheduleBox" class="common-popup" style="display:none;"></div>
+      <div id="summaryBox" class="summary-popup" style="display:none;"></div>
+      <div id="destinationIntroBox" class="destination-intro-popup" style="display:none;"></div>
     </div>
     <div class="side-tables">
       <div class="table-section attraction-table">
@@ -507,7 +477,7 @@
       </div>
     </div>
   </div>
-  <div id="placeDetailsBox" class="common-popup details-popup" style="display:none;"></div>
+  <div id="placeDetailsBox" class="details-popup" style="display:none;"></div>
   <script>
     const PROXY = 'https://moazine.onrender.com';
     let map, marker, destLatLng, attractions = [], restaurants = [];
@@ -545,34 +515,15 @@
           if (marker) marker.setMap(null);
           marker = new google.maps.Marker({ position: { lat, lng }, map: map, title: '현재 위치', icon: { url: '/assets/current.png', scaledSize: new google.maps.Size(48, 48) } });
           destLatLng = { lat, lng };
-          
-          // 현재 위치의 행정주소 가져오기
-          fetch(`${PROXY}/reverse-geocode?lat=${lat}&lng=${lng}`)
-          .then(res => res.json())
-          .then(data => {
-            // 행정주소는 내부적으로만 저장하고 입력란에는 표시하지 않음
-            document.getElementById('destination').value = '';
-            document.getElementById('destination').placeholder = '현재 위치 검색 결과';
-            document.getElementById('destination').style.color = '#888';
-            loadPlaces(true);
-          })
-          .catch(() => {
-            document.getElementById('destination').value = '';
-            document.getElementById('destination').placeholder = '현재 위치 검색 결과';
-            document.getElementById('destination').style.color = '#888';
-            loadPlaces(true);
-          });
-        }, () => {
-          // 위치 권한 거부 시 서울 기본
           document.getElementById('destination').value = '';
           document.getElementById('destination').placeholder = '현재 위치 검색 결과';
           document.getElementById('destination').style.color = '#888';
           loadPlaces(true);
+        }, () => {
+          // 위치 권한 거부 시 서울 기본
+          loadPlaces(true);
         });
       } else {
-        document.getElementById('destination').value = '';
-        document.getElementById('destination').placeholder = '현재 위치 검색 결과';
-        document.getElementById('destination').style.color = '#888';
         loadPlaces(true);
       }
     };
@@ -602,8 +553,6 @@
           if (marker) marker.setMap(null);
           marker = new google.maps.Marker({ position: destLatLng, map: map, title: '목적지' });
           document.getElementById('destination').style.color = '#222';
-          // 원래 검색어를 유지하고 행정주소는 표시하지 않음
-          // document.getElementById('destination').value = placeName;
           // 목적지 소개 표시 (Gemini API 호출)
           showDestinationIntro(dest, placeName, destLatLng);
           loadPlaces(false);
@@ -676,9 +625,9 @@
         });
         // 검색창 표시
         if (isCurrentLocation) {
-          // 현재 위치인 경우 이미 행정주소가 설정되어 있으므로 추가 설정 불필요
-        } else {
-          // 검색한 목적지인 경우 이미 행정주소가 설정되어 있음
+          document.getElementById('destination').value = '';
+          document.getElementById('destination').placeholder = '현재 위치 검색 결과';
+          document.getElementById('destination').style.color = '#888';
         }
       });
     }
@@ -686,6 +635,7 @@
     function renderTable(tableId, list, type) {
       const tbody = document.getElementById(tableId).querySelector('tbody');
       let html = '';
+      
       if (list.length === 0) {
         // 데이터가 없을 때 5개의 빈 항목 표시
         for (let i = 0; i < 5; i++) {
@@ -700,6 +650,7 @@
             <td class="score">${item.rating ? item.rating.toFixed(1) + '점' : '-'}</td>
           </tr>`
         ).join('');
+        
         // 5개 미만일 때만 빈 항목으로 채움
         if (list.length < 5) {
           for (let i = list.length; i < 5; i++) {
@@ -938,208 +889,6 @@
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
-    }
-
-    document.getElementById('scheduleBtn').onclick = function() {
-      const scheduleBtn = this;
-      const originalText = scheduleBtn.textContent;
-      
-      // 로딩 상태 표시
-      scheduleBtn.textContent = '생성 중...';
-      scheduleBtn.disabled = true;
-      scheduleBtn.style.background = '#ccc';
-      
-      const dest = document.getElementById('destination').value;
-      
-      // 1. 더 구체적인 검증
-      if (!destLatLng) {
-        alert('위치 정보를 가져올 수 없습니다. 페이지를 새로고침하거나 목적지를 다시 검색해 주세요.');
-        resetScheduleBtn();
-        return;
-      }
-      
-      if (!attractions.length && !restaurants.length) {
-        alert('주변 관광지와 맛집 정보가 없습니다. 다른 위치를 검색해 보세요.');
-        resetScheduleBtn();
-        return;
-      }
-      
-      // 2. 로딩 상태 표시 개선
-      showScheduleBox('여행 스케줄을 생성하는 중입니다...<br><small>잠시만 기다려주세요.</small>');
-      
-      // 3. 데이터 준비 및 검증
-      const scheduleData = {
-        destination: dest || '현재 위치',
-        attractions: attractions.slice(0, 5), // 상위 5개만 사용
-        restaurants: restaurants.slice(0, 5)  // 상위 5개만 사용
-      };
-      
-      // 4. 에러 처리 개선된 API 호출
-      fetch(`${PROXY}/generate-schedule`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(scheduleData)
-      })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-        }
-        return res.json();
-      })
-      .then(data => {
-        if (data.error) {
-          throw new Error(data.error);
-        }
-        const scheduleText = (data.schedule || '여행 스케줄을 가져오지 못했습니다.').replace(/\n/g, '<br>');
-        showScheduleBox(scheduleText);
-        resetScheduleBtn();
-      })
-      .catch(error => {
-        console.error('Schedule generation error:', error);
-        let errorMessage = '여행 스케줄을 가져오지 못했습니다.';
-        
-        if (error.message.includes('HTTP')) {
-          errorMessage = '서버 연결에 문제가 있습니다. 잠시 후 다시 시도해 주세요.';
-        } else if (error.message.includes('Failed to fetch')) {
-          errorMessage = '인터넷 연결을 확인해 주세요.';
-        }
-        
-        showScheduleBox(errorMessage);
-        resetScheduleBtn();
-      });
-      
-      // 버튼 상태 초기화 함수
-      function resetScheduleBtn() {
-        scheduleBtn.textContent = originalText;
-        scheduleBtn.disabled = false;
-        scheduleBtn.style.background = '#4caf50';
-      }
-    };
-
-    function showScheduleBox(text) {
-      const box = document.getElementById('scheduleBox');
-      // 에러 메시지인지 확인
-      const isError = text.includes('실패') || text.includes('문제') || text.includes('연결');
-      let content = `<span class='close-btn' onclick="closeScheduleBox()">✕</span>`;
-      content += `<div class="title">🗓️ 여행 스케줄</div>`;
-      if (isError) {
-        content += `<div class="guide-text" style="color: #d32f2f; text-align: center; padding: 20px;">`;
-        content += `<div style="font-size: 1.2em; margin-bottom: 10px;">⚠️ ${text}</div>`;
-        content += `<button onclick="retryScheduleGeneration()" style="background: #217093; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">다시 시도</button>`;
-        content += `</div>`;
-      } else {
-        // Gemini가 반환한 HTML을 그대로 출력
-        content += `<div class="schedule-container">${text}</div>`;
-      }
-      box.innerHTML = content;
-      box.style.display = 'block';
-    }
-
-    // 카드 스타일로 변환하는 함수
-    function convertScheduleToCards(text) {
-      const schedulePattern = /\*\*스케줄\s*(\d+):\s*([^*]+)\*\*/g;
-      let html = '';
-      let lastIndex = 0;
-      let match;
-      let safety = 0; // 안전장치
-
-      // 패턴이 하나도 없으면 안내 메시지
-      if (!/\*\*스케줄\s*\d+:/.test(text)) {
-        return '<div style="color:#888;text-align:center;padding:32px 0;">생성된 여행 일정이 없습니다.</div>';
-      }
-      schedulePattern.lastIndex = 0; // 패턴 재설정
-
-      while ((match = schedulePattern.exec(text)) !== null && safety++ < 100) {
-        const scheduleNum = match[1];
-        const scheduleTitle = match[2].trim();
-        const startIndex = match.index + match[0].length;
-        const nextMatch = schedulePattern.exec(text);
-        const endIndex = nextMatch ? nextMatch.index : text.length;
-        const scheduleContent = text.substring(startIndex, endIndex);
-        html += `<div class="schedule-section-title">📅 스케줄 ${scheduleNum}: ${scheduleTitle}</div>`;
-        html += convertScheduleSectionToCards(scheduleContent);
-        if (nextMatch) {
-          schedulePattern.lastIndex = nextMatch.index;
-        } else {
-          break; // nextMatch 없으면 반드시 종료
-        }
-      }
-      return html;
-    }
-
-    // 각 스케줄 섹션(표+설명)을 카드로 변환
-    function convertScheduleSectionToCards(sectionText) {
-      const lines = sectionText.split('\n').map(l => l.trim()).filter(Boolean);
-      let cards = '';
-      let lastTime = '', lastPlace = '', lastDesc = '', lastTip = '', lastRating = '', lastEmojis = '';
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        if (/^\|\s*시간\s*\|/i.test(line) || /^\|[-: ]+\|/.test(line)) continue;
-        if (/^\|/.test(line)) {
-          if (lastTime && lastPlace) {
-            cards += renderScheduleCard(lastTime, lastPlace, lastDesc, lastTip, lastRating, lastEmojis);
-          }
-          const cells = line.split('|').map(c => c.trim());
-          lastTime = cells[1] || '';
-          lastPlace = cells[2] || '';
-          lastDesc = cells[3] || '';
-          lastTip = cells[4] || '';
-          lastRating = cells[5] || '';
-          lastEmojis = suggestPlaceEmoji(lastPlace, lastDesc);
-        }
-      }
-      if (lastTime && lastPlace) {
-        cards += renderScheduleCard(lastTime, lastPlace, lastDesc, lastTip, lastRating, lastEmojis);
-      }
-      return cards;
-    }
-
-    // 카드 렌더링
-    function renderScheduleCard(time, place, desc, tip, rating, emoji) {
-      // 설명을 2~3줄 단락으로 끊기
-      const descParagraphs = desc.split(/(?<=\.)\s+/).filter(Boolean);
-      let descHtml = '';
-      for (let i = 0; i < descParagraphs.length; i += 2) {
-        descHtml += `<p>${descParagraphs.slice(i, i + 2).join(' ')}</p>`;
-      }
-      let html = `<div class="schedule-card">
-        <div class="schedule-title">🕘 ${time} – <b>${place}</b> ${emoji}</div>
-        <div class="schedule-desc">${descHtml}`;
-      if (tip && tip !== '없음') {
-        html += `<blockquote>${tip.trim()}</blockquote>`;
-      }
-      if (rating) {
-        html += `<div class="schedule-rating"><b>⭐ 평점: ${rating}</b></div>`;
-      }
-      html += `</div></div>`;
-      return html;
-    }
-
-    // 장소명/설명에 따라 이모지 추천
-    function suggestPlaceEmoji(place, desc) {
-      const lower = (place + ' ' + desc).toLowerCase();
-      if (/[모스크|성당|church|cathedral|mosque|temple|사원|절|이슬람|종교]/.test(lower)) return '🕌';
-      if (/[공원|park|산|mountain|정원|garden|숲|forest|호수|lake|강|river]/.test(lower)) return '🌳';
-      if (/[타워|전망대|tower|observatory]/.test(lower)) return '🗼';
-      if (/[박물관|museum]/.test(lower)) return '🏛️';
-      if (/[시장|market|마켓]/.test(lower)) return '🛍️';
-      if (/[카페|cafe|커피|coffee]/.test(lower)) return '☕';
-      if (/[식당|restaurant|맛집|food|grill|steak|bar|cafe|피자|pizza|한식|양식|중식|일식|분식|죽|비빔밥|steakhouse|grill|demiglace|outback|alvolo|albolo|alvollo|alvolo]/.test(lower)) return '🍽️';
-      if (/[쇼핑|mall|백화점|shopping|plaza|square|광장]/.test(lower)) return '🏬';
-      if (/[사진|포토|photo|촬영|전망|view|풍경|scenery|panorama|sunset|석양]/.test(lower)) return '📸';
-      if (/[역|station|지하철|subway]/.test(lower)) return '🚉';
-      if (/[호텔|hotel|숙소|guesthouse|hostel]/.test(lower)) return '🏨';
-      return '';
-    }
-
-    // 다시 시도 함수 추가
-    function retryScheduleGeneration() {
-      document.getElementById('scheduleBtn').click();
-    }
-
-    function closeScheduleBox() {
-      document.getElementById('scheduleBox').style.display = 'none';
-      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     }
 
     // 페이지 로드 시 Google Maps API 로드 시작
