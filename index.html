@@ -685,7 +685,6 @@
     function renderTable(tableId, list, type) {
       const tbody = document.getElementById(tableId).querySelector('tbody');
       let html = '';
-      
       if (list.length === 0) {
         // 데이터가 없을 때 5개의 빈 항목 표시
         for (let i = 0; i < 5; i++) {
@@ -700,7 +699,6 @@
             <td class="score">${item.rating ? item.rating.toFixed(1) + '점' : '-'}</td>
           </tr>`
         ).join('');
-        
         // 5개 미만일 때만 빈 항목으로 채움
         if (list.length < 5) {
           for (let i = list.length; i < 5; i++) {
