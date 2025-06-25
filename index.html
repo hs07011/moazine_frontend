@@ -541,15 +541,10 @@
           fetch(`${PROXY}/reverse-geocode?lat=${lat}&lng=${lng}`)
           .then(res => res.json())
           .then(data => {
-            if (data.results && data.results.length > 0) {
-              const address = data.results[0].formatted_address;
-              document.getElementById('destination').value = address;
-              document.getElementById('destination').style.color = '#222';
-            } else {
-              document.getElementById('destination').value = '';
-              document.getElementById('destination').placeholder = '현재 위치 검색 결과';
-              document.getElementById('destination').style.color = '#888';
-            }
+            // 행정주소는 내부적으로만 저장하고 입력란에는 표시하지 않음
+            document.getElementById('destination').value = '';
+            document.getElementById('destination').placeholder = '현재 위치 검색 결과';
+            document.getElementById('destination').style.color = '#888';
             loadPlaces(true);
           })
           .catch(() => {
@@ -598,8 +593,8 @@
           if (marker) marker.setMap(null);
           marker = new google.maps.Marker({ position: destLatLng, map: map, title: '목적지' });
           document.getElementById('destination').style.color = '#222';
-          // 목적지명을 행정주소로 표시
-          document.getElementById('destination').value = placeName;
+          // 원래 검색어를 유지하고 행정주소는 표시하지 않음
+          // document.getElementById('destination').value = placeName;
           // 목적지 소개 표시 (Gemini API 호출)
           showDestinationIntro(dest, placeName, destLatLng);
           loadPlaces(false);
@@ -1029,6 +1024,9 @@
         content += `<button onclick="retryScheduleGeneration()" style="background: #217093; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">다시 시도</button>`;
         content += `</div>`;
       } else {
+        // 마크다운 표를 HTML 테이블로 변환
+        const convertedText = convertMarkdownToHtml(text);
+        
         // 표 형식 스타일링을 위한 CSS 추가
         content += `<style>
           .schedule-table {
@@ -1036,6 +1034,7 @@
             border-collapse: collapse;
             margin: 10px 0;
             font-size: 1.4rem;
+            background: white;
           }
           .schedule-table th,
           .schedule-table td {
@@ -1043,11 +1042,13 @@
             padding: 12px;
             text-align: left;
             vertical-align: top;
+            word-wrap: break-word;
           }
           .schedule-table th {
             background-color: #217093;
             color: white;
             font-weight: bold;
+            text-align: center;
           }
           .schedule-table tr:nth-child(even) {
             background-color: #f9f9f9;
@@ -1063,11 +1064,31 @@
             padding: 10px;
             background-color: #e3f2fd;
             border-left: 4px solid #217093;
+            border-radius: 4px;
+          }
+          .schedule-description {
+            font-size: 1.4rem;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-style: italic;
           }
           .schedule-container {
             max-height: 70vh;
             overflow-y: auto;
             padding: 10px;
+          }
+          .time-column {
+            width: 15%;
+            font-weight: bold;
+            color: #217093;
+          }
+          .place-column {
+            width: 25%;
+            font-weight: bold;
+          }
+          .description-column {
+            width: 60%;
           }
           @media (max-width: 600px) {
             .schedule-table {
@@ -1080,15 +1101,141 @@
             .schedule-title {
               font-size: 1.5rem;
             }
+            .time-column {
+              width: 20%;
+            }
+            .place-column {
+              width: 30%;
+            }
+            .description-column {
+              width: 50%;
+            }
           }
         </style>`;
-        content += `<div class="schedule-container">${text}</div>`;
+        content += `<div class="schedule-container">${convertedText}</div>`;
       }
       
       box.innerHTML = content;
       box.style.display = 'block';
       
       // 음성 안내 제거 (에러가 아닐 때도 음성 출력하지 않음)
+    }
+
+    // 마크다운 표를 HTML로 변환하는 함수
+    function convertMarkdownToHtml(text) {
+      // **스케줄 X: 제목** 패턴 찾기
+      const schedulePattern = /\*\*스케줄\s+(\d+):\s+([^*]+)\*\*/g;
+      let html = '';
+      let lastIndex = 0;
+      let match;
+      
+      while ((match = schedulePattern.exec(text)) !== null) {
+        const scheduleNumber = match[1];
+        const scheduleTitle = match[2].trim();
+        const startIndex = match.index;
+        
+        // 이전 텍스트 처리
+        if (startIndex > lastIndex) {
+          const previousText = text.substring(lastIndex, startIndex);
+          html += processTextContent(previousText);
+        }
+        
+        // 스케줄 제목 추가
+        html += `<div class="schedule-title">📅 스케줄 ${scheduleNumber}: ${scheduleTitle}</div>`;
+        
+        // 다음 스케줄 제목까지의 내용 찾기
+        const nextScheduleMatch = /\*\*스케줄\s+\d+:/g;
+        nextScheduleMatch.lastIndex = startIndex + match[0].length;
+        const nextMatch = nextScheduleMatch.exec(text);
+        
+        const endIndex = nextMatch ? nextMatch.index : text.length;
+        const scheduleContent = text.substring(startIndex + match[0].length, endIndex);
+        
+        // 스케줄 설명과 표 처리
+        html += processScheduleContent(scheduleContent);
+        
+        lastIndex = endIndex;
+      }
+      
+      // 마지막 부분 처리
+      if (lastIndex < text.length) {
+        const remainingText = text.substring(lastIndex);
+        html += processTextContent(remainingText);
+      }
+      
+      return html;
+    }
+
+    // 스케줄 내용 처리 함수
+    function processScheduleContent(content) {
+      let html = '';
+      
+      // 설명 부분과 표 부분 분리
+      const tableStart = content.indexOf('|');
+      if (tableStart === -1) {
+        // 표가 없는 경우
+        html += `<div class="schedule-description">${content.trim()}</div>`;
+        return html;
+      }
+      
+      // 설명 부분 처리
+      const description = content.substring(0, tableStart).trim();
+      if (description) {
+        html += `<div class="schedule-description">${description}</div>`;
+      }
+      
+      // 표 부분 처리
+      const tableContent = content.substring(tableStart);
+      html += convertMarkdownTableToHtml(tableContent);
+      
+      return html;
+    }
+
+    // 마크다운 표를 HTML 테이블로 변환
+    function convertMarkdownTableToHtml(tableText) {
+      const lines = tableText.trim().split('\n');
+      if (lines.length < 3) return tableText; // 유효한 표가 아닌 경우
+      
+      let html = '<table class="schedule-table">';
+      
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line.startsWith('|')) continue;
+        
+        const cells = line.split('|').slice(1, -1).map(cell => cell.trim());
+        
+        if (i === 0) {
+          // 헤더 행
+          html += '<thead><tr>';
+          cells.forEach(cell => {
+            html += `<th>${cell}</th>`;
+          });
+          html += '</tr></thead><tbody>';
+        } else if (i === 1) {
+          // 구분선 행 (무시)
+          continue;
+        } else {
+          // 데이터 행
+          html += '<tr>';
+          cells.forEach((cell, index) => {
+            const className = index === 0 ? 'time-column' : 
+                            index === 1 ? 'place-column' : 'description-column';
+            html += `<td class="${className}">${cell}</td>`;
+          });
+          html += '</tr>';
+        }
+      }
+      
+      html += '</tbody></table>';
+      return html;
+    }
+
+    // 일반 텍스트 내용 처리
+    function processTextContent(text) {
+      if (!text.trim()) return '';
+      
+      // 줄바꿈을 <br>로 변환
+      return text.replace(/\n/g, '<br>');
     }
 
     // 다시 시도 함수 추가
