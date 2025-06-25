@@ -92,9 +92,9 @@
     #scheduleBtn:hover {
       background: #388e3c;
     }
-    #scheduleBox, #summaryBox, #destinationIntroBox {
+    #scheduleBox, #summaryBox, #destinationIntroBox, .details-popup {
       display: none;
-      position: absolute;
+      position: fixed;
       top: 60px;
       left: 50%;
       width: 520px;
@@ -111,7 +111,7 @@
       transform: translateX(-50%);
     }
     @media (max-width: 600px) {
-      #scheduleBox, #summaryBox, #destinationIntroBox {
+      #scheduleBox, #summaryBox, #destinationIntroBox, .details-popup {
         width: 98vw;
         left: 1vw;
         padding: 12px 4px 10px 4px;
@@ -119,7 +119,7 @@
         max-width: 99vw;
       }
     }
-    #scheduleBox .close-btn, #summaryBox .close-btn, #destinationIntroBox .close-btn {
+    #scheduleBox .close-btn, #summaryBox .close-btn, #destinationIntroBox .close-btn, .details-popup .close-btn {
       position: absolute;
       right: -24px;
       top: -24px;
@@ -139,7 +139,7 @@
       cursor: pointer;
       transition: background 0.2s, color 0.2s;
     }
-    #scheduleBox .close-btn:hover, #summaryBox .close-btn:hover, #destinationIntroBox .close-btn:hover {
+    #scheduleBox .close-btn:hover, #summaryBox .close-btn:hover, #destinationIntroBox .close-btn:hover, .details-popup .close-btn:hover {
       background: #217093;
       color: #fff;
     }
