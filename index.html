@@ -453,6 +453,56 @@
         font-size: 2rem;
       }
     }
+    .schedule-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px #0001;
+      margin: 18px 0;
+      padding: 24px 22px 18px 22px;
+      max-width: 700px;
+      border-left: 6px solid #217093;
+    }
+    .schedule-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #217093;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .schedule-desc p {
+      margin: 0 0 8px 0;
+      line-height: 1.7;
+      color: #222;
+    }
+    .schedule-desc blockquote {
+      background: #f4f8fa;
+      border-left: 4px solid #4caf50;
+      margin: 10px 0 10px 0;
+      padding: 8px 16px;
+      color: #217093;
+      font-style: italic;
+      font-size: 1rem;
+    }
+    .schedule-rating {
+      margin-top: 8px;
+      color: #ff9800;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    .schedule-section-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #217093;
+      background: #e3f2fd;
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin: 24px 0 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
   </style>
 </head>
 <body>
@@ -1011,231 +1061,190 @@
 
     function showScheduleBox(text) {
       const box = document.getElementById('scheduleBox');
-      
       // 에러 메시지인지 확인
       const isError = text.includes('실패') || text.includes('문제') || text.includes('연결');
-      
       let content = `<span class='close-btn' onclick="closeScheduleBox()">✕</span>`;
       content += `<div class="title">🗓️ 여행 스케줄</div>`;
-      
       if (isError) {
         content += `<div class="guide-text" style="color: #d32f2f; text-align: center; padding: 20px;">`;
         content += `<div style="font-size: 1.2em; margin-bottom: 10px;">⚠️ ${text}</div>`;
         content += `<button onclick="retryScheduleGeneration()" style="background: #217093; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">다시 시도</button>`;
         content += `</div>`;
       } else {
-        // 마크다운 표를 HTML 테이블로 변환
-        const convertedText = convertMarkdownToHtml(text);
-        
-        // 표 형식 스타일링을 위한 CSS 추가
+        // 카드 스타일로 변환 적용
+        const convertedText = convertScheduleToCards(text);
         content += `<style>
-          .schedule-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 10px 0;
-            font-size: 1.4rem;
-            background: white;
-          }
-          .schedule-table th,
-          .schedule-table td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-            vertical-align: top;
-            word-wrap: break-word;
-          }
-          .schedule-table th {
-            background-color: #217093;
-            color: white;
-            font-weight: bold;
-            text-align: center;
-          }
-          .schedule-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-          }
-          .schedule-table tr:hover {
-            background-color: #f0f0f0;
+          .schedule-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px #0001;
+            margin: 18px 0;
+            padding: 24px 22px 18px 22px;
+            max-width: 700px;
+            border-left: 6px solid #217093;
           }
           .schedule-title {
-            font-size: 1.8rem;
+            font-size: 1.25rem;
             font-weight: bold;
             color: #217093;
-            margin: 20px 0 10px 0;
-            padding: 10px;
-            background-color: #e3f2fd;
-            border-left: 4px solid #217093;
-            border-radius: 4px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
           }
-          .schedule-description {
-            font-size: 1.4rem;
-            color: #666;
-            margin-bottom: 15px;
-            line-height: 1.6;
+          .schedule-desc p {
+            margin: 0 0 8px 0;
+            line-height: 1.7;
+            color: #222;
+          }
+          .schedule-desc blockquote {
+            background: #f4f8fa;
+            border-left: 4px solid #4caf50;
+            margin: 10px 0 10px 0;
+            padding: 8px 16px;
+            color: #217093;
             font-style: italic;
+            font-size: 1rem;
           }
-          .schedule-container {
-            max-height: 70vh;
-            overflow-y: auto;
-            padding: 10px;
+          .schedule-rating {
+            margin-top: 8px;
+            color: #ff9800;
+            font-weight: bold;
+            font-size: 1.1rem;
           }
-          .time-column {
-            width: 15%;
+          .schedule-section-title {
+            font-size: 1.1rem;
             font-weight: bold;
             color: #217093;
-          }
-          .place-column {
-            width: 25%;
-            font-weight: bold;
-          }
-          .description-column {
-            width: 60%;
-          }
-          @media (max-width: 600px) {
-            .schedule-table {
-              font-size: 1.2rem;
-            }
-            .schedule-table th,
-            .schedule-table td {
-              padding: 8px;
-            }
-            .schedule-title {
-              font-size: 1.5rem;
-            }
-            .time-column {
-              width: 20%;
-            }
-            .place-column {
-              width: 30%;
-            }
-            .description-column {
-              width: 50%;
-            }
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin: 24px 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
           }
         </style>`;
         content += `<div class="schedule-container">${convertedText}</div>`;
       }
-      
       box.innerHTML = content;
       box.style.display = 'block';
-      
-      // 음성 안내 제거 (에러가 아닐 때도 음성 출력하지 않음)
     }
 
-    // 마크다운 표를 HTML로 변환하는 함수
-    function convertMarkdownToHtml(text) {
-      // **스케줄 X: 제목** 패턴 찾기
-      const schedulePattern = /\*\*스케줄\s+(\d+):\s+([^*]+)\*\*/g;
+    // 카드 스타일로 변환하는 함수
+    function convertScheduleToCards(text) {
+      // 스케줄 구분 (예: **스케줄 1: ...**)
+      const schedulePattern = /\*\*스케줄\s*(\d+):\s*([^*]+)\*\*/g;
       let html = '';
       let lastIndex = 0;
       let match;
-      
       while ((match = schedulePattern.exec(text)) !== null) {
-        const scheduleNumber = match[1];
+        const scheduleNum = match[1];
         const scheduleTitle = match[2].trim();
-        const startIndex = match.index;
-        
-        // 이전 텍스트 처리
-        if (startIndex > lastIndex) {
-          const previousText = text.substring(lastIndex, startIndex);
-          html += processTextContent(previousText);
-        }
-        
-        // 스케줄 제목 추가
-        html += `<div class="schedule-title">📅 스케줄 ${scheduleNumber}: ${scheduleTitle}</div>`;
-        
-        // 다음 스케줄 제목까지의 내용 찾기
-        const nextScheduleMatch = /\*\*스케줄\s+\d+:/g;
-        nextScheduleMatch.lastIndex = startIndex + match[0].length;
-        const nextMatch = nextScheduleMatch.exec(text);
-        
+        const startIndex = match.index + match[0].length;
+        const nextMatch = schedulePattern.exec(text);
         const endIndex = nextMatch ? nextMatch.index : text.length;
-        const scheduleContent = text.substring(startIndex + match[0].length, endIndex);
-        
-        // 스케줄 설명과 표 처리
-        html += processScheduleContent(scheduleContent);
-        
-        lastIndex = endIndex;
+        const scheduleContent = text.substring(startIndex, endIndex);
+        html += `<div class="schedule-section-title">📅 스케줄 ${scheduleNum}: ${scheduleTitle}</div>`;
+        html += convertScheduleSectionToCards(scheduleContent);
+        if (nextMatch) schedulePattern.lastIndex = nextMatch.index;
       }
-      
-      // 마지막 부분 처리
-      if (lastIndex < text.length) {
-        const remainingText = text.substring(lastIndex);
-        html += processTextContent(remainingText);
-      }
-      
       return html;
     }
 
-    // 스케줄 내용 처리 함수
-    function processScheduleContent(content) {
-      let html = '';
-      
-      // 설명 부분과 표 부분 분리
-      const tableStart = content.indexOf('|');
-      if (tableStart === -1) {
-        // 표가 없는 경우
-        html += `<div class="schedule-description">${content.trim()}</div>`;
-        return html;
-      }
-      
-      // 설명 부분 처리
-      const description = content.substring(0, tableStart).trim();
-      if (description) {
-        html += `<div class="schedule-description">${description}</div>`;
-      }
-      
-      // 표 부분 처리
-      const tableContent = content.substring(tableStart);
-      html += convertMarkdownTableToHtml(tableContent);
-      
-      return html;
-    }
-
-    // 마크다운 표를 HTML 테이블로 변환
-    function convertMarkdownTableToHtml(tableText) {
-      const lines = tableText.trim().split('\n');
-      if (lines.length < 3) return tableText; // 유효한 표가 아닌 경우
-      
-      let html = '<table class="schedule-table">';
-      
+    // 각 스케줄 섹션(표+설명)을 카드로 변환
+    function convertScheduleSectionToCards(sectionText) {
+      // 표 행 추출 (| 시간 | 장소 | 설명 | ...)
+      const lines = sectionText.split('\n').map(l => l.trim()).filter(Boolean);
+      let cards = '';
+      let currentCard = '';
+      let inTable = false;
+      let lastTime = '';
+      let lastPlace = '';
+      let lastDesc = '';
+      let lastRating = '';
+      let lastEmojis = '';
+      let buffer = [];
+      let blockquote = '';
+      let cardCount = 0;
       for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (!line.startsWith('|')) continue;
-        
-        const cells = line.split('|').slice(1, -1).map(cell => cell.trim());
-        
-        if (i === 0) {
-          // 헤더 행
-          html += '<thead><tr>';
-          cells.forEach(cell => {
-            html += `<th>${cell}</th>`;
-          });
-          html += '</tr></thead><tbody>';
-        } else if (i === 1) {
-          // 구분선 행 (무시)
-          continue;
-        } else {
-          // 데이터 행
-          html += '<tr>';
-          cells.forEach((cell, index) => {
-            const className = index === 0 ? 'time-column' : 
-                            index === 1 ? 'place-column' : 'description-column';
-            html += `<td class="${className}">${cell}</td>`;
-          });
-          html += '</tr>';
+        const line = lines[i];
+        // 표 헤더/구분선 무시
+        if (/^\|\s*시간\s*\|/i.test(line) || /^\|[-: ]+\|/.test(line)) continue;
+        // 표 데이터 행
+        if (/^\|/.test(line)) {
+          // 이전 카드가 있으면 출력
+          if (lastTime && lastPlace) {
+            cards += renderScheduleCard(lastTime, lastPlace, buffer.join(' '), blockquote, lastRating, lastEmojis);
+            buffer = [];
+            blockquote = '';
+            lastRating = '';
+            lastEmojis = '';
+            cardCount++;
+          }
+          // | 시간 | 장소 | 설명 |
+          const cells = line.split('|').map(c => c.trim());
+          lastTime = cells[1] || '';
+          lastPlace = cells[2] || '';
+          lastDesc = cells[3] || '';
+          // 이모지 추천
+          lastEmojis = suggestPlaceEmoji(lastPlace, lastDesc);
+          // 평점 추출
+          const ratingMatch = lastDesc.match(/평점[:\s]*([0-9]\.[0-9])/);
+          lastRating = ratingMatch ? ratingMatch[1] : '';
+          // 설명에서 평점 문구 제거
+          if (lastRating) lastDesc = lastDesc.replace(/\(?평점[:\s]*[0-9]\.[0-9]\)?/g, '').trim();
+          buffer = [lastDesc];
+        } else if (line.startsWith('>')) {
+          // 블록 인용
+          blockquote += line.replace(/^>\s*/, '') + ' ';
+        } else if (line) {
+          buffer.push(line);
         }
       }
-      
-      html += '</tbody></table>';
+      // 마지막 카드 출력
+      if (lastTime && lastPlace) {
+        cards += renderScheduleCard(lastTime, lastPlace, buffer.join(' '), blockquote, lastRating, lastEmojis);
+      }
+      return cards;
+    }
+
+    // 카드 렌더링
+    function renderScheduleCard(time, place, desc, blockquote, rating, emoji) {
+      // 설명을 2~3줄 단락으로 끊기
+      const descParagraphs = desc.split(/(?<=\.)\s+/).filter(Boolean);
+      let descHtml = '';
+      for (let i = 0; i < descParagraphs.length; i += 2) {
+        descHtml += `<p>${descParagraphs.slice(i, i + 2).join(' ')}</p>`;
+      }
+      let html = `<div class="schedule-card">
+        <div class="schedule-title">🕘 ${time} – <b>${place}</b> ${emoji}</div>
+        <div class="schedule-desc">${descHtml}`;
+      if (blockquote) {
+        html += `<blockquote>${blockquote.trim()}</blockquote>`;
+      }
+      if (rating) {
+        html += `<div class="schedule-rating"><b>⭐ 평점: ${rating}</b></div>`;
+      }
+      html += `</div></div>`;
       return html;
     }
 
-    // 일반 텍스트 내용 처리
-    function processTextContent(text) {
-      if (!text.trim()) return '';
-      
-      // 줄바꿈을 <br>로 변환
-      return text.replace(/\n/g, '<br>');
+    // 장소명/설명에 따라 이모지 추천
+    function suggestPlaceEmoji(place, desc) {
+      const lower = (place + ' ' + desc).toLowerCase();
+      if (/[모스크|성당|church|cathedral|mosque|temple|사원|절|이슬람|종교]/.test(lower)) return '🕌';
+      if (/[공원|park|산|mountain|정원|garden|숲|forest|호수|lake|강|river]/.test(lower)) return '🌳';
+      if (/[타워|전망대|tower|observatory]/.test(lower)) return '🗼';
+      if (/[박물관|museum]/.test(lower)) return '🏛️';
+      if (/[시장|market|마켓]/.test(lower)) return '🛍️';
+      if (/[카페|cafe|커피|coffee]/.test(lower)) return '☕';
+      if (/[식당|restaurant|맛집|food|grill|steak|bar|cafe|피자|pizza|한식|양식|중식|일식|분식|죽|비빔밥|steakhouse|grill|demiglace|outback|alvolo|albolo|alvollo|alvolo]/.test(lower)) return '🍽️';
+      if (/[쇼핑|mall|백화점|shopping|plaza|square|광장]/.test(lower)) return '🏬';
+      if (/[사진|포토|photo|촬영|전망|view|풍경|scenery|panorama|sunset|석양]/.test(lower)) return '📸';
+      if (/[역|station|지하철|subway]/.test(lower)) return '🚉';
+      if (/[호텔|hotel|숙소|guesthouse|hostel]/.test(lower)) return '🏨';
+      return '';
     }
 
     // 다시 시도 함수 추가
