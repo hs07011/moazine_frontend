@@ -1165,63 +1165,33 @@
 
     // 각 스케줄 섹션(표+설명)을 카드로 변환
     function convertScheduleSectionToCards(sectionText) {
-      // 표 행 추출 (| 시간 | 장소 | 설명 | ...)
       const lines = sectionText.split('\n').map(l => l.trim()).filter(Boolean);
       let cards = '';
-      let currentCard = '';
-      let inTable = false;
-      let lastTime = '';
-      let lastPlace = '';
-      let lastDesc = '';
-      let lastRating = '';
-      let lastEmojis = '';
-      let buffer = [];
-      let blockquote = '';
-      let cardCount = 0;
+      let lastTime = '', lastPlace = '', lastDesc = '', lastTip = '', lastRating = '', lastEmojis = '';
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        // 표 헤더/구분선 무시
         if (/^\|\s*시간\s*\|/i.test(line) || /^\|[-: ]+\|/.test(line)) continue;
-        // 표 데이터 행
         if (/^\|/.test(line)) {
-          // 이전 카드가 있으면 출력
           if (lastTime && lastPlace) {
-            cards += renderScheduleCard(lastTime, lastPlace, buffer.join(' '), blockquote, lastRating, lastEmojis);
-            buffer = [];
-            blockquote = '';
-            lastRating = '';
-            lastEmojis = '';
-            cardCount++;
+            cards += renderScheduleCard(lastTime, lastPlace, lastDesc, lastTip, lastRating, lastEmojis);
           }
-          // | 시간 | 장소 | 설명 |
           const cells = line.split('|').map(c => c.trim());
           lastTime = cells[1] || '';
           lastPlace = cells[2] || '';
           lastDesc = cells[3] || '';
-          // 이모지 추천
+          lastTip = cells[4] || '';
+          lastRating = cells[5] || '';
           lastEmojis = suggestPlaceEmoji(lastPlace, lastDesc);
-          // 평점 추출
-          const ratingMatch = lastDesc.match(/평점[:\s]*([0-9]\.[0-9])/);
-          lastRating = ratingMatch ? ratingMatch[1] : '';
-          // 설명에서 평점 문구 제거
-          if (lastRating) lastDesc = lastDesc.replace(/\(?평점[:\s]*[0-9]\.[0-9]\)?/g, '').trim();
-          buffer = [lastDesc];
-        } else if (line.startsWith('>')) {
-          // 블록 인용
-          blockquote += line.replace(/^>\s*/, '') + ' ';
-        } else if (line) {
-          buffer.push(line);
         }
       }
-      // 마지막 카드 출력
       if (lastTime && lastPlace) {
-        cards += renderScheduleCard(lastTime, lastPlace, buffer.join(' '), blockquote, lastRating, lastEmojis);
+        cards += renderScheduleCard(lastTime, lastPlace, lastDesc, lastTip, lastRating, lastEmojis);
       }
       return cards;
     }
 
     // 카드 렌더링
-    function renderScheduleCard(time, place, desc, blockquote, rating, emoji) {
+    function renderScheduleCard(time, place, desc, tip, rating, emoji) {
       // 설명을 2~3줄 단락으로 끊기
       const descParagraphs = desc.split(/(?<=\.)\s+/).filter(Boolean);
       let descHtml = '';
@@ -1231,8 +1201,8 @@
       let html = `<div class="schedule-card">
         <div class="schedule-title">🕘 ${time} – <b>${place}</b> ${emoji}</div>
         <div class="schedule-desc">${descHtml}`;
-      if (blockquote) {
-        html += `<blockquote>${blockquote.trim()}</blockquote>`;
+      if (tip && tip !== '없음') {
+        html += `<blockquote>${tip.trim()}</blockquote>`;
       }
       if (rating) {
         html += `<div class="schedule-rating"><b>⭐ 평점: ${rating}</b></div>`;
