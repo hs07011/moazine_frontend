@@ -480,6 +480,27 @@
       line-height: 1.5;
       letter-spacing: 0.5px;
     }
+    .course-btn {
+      font-size: inherit;
+      font-weight: bold;
+      padding: 12px 24px;
+      border-radius: 4px;
+      margin-left: 10px;
+      background: #27ae60;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+      height: 48px;
+      min-height: 48px;
+      box-sizing: border-box;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .course-btn:hover {
+      background: #219150;
+    }
   </style>
 </head>
 <body>
@@ -488,7 +509,7 @@
     <div class="header-search">
       <input id="destination" placeholder="현재 위치 검색 결과" style="color:#888;" />
       <button id="searchBtn">검색</button>
-      <button id="courseBtn" style="font-size:inherit;font-weight:bold;padding:12px 24px;border-radius:4px;margin-left:10px;background:#217093;color:#fff;border:none;cursor:pointer;transition:background 0.2s;white-space:nowrap;">추천코스</button>
+      <button id="courseBtn" class="course-btn">추천코스</button>
     </div>
   </div>
   <div class="main">
