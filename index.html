@@ -146,6 +146,7 @@
       height: 1%;
       vertical-align: middle;
       word-break: break-all;
+      white-space: nowrap;
     }
     th {
       background: #f0f0f0;
@@ -650,13 +651,13 @@
       if (list.length === 0) {
         // 데이터가 없을 때 10개의 빈 항목 표시
         for (let i = 0; i < maxRows; i++) {
-          html += `<tr><td style='width:36px;text-align:center;color:#888;'>${i+1}.</td><td style='color:#888;'>현재 위치에서 추천할 곳이 없습니다</td><td class='score'></td></tr>`;
+          html += `<tr><td style='width:48px;text-align:center;color:#888;white-space:nowrap;'>${i+1}.</td><td style='color:#888;'>현재 위치에서 추천할 곳이 없습니다</td><td class='score'></td></tr>`;
         }
       } else {
         // 데이터가 있을 때 최대 10개만 표시
         html = list.slice(0, maxRows).map((item, i) =>
           `<tr class="clickable" onclick="showPlaceInfo('${type}', '${item.place_id}')">
-            <td style="width:36px;text-align:center;">${i+1}.</td>
+            <td style="width:48px;text-align:center;white-space:nowrap;">${i+1}.</td>
             <td>${item.name}</td>
             <td class="score">${item.rating ? item.rating.toFixed(1) + '점' : '-'}</td>
           </tr>`
@@ -664,7 +665,7 @@
         // 10개 미만일 때 빈 항목으로 채움
         if (list.length < maxRows) {
           for (let i = list.length; i < maxRows; i++) {
-            html += `<tr><td style='width:36px;text-align:center;color:#888;'>${i+1}.</td><td style='color:#888;'>현재 위치에서 추천할 곳이 없습니다</td><td class='score'></td></tr>`;
+            html += `<tr><td style='width:48px;text-align:center;color:#888;white-space:nowrap;'>${i+1}.</td><td style='color:#888;'>현재 위치에서 추천할 곳이 없습니다</td><td class='score'></td></tr>`;
           }
         }
       }
