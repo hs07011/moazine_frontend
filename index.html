@@ -454,6 +454,18 @@
       padding: 22px 18px 18px 18px;
       box-shadow: 0 2px 8px #0001;
     }
+    .course-block.course-1 {
+      border-color: #8ecae6;
+      background: #e0f7fa;
+    }
+    .course-block.course-2 {
+      border-color: #ffd166;
+      background: #fffbe6;
+    }
+    .course-block.course-3 {
+      border-color: #b7e4c7;
+      background: #f1faee;
+    }
     .course-block:last-child { margin-bottom: 0; }
     .course-title { font-size: 2.1rem; font-weight: bold; margin-bottom: 10px; color: #217093; display: flex; align-items: center; gap: 8px; }
     .course-rating { font-weight: bold; color: #e6b800; margin-top: 8px; }
@@ -948,11 +960,11 @@
       let courseHtml = '';
       const blocks = text.split(/(?:^|\n)[#\-]{2,}[^\n]*\n?/g).map(s => s.trim()).filter(Boolean);
       if (blocks.length > 1) {
-        courseHtml = blocks.map(block => `<div class="course-block">${block.replace(/\n/g, '<br>')}</div>`).join('');
+        courseHtml = blocks.map((block, idx) => `<div class=\"course-block course-${idx+1}\">${block.replace(/\n/g, '<br>')}</div>`).join('');
       } else {
-        courseHtml = `<div class="course-block">${text.replace(/\n/g, '<br>')}</div>`;
+        courseHtml = `<div class=\"course-block\">${text.replace(/\n/g, '<br>')}</div>`;
       }
-      box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>` + courseHtml;
+      box.innerHTML = `<span class='close-btn' onclick=\"closeCourseBox()\">✕</span>` + courseHtml;
       box.style.display = 'block';
     }
 
