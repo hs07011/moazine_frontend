@@ -453,6 +453,7 @@
     <div class="header-search">
       <input id="destination" placeholder="현재 위치 검색 결과" style="color:#888;" />
       <button id="searchBtn">검색</button>
+      <button id="courseBtn" style="font-size:inherit;font-weight:bold;padding:12px 24px;border-radius:4px;margin-left:10px;background:#217093;color:#fff;border:none;cursor:pointer;transition:background 0.2s;white-space:nowrap;">추천코스</button>
     </div>
   </div>
   <div class="main">
@@ -489,6 +490,7 @@
     </div>
   </div>
   <div id="placeDetailsBox" class="details-popup" style="display:none;"></div>
+  <div id="coursePopup" class="summary-popup" style="display:none;"></div>
   <script>
     const PROXY = 'https://moazine.onrender.com';
     let map, marker, destLatLng, attractions = [], restaurants = [];
@@ -900,6 +902,40 @@
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
+    }
+
+    // 추천코스 버튼 이벤트
+    document.getElementById('courseBtn').onclick = function() {
+      showCoursePopup();
+    };
+
+    function showCoursePopup() {
+      if ((!attractions || attractions.length === 0) && (!restaurants || restaurants.length === 0)) {
+        showCourseBox('추천할 코스 정보가 없습니다.');
+        return;
+      }
+      showCourseBox('추천 코스를 생성 중입니다...');
+      fetch('https://moazine.onrender.com/generate-course', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ attractions, restaurants })
+      })
+      .then(res => res.json())
+      .then(data => {
+        showCourseBox(data.course || '추천 코스를 가져오지 못했습니다.');
+      })
+      .catch(() => showCourseBox('추천 코스를 가져오지 못했습니다.'));
+    }
+
+    function showCourseBox(text) {
+      const box = document.getElementById('coursePopup');
+      box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>` + text;
+      box.style.display = 'block';
+    }
+
+    function closeCourseBox() {
+      document.getElementById('coursePopup').style.display = 'none';
     }
 
     // 페이지 로드 시 Google Maps API 로드 시작
