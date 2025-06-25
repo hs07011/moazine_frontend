@@ -511,6 +511,21 @@
       <button id="courseBtn" class="course-btn">추천코스</button>
     </div>
   </div>
+  
+  <!-- SoundCloud 음악 플레이어 추가 -->
+  <div style="text-align: center; padding: 20px; background: #f9f9f9; border-bottom: 1px solid #ddd;">
+    <h3 style="margin: 0 0 10px 0; color: #217093;">🎵 여행 음악 - 세븐틴 Pretty U</h3>
+    <iframe
+      id="scPlayer"
+      width="300"
+      height="166"
+      scrolling="no"
+      frameborder="no"
+      allow="autoplay"
+      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/sunnyb007/pretty-u-seventeen">
+    </iframe>
+  </div>
+  
   <div class="main">
     <div class="map-container">
       <div id="map"></div>
@@ -610,6 +625,13 @@
     document.getElementById('searchBtn').onclick = function() {
       const dest = document.getElementById('destination').value;
       if (!dest) return alert('목적지를 입력하세요!');
+      
+      // 음악 재생 시작
+      const iframe = document.getElementById('scPlayer');
+      if (iframe && !iframe.src.includes('auto_play=true')) {
+        iframe.src += "&auto_play=true";
+      }
+      
       // '현재위치', '현위치', '여기', '이곳' 입력 시 현재 위치로 검색
       const currentKeywords = ['현재위치', '현위치', '여기', '이곳'];
       if (currentKeywords.includes(dest.trim().replace(/\s/g, ''))) {
