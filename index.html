@@ -266,6 +266,7 @@
       min-width: 240px;
       max-width: 98%;
       min-height: 200px;
+      max-height: 80vh;
       background: #fff;
       border: 3px solid #222;
       border-radius: 12px;
@@ -852,7 +853,7 @@
       // 2. 괄호와 괄호 안의 내용, 그 외 기호를 정리합니다.
       speech = speech
         .replace(/\([^\)]*\)/g, '') // ( ... ) 전체 제거
-        .replace(/[\[\]\-·*=_~^|#@$%&+=→•▪︎🎯🌟🎒✈️👍✅✔��❣️]/g, ' ') // 음성 출력에 불필요한 특수기호 및 이모지 제거
+        .replace(/[\[\]\-·*=_~^|#@$%&+=→•▪︎🎯🌟🎒✈️👍✅✔💯❣️]/g, ' ') // 음성 출력에 불필요한 특수기호 및 이모지 제거
         .replace(/:/g, '은')
         .replace(/\//g, ' 또는 ')
         .replace(/평점/g, '평점은');
