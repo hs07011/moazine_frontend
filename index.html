@@ -1133,12 +1133,19 @@
 
     // 카드 스타일로 변환하는 함수
     function convertScheduleToCards(text) {
-      // 스케줄 구분 (예: **스케줄 1: ...**)
       const schedulePattern = /\*\*스케줄\s*(\d+):\s*([^*]+)\*\*/g;
       let html = '';
       let lastIndex = 0;
       let match;
-      while ((match = schedulePattern.exec(text)) !== null) {
+      let safety = 0; // 안전장치
+
+      // 패턴이 하나도 없으면 안내 메시지
+      if (!/\*\*스케줄\s*\d+:/.test(text)) {
+        return '<div style="color:#888;text-align:center;padding:32px 0;">생성된 여행 일정이 없습니다.</div>';
+      }
+      schedulePattern.lastIndex = 0; // 패턴 재설정
+
+      while ((match = schedulePattern.exec(text)) !== null && safety++ < 100) {
         const scheduleNum = match[1];
         const scheduleTitle = match[2].trim();
         const startIndex = match.index + match[0].length;
@@ -1147,7 +1154,11 @@
         const scheduleContent = text.substring(startIndex, endIndex);
         html += `<div class="schedule-section-title">📅 스케줄 ${scheduleNum}: ${scheduleTitle}</div>`;
         html += convertScheduleSectionToCards(scheduleContent);
-        if (nextMatch) schedulePattern.lastIndex = nextMatch.index;
+        if (nextMatch) {
+          schedulePattern.lastIndex = nextMatch.index;
+        } else {
+          break; // nextMatch 없으면 반드시 종료
+        }
       }
       return html;
     }
