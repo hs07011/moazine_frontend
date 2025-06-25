@@ -1071,61 +1071,8 @@
         content += `<button onclick="retryScheduleGeneration()" style="background: #217093; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">다시 시도</button>`;
         content += `</div>`;
       } else {
-        // 카드 스타일로 변환 적용
-        const convertedText = convertScheduleToCards(text);
-        content += `<style>
-          .schedule-card {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 4px 16px #0001;
-            margin: 18px 0;
-            padding: 24px 22px 18px 22px;
-            max-width: 700px;
-            border-left: 6px solid #217093;
-          }
-          .schedule-title {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #217093;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-          }
-          .schedule-desc p {
-            margin: 0 0 8px 0;
-            line-height: 1.7;
-            color: #222;
-          }
-          .schedule-desc blockquote {
-            background: #f4f8fa;
-            border-left: 4px solid #4caf50;
-            margin: 10px 0 10px 0;
-            padding: 8px 16px;
-            color: #217093;
-            font-style: italic;
-            font-size: 1rem;
-          }
-          .schedule-rating {
-            margin-top: 8px;
-            color: #ff9800;
-            font-weight: bold;
-            font-size: 1.1rem;
-          }
-          .schedule-section-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #217093;
-            background: #e3f2fd;
-            border-radius: 8px;
-            padding: 8px 12px;
-            margin: 24px 0 10px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-          }
-        </style>`;
-        content += `<div class="schedule-container">${convertedText}</div>`;
+        // Gemini가 반환한 HTML을 그대로 출력
+        content += `<div class="schedule-container">${text}</div>`;
       }
       box.innerHTML = content;
       box.style.display = 'block';
