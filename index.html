@@ -644,101 +644,76 @@
       .site-block { min-width: 220px; max-width: 320px; }
       .site-block iframe { min-width: 180px; max-width: 300px; height: 120px; }
     }
+    .header-btn {
+      font-size: 1.1rem;
+      font-weight: bold;
+      padding: 8px 18px;
+      border-radius: 6px;
+      margin: 0 6px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .header-btn.blue { background: #217093; color: #fff; }
+    .header-btn.orange { background: #ff9800; color: #fff; }
+    .header-btn.blue:hover { background: #14516b; }
+    .header-btn.orange:hover { background: #e67c00; }
+    .content-bar {
+      display: flex;
+      overflow-x: auto;
+      gap: 18px;
+      padding: 12px 0 12px 12px;
+      background: #fff;
+      border-bottom: 2px solid #eee;
+      align-items: center;
+      scrollbar-width: thin;
+      scrollbar-color: #bbb #eee;
+    }
+    .content-bar::-webkit-scrollbar { height: 10px; }
+    .content-bar::-webkit-scrollbar-thumb { background: #bbb; border-radius: 6px; }
+    .content-bar::-webkit-scrollbar-track { background: #eee; }
+    .content-bar a, .content-bar button {
+      display: flex; flex-direction: column; align-items: center; text-decoration: none; border: none; background: none; cursor: pointer;
+    }
+    .content-bar img {
+      width: 64px; height: 64px; border-radius: 16px; background: #f9f9f9; box-shadow: 0 2px 8px #0001;
+      margin-bottom: 4px;
+      transition: transform 0.2s;
+    }
+    .content-bar img:hover { transform: scale(1.08); }
+    .content-bar span { font-size: 0.95rem; color: #222; text-align: center; }
+    @media (max-width: 600px) {
+      .content-bar img { width: 44px; height: 44px; border-radius: 10px; }
+      .content-bar span { font-size: 0.8rem; }
+    }
   </style>
 </head>
 <body>
   <div class="header">
     <div class="header-title">Travel Here Service</div>
+    <button id="recommendCourseBtn" class="header-btn blue">추천 코스</button>
+    <button id="recommendContentBtn" class="header-btn orange">추천 콘텐츠</button>
     <div class="header-search">
       <input id="destination" placeholder="현재 위치 검색 결과" style="color:#888;" />
       <button id="searchBtn">검색</button>
       <button id="courseBtn" class="course-btn">추천코스</button>
     </div>
   </div>
-  
-  <!-- 사이트 가로 스크롤 영역 -->
-  <div class="site-scroll-row" id="siteScrollRow">
-    <div class="site-block">
-      <h3>🎵 여행 음악 - 세븐틴 Pretty U</h3>
-      <iframe
-        id="scPlayer"
-        src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/sunnyb007/pretty-u-seventeen&volume=10&color=ff5500"
-        frameborder="no"
-        allow="autoplay"
-        scrolling="no"
-        ></iframe>
-    </div>
-    <div class="site-block">
-      <h3>전자잡지 서비스</h3>
-      <iframe
-        src="https://dl.moazine.com/sub/main.asp"
-        frameborder="0"
-        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-      ></iframe>
-      <div class="fallback-link">
-        <a href="https://dl.moazine.com/sub/main.asp" target="_blank" style="color:#217093;text-decoration:underline;">전자잡지 서비스 새 창에서 열기</a>
-      </div>
-    </div>
-    <div class="site-block">
-      <h3>윌라 (Welaaa)</h3>
-      <iframe
-        src="https://www.welaaa.com"
-        frameborder="0"
-        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-      ></iframe>
-      <div class="fallback-link">
-        <a href="https://www.welaaa.com" target="_blank" style="color:#217093;text-decoration:underline;">윌라 새 창에서 열기</a>
-      </div>
-    </div>
-    <div class="site-block">
-      <h3>밀리의 서재 (Millie)</h3>
-      <iframe
-        src="https://www.millie.co.kr"
-        frameborder="0"
-        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-      ></iframe>
-      <div class="fallback-link">
-        <a href="https://www.millie.co.kr" target="_blank" style="color:#217093;text-decoration:underline;">밀리의 서재 새 창에서 열기</a>
-      </div>
-    </div>
-    <div class="site-block">
-      <h3>멜론 (Melon)</h3>
-      <iframe
-        src="https://www.melon.com"
-        frameborder="0"
-        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-      ></iframe>
-      <div class="fallback-link">
-        <a href="https://www.melon.com" target="_blank" style="color:#217093;text-decoration:underline;">멜론 새 창에서 열기</a>
-      </div>
-    </div>
-    <div class="site-block">
-      <h3>유튜브 (YouTube)</h3>
-      <img src="https://www.youtube.com/about/static/svgs/icons/brand-resources/YouTube-icon-full_color.svg" alt="YouTube" style="width: 80%; max-width: 220px; margin: 0 auto; display: block; background: #fff; border-radius: 8px; border: 1px solid #ccc;">
-      <div class="fallback-link" style="display:block; margin-top:12px;">
-        <a href="https://www.youtube.com" target="_blank" style="color:#217093;text-decoration:underline; font-weight:bold;">유튜브 새 창에서 열기</a>
-      </div>
-    </div>
-    <div class="site-block">
-      <h3>넷플릭스 (Netflix)</h3>
-      <img src="https://assets.brand.microsites.netflix.io/assets/3d7e6e4b-7b7e-11e9-8f9e-066b49664af6_cm_800w.png" alt="Netflix" style="width: 80%; max-width: 220px; margin: 0 auto; display: block; background: #fff; border-radius: 8px; border: 1px solid #ccc;">
-      <div class="fallback-link" style="display:block; margin-top:12px;">
-        <a href="https://www.netflix.com/kr" target="_blank" style="color:#217093;text-decoration:underline; font-weight:bold;">넷플릭스 새 창에서 열기</a>
-      </div>
-    </div>
-    <div class="site-block">
-      <h3>웨이브 (Wavve)</h3>
-      <iframe
-        src="https://www.wavve.com"
-        frameborder="0"
-        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-      ></iframe>
-      <div class="fallback-link">
-        <a href="https://www.wavve.com" target="_blank" style="color:#217093;text-decoration:underline;">웨이브 새 창에서 열기</a>
-      </div>
-    </div>
+
+  <div id="contentBar" class="content-bar" style="display:none;">
+    <a href="https://www.welaaa.com" target="_blank"><img src="https://cdn.jsdelivr.net/gh/welaaa/brand@main/logo/welaaa-icon.png" alt="윌라"><span>윌라</span></a>
+    <a href="https://www.disneyplus.com/ko-kr" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg" alt="디즈니+" style="background:#fff;"><span>디즈니+</span></a>
+    <a href="https://www.wavve.com" target="_blank"><img src="https://static.wavve.com/img/common/favicon-192x192.png" alt="웨이브"><span>웨이브</span></a>
+    <a href="https://watcha.com" target="_blank"><img src="https://play-lh.googleusercontent.com/1Qn6QwO5jM8QnQwK1QwK1QwK1QwK1QwK1QwK1QwK1QwK1QwK1QwK1QwK1QwK1QwK1Q=w240-h480-rw" alt="왓챠"><span>왓챠</span></a>
+    <a href="https://www.youtube.com" target="_blank"><img src="https://www.youtube.com/about/static/svgs/icons/brand-resources/YouTube-icon-full_color.svg" alt="유튜브"><span>유튜브</span></a>
+    <a href="https://dl.moazine.com/sub/main.asp" target="_blank"><img src="https://dl.moazine.com/images/logo_moazine.png" alt="모아진"><span>모아진</span></a>
+    <a href="https://www.tving.com" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Tving_logo_2021.svg" alt="티빙"><span>티빙</span></a>
+    <a href="https://www.uplus.co.kr" target="_blank"><img src="https://www.uplus.co.kr/css/images/common/favicon.ico" alt="U+"><span>U+</span></a>
+    <a href="https://www.melon.com" target="_blank"><img src="https://cdnimg.melon.co.kr/resource/image/web/favicon/favicon_20230607151532.ico" alt="멜론"><span>멜론</span></a>
+    <a href="https://www.genesis-music.com" target="_blank"><img src="https://www.genesis-music.com/favicon.ico" alt="제네시스뮤직"><span>GENESIS MUSIC</span></a>
+    <a href="https://www.netflix.com/kr" target="_blank"><img src="https://assets.brand.microsites.netflix.io/assets/3d7e6e4b-7b7e-11e9-8f9e-066b49664af6_cm_800w.png" alt="넷플릭스"><span>넷플릭스</span></a>
   </div>
-  
+
   <div class="main">
     <div class="map-container">
       <div id="map"></div>
@@ -1598,5 +1573,10 @@
       });
       // 터치 스와이프 지원은 기본적으로 overflow-x: auto로 동작
     })();
+
+    document.getElementById('recommendContentBtn').onclick = function() {
+      const bar = document.getElementById('contentBar');
+      bar.style.display = (bar.style.display === 'none' || bar.style.display === '') ? 'flex' : 'none';
+    };
   </script>
 </body>
