@@ -1266,12 +1266,16 @@
       const places = [];
       const allPlaces = [...attractions, ...restaurants];
       
-      // 코스 텍스트에서 장소명 찾기 (볼드 처리된 텍스트나 특정 패턴)
-      const placeMatches = courseText.match(/\*\*(.*?)\*\*/g) || [];
+      // 코스 텍스트에서 시간과 장소명 패턴 찾기 (예: "🕘 09:00 – **첫 번째 장소**" 또는 "1. **첫 번째 장소**")
+      const timePlacePattern = /🕘\s*(\d{1,2}:\d{2})\s*–\s*\*\*(.*?)\*\*/g;
+      const numberPlacePattern = /(\d+)\.\s*\*\*(.*?)\*\*/g;
       
-      placeMatches.forEach(match => {
-        const placeName = match.replace(/\*\*/g, '').trim();
-        // 기존 관광지/맛집 목록에서 매칭되는 장소 찾기
+      let match;
+      let visitOrder = 1;
+      
+      // 시간 패턴으로 먼저 찾기
+      while ((match = timePlacePattern.exec(courseText)) !== null) {
+        const placeName = match[2].trim();
         const foundPlace = allPlaces.find(place => 
           place.name.includes(placeName) || placeName.includes(place.name)
         );
@@ -1281,10 +1285,36 @@
             name: foundPlace.name,
             location: foundPlace.geometry?.location,
             type: attractions.includes(foundPlace) ? 'attraction' : 'restaurant',
-            rating: foundPlace.rating
+            rating: foundPlace.rating,
+            visitOrder: visitOrder++,
+            time: match[1]
           });
         }
-      });
+      }
+      
+      // 번호 패턴으로 찾기 (시간 패턴에서 찾지 못한 경우)
+      if (places.length === 0) {
+        while ((match = numberPlacePattern.exec(courseText)) !== null) {
+          const placeName = match[2].trim();
+          const foundPlace = allPlaces.find(place => 
+            place.name.includes(placeName) || placeName.includes(place.name)
+          );
+          
+          if (foundPlace) {
+            places.push({
+              name: foundPlace.name,
+              location: foundPlace.geometry?.location,
+              type: attractions.includes(foundPlace) ? 'attraction' : 'restaurant',
+              rating: foundPlace.rating,
+              visitOrder: parseInt(match[1]),
+              time: null
+            });
+          }
+        }
+      }
+      
+      // 방문 순서로 정렬
+      places.sort((a, b) => a.visitOrder - b.visitOrder);
       
       return places;
     }
@@ -1324,23 +1354,26 @@
           const marker = new google.maps.Marker({
             position: place.location,
             map: courseMap,
-            title: place.name,
-            label: `${index + 1}`,
+            title: `${place.visitOrder}. ${place.name}`,
+            label: `${place.visitOrder}`,
             icon: {
               url: place.type === 'attraction' ? '/assets/attraction.png' : '/assets/restaurant.png',
               scaledSize: new google.maps.Size(32, 32)
             }
           });
           
-          // 정보창 추가
+          // 정보창 추가 (방문 순서와 시간 포함)
           const infoWindow = new google.maps.InfoWindow({
             content: `
-              <div style="padding: 10px;">
-                <h4 style="margin: 0 0 5px 0; color: #217093;">${place.name}</h4>
-                <p style="margin: 0; font-size: 12px;">
-                  ${place.type === 'attraction' ? '관광지' : '맛집'}
-                  ${place.rating ? ` | 평점: ${place.rating}점` : ''}
+              <div style="padding: 10px; min-width: 200px;">
+                <h4 style="margin: 0 0 5px 0; color: #217093;">
+                  ${place.visitOrder}. ${place.name}
+                </h4>
+                <p style="margin: 0 0 3px 0; font-size: 12px; color: #666;">
+                  ${place.type === 'attraction' ? '🏛️ 관광지' : '🍽️ 맛집'}
+                  ${place.rating ? ` | ⭐ ${place.rating}점` : ''}
                 </p>
+                ${place.time ? `<p style="margin: 0; font-size: 12px; color: #ff6b35; font-weight: bold;">🕘 ${place.time}</p>` : ''}
               </div>
             `
           });
