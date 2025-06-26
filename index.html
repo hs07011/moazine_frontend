@@ -930,7 +930,7 @@
         utter.lang = 'ko-KR';
         utter.rate = 0.9; // 조금 더 천천히
         utter.pitch = 1; // 자연스러운 높이
-        utter.volume = 1.0; // 최대 볼륨으로 설정
+        utter.volume = 2.0; // 최대 볼륨의 2배로 설정 (기존 1.0에서 증가)
         // 자연스러운 한국어 voice 선택
         const koVoice = speechVoices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
         if (koVoice) utter.voice = koVoice;
@@ -982,7 +982,7 @@
           utter.lang = 'ko-KR';
           utter.rate = 0.9; // 조금 더 천천히
           utter.pitch = 1; // 자연스러운 높이
-          utter.volume = 1.0; // 최대 볼륨으로 설정
+          utter.volume = 2.0; // 최대 볼륨의 2배로 설정 (기존 1.0에서 증가)
           const koVoice = speechVoices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
           if (koVoice) utter.voice = koVoice;
           
