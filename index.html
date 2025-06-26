@@ -691,7 +691,7 @@
 <body>
   <div class="header">
     <div class="header-title">Travel Here Service</div>
-    <button id="recommendCourseBtn" class="header-btn blue">추천 코스</button>
+    <!-- <button id="recommendCourseBtn" class="header-btn blue">추천 코스</button> -->
     <button id="recommendContentBtn" class="header-btn orange">추천 콘텐츠</button>
     <div class="header-search">
       <input id="destination" placeholder="현재 위치 검색 결과" style="color:#888;" />
@@ -1550,6 +1550,15 @@
     // 페이지 로드 시 Google Maps API 로드 시작
     window.onload = function() {
       loadGoogleMapAPI();
+
+      // 추천 콘텐츠 버튼 토글 이벤트 등록
+      var recommendBtn = document.getElementById('recommendContentBtn');
+      if (recommendBtn) {
+        recommendBtn.onclick = function() {
+          const bar = document.getElementById('contentBar');
+          bar.style.display = (bar.style.display === 'none' || bar.style.display === '') ? 'flex' : 'none';
+        };
+      }
     };
 
     // 마우스 드래그로 가로 스크롤 지원
@@ -1573,10 +1582,5 @@
       });
       // 터치 스와이프 지원은 기본적으로 overflow-x: auto로 동작
     })();
-
-    document.getElementById('recommendContentBtn').onclick = function() {
-      const bar = document.getElementById('contentBar');
-      bar.style.display = (bar.style.display === 'none' || bar.style.display === '') ? 'flex' : 'none';
-    };
   </script>
 </body>
