@@ -670,6 +670,7 @@
     let scWidget = null; // SoundCloud Widget 객체
     let courseMap = null; // 코스 지도 인스턴스
     let courseData = []; // 코스 데이터 저장
+    let courseMarkers = []; // 코스 지도 마커 배열
 
     function loadVoices() {
       speechVoices = window.speechSynthesis.getVoices();
@@ -1359,12 +1360,13 @@
       titleElement.textContent = course.title + ' - 길안내';
       popup.style.display = 'flex';
       
-      // 지도 초기화
-      if (courseMap) {
-        courseMap.setMap(null);
+      // 기존 마커 제거
+      if (courseMarkers.length > 0) {
+        courseMarkers.forEach(marker => marker.setMap(null));
+        courseMarkers = [];
       }
       
-      // 지도 요소가 준비될 때까지 잠시 대기
+      // 지도 초기화 (지연)
       setTimeout(() => {
         courseMap = new google.maps.Map(mapElement, {
           zoom: 12,
@@ -1377,7 +1379,6 @@
         
         // 코스의 장소들을 지도에 표시
         const bounds = new google.maps.LatLngBounds();
-        const markers = [];
         
         if (course.places && course.places.length > 0) {
           course.places.forEach((place, index) => {
@@ -1408,7 +1409,7 @@
                       ${place.type === 'attraction' ? '🏛️ 관광지' : '🍽️ 맛집'}
                       ${place.rating ? ` | ⭐ ${place.rating}점` : ''}
                     </p>
-                    ${place.time ? `<p style="margin: 0; font-size: 12px; color: #ff6b35; font-weight: bold;">🕘 ${place.time}</p>` : ''}
+                    ${place.time ? `<p style=\"margin: 0; font-size: 12px; color: #ff6b35; font-weight: bold;\">🕘 ${place.time}</p>` : ''}
                   </div>
                 `
               });
@@ -1417,7 +1418,7 @@
                 infoWindow.open(courseMap, marker);
               });
               
-              markers.push(marker);
+              courseMarkers.push(marker);
               bounds.extend(place.location);
               console.log('마커 추가됨:', place.name);
             } else {
@@ -1426,9 +1427,9 @@
           });
           
           // 모든 마커가 보이도록 지도 영역 조정
-          if (markers.length > 0) {
+          if (courseMarkers.length > 0) {
             courseMap.fitBounds(bounds);
-            console.log('지도 영역 조정 완료, 마커 수:', markers.length);
+            console.log('지도 영역 조정 완료, 마커 수:', courseMarkers.length);
           } else {
             console.log('표시할 마커가 없습니다.');
           }
@@ -1443,10 +1444,12 @@
     // 코스 지도 팝업 닫기 함수
     function closeCourseMap() {
       document.getElementById('courseMapPopup').style.display = 'none';
-      if (courseMap) {
-        courseMap.setMap(null);
-        courseMap = null;
+      // 마커 제거
+      if (courseMarkers.length > 0) {
+        courseMarkers.forEach(marker => marker.setMap(null));
+        courseMarkers = [];
       }
+      courseMap = null;
     }
 
     // 페이지 로드 시 Google Maps API 로드 시작
