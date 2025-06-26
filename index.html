@@ -593,6 +593,57 @@
         padding: 5px 10px;
       }
     }
+    .site-scroll-row {
+      display: flex;
+      gap: 32px;
+      padding: 20px;
+      background: #f9f9f9;
+      border-bottom: 1px solid #ddd;
+      overflow-x: auto;
+      overflow-y: visible;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      cursor: grab;
+    }
+    .site-block {
+      min-width: 320px;
+      max-width: 420px;
+      flex: 0 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px #0001;
+      padding: 10px 8px 18px 8px;
+      text-align: center;
+      border: 1px solid #eee;
+      position: relative;
+      transition: box-shadow 0.2s;
+    }
+    .site-block:active {
+      box-shadow: 0 4px 16px #0002;
+    }
+    .site-block h3 {
+      margin: 0 0 10px 0;
+      color: #217093;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+    .site-block iframe {
+      width: 100%;
+      min-width: 280px;
+      max-width: 400px;
+      height: 166px;
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 6px;
+    }
+    .site-block .fallback-link {
+      margin-top: 8px;
+      display: none;
+    }
+    @media (max-width: 900px) {
+      .site-block { min-width: 220px; max-width: 320px; }
+      .site-block iframe { min-width: 180px; max-width: 300px; height: 120px; }
+    }
   </style>
 </head>
 <body>
@@ -605,60 +656,93 @@
     </div>
   </div>
   
-  <!-- SoundCloud 음악 플레이어 + Moazine + Welaaa + Millie 사이트 나란히 표시 -->
-  <div style="display: flex; justify-content: center; align-items: flex-start; gap: 32px; padding: 20px; background: #f9f9f9; border-bottom: 1px solid #ddd; flex-wrap: wrap;">
-    <div style="text-align: center;">
-      <h3 style="margin: 0 0 10px 0; color: #217093;">🎵 여행 음악 - 세븐틴 Pretty U</h3>
+  <!-- 사이트 가로 스크롤 영역 -->
+  <div class="site-scroll-row" id="siteScrollRow">
+    <div class="site-block">
+      <h3>🎵 여행 음악 - 세븐틴 Pretty U</h3>
       <iframe
         id="scPlayer"
-        width="300"
-        height="166"
-        scrolling="no"
+        src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/sunnyb007/pretty-u-seventeen&volume=10&color=ff5500"
         frameborder="no"
         allow="autoplay"
-        src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/sunnyb007/pretty-u-seventeen&volume=10&color=ff5500">
-      </iframe>
+        scrolling="no"
+        ></iframe>
     </div>
-    <div style="text-align: center;">
-      <h3 style="margin: 0 0 10px 0; color: #217093;">전자잡지 서비스</h3>
+    <div class="site-block">
+      <h3>전자잡지 서비스</h3>
       <iframe
         src="https://dl.moazine.com/sub/main.asp"
-        width="400"
-        height="166"
         frameborder="0"
-        style="border:1px solid #ccc; background:#fff;"
-        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-      </iframe>
-      <div style="margin-top:8px; display:none;">
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+      ></iframe>
+      <div class="fallback-link">
         <a href="https://dl.moazine.com/sub/main.asp" target="_blank" style="color:#217093;text-decoration:underline;">전자잡지 서비스 새 창에서 열기</a>
       </div>
     </div>
-    <div style="text-align: center;">
-      <h3 style="margin: 0 0 10px 0; color: #217093;">윌라 (Welaaa)</h3>
+    <div class="site-block">
+      <h3>윌라 (Welaaa)</h3>
       <iframe
         src="https://www.welaaa.com"
-        width="400"
-        height="166"
         frameborder="0"
-        style="border:1px solid #ccc; background:#fff;"
-        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-      </iframe>
-      <div style="margin-top:8px; display:none;">
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+      ></iframe>
+      <div class="fallback-link">
         <a href="https://www.welaaa.com" target="_blank" style="color:#217093;text-decoration:underline;">윌라 새 창에서 열기</a>
       </div>
     </div>
-    <div style="text-align: center;">
-      <h3 style="margin: 0 0 10px 0; color: #217093;">밀리의 서재 (Millie)</h3>
+    <div class="site-block">
+      <h3>밀리의 서재 (Millie)</h3>
       <iframe
         src="https://www.millie.co.kr"
-        width="400"
-        height="166"
         frameborder="0"
-        style="border:1px solid #ccc; background:#fff;"
-        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-      </iframe>
-      <div style="margin-top:8px; display:none;">
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+      ></iframe>
+      <div class="fallback-link">
         <a href="https://www.millie.co.kr" target="_blank" style="color:#217093;text-decoration:underline;">밀리의 서재 새 창에서 열기</a>
+      </div>
+    </div>
+    <div class="site-block">
+      <h3>멜론 (Melon)</h3>
+      <iframe
+        src="https://www.melon.com"
+        frameborder="0"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+      ></iframe>
+      <div class="fallback-link">
+        <a href="https://www.melon.com" target="_blank" style="color:#217093;text-decoration:underline;">멜론 새 창에서 열기</a>
+      </div>
+    </div>
+    <div class="site-block">
+      <h3>유튜브 (YouTube)</h3>
+      <iframe
+        src="https://www.youtube.com"
+        frameborder="0"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+      ></iframe>
+      <div class="fallback-link">
+        <a href="https://www.youtube.com" target="_blank" style="color:#217093;text-decoration:underline;">유튜브 새 창에서 열기</a>
+      </div>
+    </div>
+    <div class="site-block">
+      <h3>넷플릭스 (Netflix)</h3>
+      <iframe
+        src="https://www.netflix.com/kr"
+        frameborder="0"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+      ></iframe>
+      <div class="fallback-link">
+        <a href="https://www.netflix.com/kr" target="_blank" style="color:#217093;text-decoration:underline;">넷플릭스 새 창에서 열기</a>
+      </div>
+    </div>
+    <div class="site-block">
+      <h3>웨이브 (Wavve)</h3>
+      <iframe
+        src="https://www.wavve.com"
+        frameborder="0"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+      ></iframe>
+      <div class="fallback-link">
+        <a href="https://www.wavve.com" target="_blank" style="color:#217093;text-decoration:underline;">웨이브 새 창에서 열기</a>
       </div>
     </div>
   </div>
@@ -1500,5 +1584,27 @@
     window.onload = function() {
       loadGoogleMapAPI();
     };
+
+    // 마우스 드래그로 가로 스크롤 지원
+    (function() {
+      const row = document.getElementById('siteScrollRow');
+      let isDown = false, startX, scrollLeft;
+      row.addEventListener('mousedown', (e) => {
+        isDown = true;
+        row.classList.add('active');
+        startX = e.pageX - row.offsetLeft;
+        scrollLeft = row.scrollLeft;
+      });
+      row.addEventListener('mouseleave', () => { isDown = false; row.classList.remove('active'); });
+      row.addEventListener('mouseup', () => { isDown = false; row.classList.remove('active'); });
+      row.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - row.offsetLeft;
+        const walk = (x - startX) * 1.2;
+        row.scrollLeft = scrollLeft - walk;
+      });
+      // 터치 스와이프 지원은 기본적으로 overflow-x: auto로 동작
+    })();
   </script>
 </body>
