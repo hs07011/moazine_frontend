@@ -1266,67 +1266,92 @@
       const places = [];
       const allPlaces = [...attractions, ...restaurants];
       
-      // 코스 텍스트에서 시간과 장소명 패턴 찾기 (예: "🕘 09:00 – **첫 번째 장소**" 또는 "1. **첫 번째 장소**")
-      const timePlacePattern = /🕘\s*(\d{1,2}:\d{2})\s*–\s*\*\*(.*?)\*\*/g;
-      const numberPlacePattern = /(\d+)\.\s*\*\*(.*?)\*\*/g;
+      console.log('코스 텍스트:', courseText);
+      console.log('전체 장소 목록:', allPlaces.map(p => p.name));
       
-      let match;
+      // 코스 텍스트에서 장소명 찾기 (여러 패턴 시도)
+      const patterns = [
+        // 시간 패턴: 🕘 09:00 – **장소명**
+        /🕘\s*(\d{1,2}:\d{2})\s*–\s*\*\*(.*?)\*\*/g,
+        // 번호 패턴: 1. **장소명**
+        /(\d+)\.\s*\*\*(.*?)\*\*/g,
+        // 단순 볼드 패턴: **장소명**
+        /\*\*(.*?)\*\*/g
+      ];
+      
       let visitOrder = 1;
+      let foundPlaces = new Set(); // 중복 방지
       
-      // 시간 패턴으로 먼저 찾기
-      while ((match = timePlacePattern.exec(courseText)) !== null) {
-        const placeName = match[2].trim();
-        const foundPlace = allPlaces.find(place => 
-          place.name.includes(placeName) || placeName.includes(place.name)
-        );
-        
-        if (foundPlace) {
-          places.push({
-            name: foundPlace.name,
-            location: foundPlace.geometry?.location,
-            type: attractions.includes(foundPlace) ? 'attraction' : 'restaurant',
-            rating: foundPlace.rating,
-            visitOrder: visitOrder++,
-            time: match[1]
+      patterns.forEach((pattern, patternIndex) => {
+        let match;
+        while ((match = pattern.exec(courseText)) !== null) {
+          let placeName, time = null;
+          
+          if (patternIndex === 0) {
+            // 시간 패턴
+            time = match[1];
+            placeName = match[2].trim();
+          } else if (patternIndex === 1) {
+            // 번호 패턴
+            visitOrder = parseInt(match[1]);
+            placeName = match[2].trim();
+          } else {
+            // 단순 볼드 패턴
+            placeName = match[1].trim();
+          }
+          
+          // 이미 찾은 장소는 건너뛰기
+          if (foundPlaces.has(placeName)) continue;
+          
+          console.log('찾은 장소명:', placeName);
+          
+          // 기존 관광지/맛집 목록에서 매칭되는 장소 찾기
+          const foundPlace = allPlaces.find(place => {
+            const placeNameLower = placeName.toLowerCase();
+            const placeNameInList = place.name.toLowerCase();
+            return placeNameInList.includes(placeNameLower) || 
+                   placeNameLower.includes(placeNameInList) ||
+                   placeNameInList.includes(placeNameLower.replace(/\s+/g, ''));
           });
-        }
-      }
-      
-      // 번호 패턴으로 찾기 (시간 패턴에서 찾지 못한 경우)
-      if (places.length === 0) {
-        while ((match = numberPlacePattern.exec(courseText)) !== null) {
-          const placeName = match[2].trim();
-          const foundPlace = allPlaces.find(place => 
-            place.name.includes(placeName) || placeName.includes(place.name)
-          );
           
           if (foundPlace) {
+            console.log('매칭된 장소:', foundPlace.name);
             places.push({
               name: foundPlace.name,
               location: foundPlace.geometry?.location,
               type: attractions.includes(foundPlace) ? 'attraction' : 'restaurant',
               rating: foundPlace.rating,
-              visitOrder: parseInt(match[1]),
-              time: null
+              visitOrder: visitOrder,
+              time: time
             });
+            foundPlaces.add(placeName);
+            visitOrder++;
+          } else {
+            console.log('매칭되지 않은 장소:', placeName);
           }
         }
-      }
+      });
       
       // 방문 순서로 정렬
       places.sort((a, b) => a.visitOrder - b.visitOrder);
       
+      console.log('최종 추출된 장소들:', places);
       return places;
     }
 
     // 코스 지도 표시 함수
     function showCourseMap(courseIndex) {
+      console.log('showCourseMap 호출됨, courseIndex:', courseIndex);
+      console.log('courseData:', courseData);
+      
       if (!courseData[courseIndex]) {
         alert('코스 정보를 찾을 수 없습니다.');
         return;
       }
       
       const course = courseData[courseIndex];
+      console.log('선택된 코스:', course);
+      
       const popup = document.getElementById('courseMapPopup');
       const titleElement = document.getElementById('courseMapTitle');
       const mapElement = document.getElementById('courseMap');
@@ -1339,58 +1364,80 @@
         courseMap.setMap(null);
       }
       
-      courseMap = new google.maps.Map(mapElement, {
-        zoom: 12,
-        center: destLatLng,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-      });
-      
-      // 코스의 장소들을 지도에 표시
-      const bounds = new google.maps.LatLngBounds();
-      const markers = [];
-      
-      course.places.forEach((place, index) => {
-        if (place.location) {
-          const marker = new google.maps.Marker({
-            position: place.location,
-            map: courseMap,
-            title: `${place.visitOrder}. ${place.name}`,
-            label: `${place.visitOrder}`,
-            icon: {
-              url: place.type === 'attraction' ? '/assets/attraction.png' : '/assets/restaurant.png',
-              scaledSize: new google.maps.Size(32, 32)
+      // 지도 요소가 준비될 때까지 잠시 대기
+      setTimeout(() => {
+        courseMap = new google.maps.Map(mapElement, {
+          zoom: 12,
+          center: destLatLng,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+        
+        console.log('지도 초기화 완료');
+        console.log('코스 장소들:', course.places);
+        
+        // 코스의 장소들을 지도에 표시
+        const bounds = new google.maps.LatLngBounds();
+        const markers = [];
+        
+        if (course.places && course.places.length > 0) {
+          course.places.forEach((place, index) => {
+            console.log('장소 처리 중:', place);
+            
+            if (place.location) {
+              console.log('장소 위치:', place.location);
+              
+              const marker = new google.maps.Marker({
+                position: place.location,
+                map: courseMap,
+                title: `${place.visitOrder}. ${place.name}`,
+                label: `${place.visitOrder}`,
+                icon: {
+                  url: place.type === 'attraction' ? '/assets/attraction.png' : '/assets/restaurant.png',
+                  scaledSize: new google.maps.Size(32, 32)
+                }
+              });
+              
+              // 정보창 추가 (방문 순서와 시간 포함)
+              const infoWindow = new google.maps.InfoWindow({
+                content: `
+                  <div style="padding: 10px; min-width: 200px;">
+                    <h4 style="margin: 0 0 5px 0; color: #217093;">
+                      ${place.visitOrder}. ${place.name}
+                    </h4>
+                    <p style="margin: 0 0 3px 0; font-size: 12px; color: #666;">
+                      ${place.type === 'attraction' ? '🏛️ 관광지' : '🍽️ 맛집'}
+                      ${place.rating ? ` | ⭐ ${place.rating}점` : ''}
+                    </p>
+                    ${place.time ? `<p style="margin: 0; font-size: 12px; color: #ff6b35; font-weight: bold;">🕘 ${place.time}</p>` : ''}
+                  </div>
+                `
+              });
+              
+              marker.addListener('click', () => {
+                infoWindow.open(courseMap, marker);
+              });
+              
+              markers.push(marker);
+              bounds.extend(place.location);
+              console.log('마커 추가됨:', place.name);
+            } else {
+              console.log('장소 위치 정보 없음:', place.name);
             }
           });
           
-          // 정보창 추가 (방문 순서와 시간 포함)
-          const infoWindow = new google.maps.InfoWindow({
-            content: `
-              <div style="padding: 10px; min-width: 200px;">
-                <h4 style="margin: 0 0 5px 0; color: #217093;">
-                  ${place.visitOrder}. ${place.name}
-                </h4>
-                <p style="margin: 0 0 3px 0; font-size: 12px; color: #666;">
-                  ${place.type === 'attraction' ? '🏛️ 관광지' : '🍽️ 맛집'}
-                  ${place.rating ? ` | ⭐ ${place.rating}점` : ''}
-                </p>
-                ${place.time ? `<p style="margin: 0; font-size: 12px; color: #ff6b35; font-weight: bold;">🕘 ${place.time}</p>` : ''}
-              </div>
-            `
-          });
-          
-          marker.addListener('click', () => {
-            infoWindow.open(courseMap, marker);
-          });
-          
-          markers.push(marker);
-          bounds.extend(place.location);
+          // 모든 마커가 보이도록 지도 영역 조정
+          if (markers.length > 0) {
+            courseMap.fitBounds(bounds);
+            console.log('지도 영역 조정 완료, 마커 수:', markers.length);
+          } else {
+            console.log('표시할 마커가 없습니다.');
+          }
+        } else {
+          console.log('코스에 장소가 없습니다.');
+          // 기본 위치로 지도 설정
+          courseMap.setCenter(destLatLng);
         }
-      });
-      
-      // 모든 마커가 보이도록 지도 영역 조정
-      if (markers.length > 0) {
-        courseMap.fitBounds(bounds);
-      }
+      }, 100);
     }
 
     // 코스 지도 팝업 닫기 함수
