@@ -522,7 +522,7 @@
       scrolling="no"
       frameborder="no"
       allow="autoplay"
-      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/sunnyb007/pretty-u-seventeen">
+      src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/sunnyb007/pretty-u-seventeen&volume=20&color=ff5500">
     </iframe>
   </div>
   
@@ -629,7 +629,7 @@
       // 음악 재생 시작
       const iframe = document.getElementById('scPlayer');
       if (iframe && !iframe.src.includes('auto_play=true')) {
-        iframe.src += "&auto_play=true";
+        iframe.src += "&auto_play=true&volume=20";
       }
       
       // '현재위치', '현위치', '여기', '이곳' 입력 시 현재 위치로 검색
