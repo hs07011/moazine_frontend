@@ -691,6 +691,13 @@
     function loadPlaces(isCurrentLocation) {
       clearPlaceMarkers();
       let url = `${PROXY}/places?lat=${destLatLng.lat}&lng=${destLatLng.lng}&radius=5000`;
+      
+      // 목적지 정보가 있으면 전달
+      const destinationInput = document.getElementById('destination');
+      if (destinationInput && destinationInput.value.trim()) {
+        url += `&destination=${encodeURIComponent(destinationInput.value.trim())}`;
+      }
+      
       fetch(url)
       .then(res => res.json())
       .then(data => {
