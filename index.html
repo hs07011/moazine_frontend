@@ -470,7 +470,16 @@
     }
     .course-block:last-child { margin-bottom: 0; }
     .course-title {
-      font-size: 2.6rem; font-weight: 900; margin-bottom: 14px; color: #217093; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px; }
+      font-size: 2.6rem; 
+      font-weight: 900; 
+      margin-bottom: 14px; 
+      color: #217093; 
+      display: flex; 
+      align-items: center; 
+      gap: 15px; 
+      letter-spacing: 0.5px; 
+      flex-wrap: wrap;
+    }
     .course-rating { font-weight: bold; color: #e6b800; margin-top: 8px; }
     .course-block blockquote { border-left: 4px solid #217093; background: #eef6fa; margin: 12px 0; padding: 8px 16px; color: #217093; font-size: 1.1em; }
     .course-block p { margin: 8px 0; }
@@ -521,9 +530,9 @@
       background: #fff;
       border-radius: 12px;
       padding: 30px;
-      width: 90%;
-      max-width: 800px;
-      max-height: 90vh;
+      width: 95%;
+      max-width: 1200px;
+      max-height: 95vh;
       overflow-y: auto;
       position: relative;
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
@@ -549,13 +558,14 @@
       background: #ff6b35;
       color: white;
       border: none;
-      padding: 8px 16px;
+      padding: 6px 12px;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 1.4rem;
+      font-size: 1.2rem;
       font-weight: bold;
-      margin-top: 10px;
       transition: background 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     
     .route-btn:hover {
@@ -564,13 +574,23 @@
     
     @media (max-width: 768px) {
       .course-map-content {
-        width: 95%;
+        width: 98%;
         padding: 20px;
-        margin: 10px;
+        margin: 5px;
       }
       
       .course-map-popup #courseMap {
-        height: 300px;
+        height: 600px;
+      }
+      
+      .course-title {
+        font-size: 2rem;
+        gap: 10px;
+      }
+      
+      .route-btn {
+        font-size: 1rem;
+        padding: 5px 10px;
       }
     }
   </style>
@@ -638,7 +658,7 @@
     <div class="course-map-content">
       <span class="close-btn" onclick="closeCourseMap()">✕</span>
       <h3 id="courseMapTitle" style="margin: 0 0 20px 0; color: #217093; text-align: center;">코스 지도</h3>
-      <div id="courseMap" style="width: 100%; height: 400px; border-radius: 8px;"></div>
+      <div id="courseMap" style="width: 100%; height: 1000px; border-radius: 8px;"></div>
     </div>
   </div>
   <script>
@@ -1151,9 +1171,11 @@
               places: extractPlacesFromCourse(block, idx)
             });
             return `<div class="course-block course-${idx+1}">
-              <div class="course-title">${title}</div>
+              <div class="course-title">
+                ${title}
+                <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
+              </div>
               ${block.replace(/\n/g, '<br>')}
-              <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
             </div>`;
           }).join('');
       } else if (blocks.length > 1) {
@@ -1166,9 +1188,11 @@
             places: extractPlacesFromCourse(block, idx)
           });
           return `<div class="course-block course-${idx+1}">
-            <div class="course-title">${title}</div>
+            <div class="course-title">
+              ${title}
+              <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
+            </div>
             ${block.replace(/\n/g, '<br>')}
-            <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
           </div>`;
         }).join('');
       } else {
@@ -1179,9 +1203,11 @@
           places: extractPlacesFromCourse(text, 0)
         });
         courseHtml = `<div class="course-block">
-          <div class="course-title">첫번째 코스</div>
+          <div class="course-title">
+            첫번째 코스
+            <button class="route-btn" onclick="showCourseMap(0)">🗺️ 길안내</button>
+          </div>
           ${text.replace(/\n/g, '<br>')}
-          <button class="route-btn" onclick="showCourseMap(0)">🗺️ 길안내</button>
         </div>`;
       }
       box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>` + courseHtml;
