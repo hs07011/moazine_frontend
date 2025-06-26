@@ -1157,14 +1157,22 @@
       // 코스 데이터 초기화
       courseData = [];
       
+      // 마크다운 문법 제거 함수
+      function cleanMarkdown(text) {
+        return text
+          .replace(/\*\*/g, '') // ** 제거
+          .replace(/\*/g, '')   // * 제거
+          .replace(/\n/g, '<br>'); // 줄바꿈을 <br>로 변환
+      }
+      
       // 안내문구(인트로)가 있는 경우 첫 블록이 인트로, 나머지가 코스
       if (blocks.length > 2) {
-        const intro = blocks[0];
+        const intro = cleanMarkdown(blocks[0]);
         const courses = blocks.slice(1);
-        courseHtml = `<div class="course-intro">${intro.replace(/\n/g, '<br>')}</div>` +
+        courseHtml = `<div class="course-intro">${intro}</div>` +
           courses.map((block, idx) => {
             const title = courseTitles[idx] || `코스 ${idx+1}`;
-            // 코스 데이터 저장
+            // 코스 데이터 저장 (원본 텍스트는 마크다운 제거 전에 저장)
             courseData.push({
               title: title,
               content: block,
@@ -1175,13 +1183,13 @@
                 ${title}
                 <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
               </div>
-              ${block.replace(/\n/g, '<br>')}
+              ${cleanMarkdown(block)}
             </div>`;
           }).join('');
       } else if (blocks.length > 1) {
         courseHtml = blocks.map((block, idx) => {
           const title = courseTitles[idx] || `코스 ${idx+1}`;
-          // 코스 데이터 저장
+          // 코스 데이터 저장 (원본 텍스트는 마크다운 제거 전에 저장)
           courseData.push({
             title: title,
             content: block,
@@ -1192,11 +1200,11 @@
               ${title}
               <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
             </div>
-            ${block.replace(/\n/g, '<br>')}
+            ${cleanMarkdown(block)}
           </div>`;
         }).join('');
       } else {
-        // 코스 데이터 저장
+        // 코스 데이터 저장 (원본 텍스트는 마크다운 제거 전에 저장)
         courseData.push({
           title: '첫번째 코스',
           content: text,
@@ -1207,7 +1215,7 @@
             첫번째 코스
             <button class="route-btn" onclick="showCourseMap(0)">🗺️ 길안내</button>
           </div>
-          ${text.replace(/\n/g, '<br>')}
+          ${cleanMarkdown(text)}
         </div>`;
       }
       box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>` + courseHtml;
