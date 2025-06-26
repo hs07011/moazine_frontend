@@ -501,6 +501,78 @@
     .course-btn:hover {
       background: #219150;
     }
+    
+    /* 코스 지도 팝업 스타일 */
+    .course-map-popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .course-map-content {
+      background: #fff;
+      border-radius: 12px;
+      padding: 30px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .course-map-popup .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      cursor: pointer;
+      font-size: 2rem;
+      color: #aaa;
+      font-weight: bold;
+      z-index: 10;
+    }
+    
+    .course-map-popup .close-btn:hover {
+      color: #333;
+    }
+    
+    /* 길안내 버튼 스타일 */
+    .route-btn {
+      background: #ff6b35;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1.4rem;
+      font-weight: bold;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+    
+    .route-btn:hover {
+      background: #e55a2b;
+    }
+    
+    @media (max-width: 768px) {
+      .course-map-content {
+        width: 95%;
+        padding: 20px;
+        margin: 10px;
+      }
+      
+      .course-map-popup #courseMap {
+        height: 300px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -562,6 +634,13 @@
   </div>
   <div id="placeDetailsBox" class="details-popup" style="display:none;"></div>
   <div id="coursePopup" class="summary-popup" style="display:none;"></div>
+  <div id="courseMapPopup" class="course-map-popup" style="display:none;">
+    <div class="course-map-content">
+      <span class="close-btn" onclick="closeCourseMap()">✕</span>
+      <h3 id="courseMapTitle" style="margin: 0 0 20px 0; color: #217093; text-align: center;">코스 지도</h3>
+      <div id="courseMap" style="width: 100%; height: 400px; border-radius: 8px;"></div>
+    </div>
+  </div>
   <script>
     const PROXY = 'https://moazine.onrender.com';
     let map, marker, destLatLng, attractions = [], restaurants = [];
@@ -569,6 +648,8 @@
     let speechVoices = [];
     let isVoicePlaying = false; // 음성 재생 상태 추적
     let scWidget = null; // SoundCloud Widget 객체
+    let courseMap = null; // 코스 지도 인스턴스
+    let courseData = []; // 코스 데이터 저장
 
     function loadVoices() {
       speechVoices = window.speechSynthesis.getVoices();
@@ -1052,24 +1133,58 @@
       let courseHtml = '';
       const courseTitles = ['첫번째 코스', '두번째 코스', '세번째 코스'];
       const blocks = text.split(/(?:^|\n)[#\-]{2,}[^\n]*\n?/g).map(s => s.trim()).filter(Boolean);
+      
+      // 코스 데이터 초기화
+      courseData = [];
+      
       // 안내문구(인트로)가 있는 경우 첫 블록이 인트로, 나머지가 코스
       if (blocks.length > 2) {
         const intro = blocks[0];
         const courses = blocks.slice(1);
-        courseHtml = `<div class=\"course-intro\">${intro.replace(/\n/g, '<br>')}</div>` +
+        courseHtml = `<div class="course-intro">${intro.replace(/\n/g, '<br>')}</div>` +
           courses.map((block, idx) => {
             const title = courseTitles[idx] || `코스 ${idx+1}`;
-            return `<div class=\"course-block course-${idx+1}\"><div class=\"course-title\">${title}</div>${block.replace(/\n/g, '<br>')}</div>`;
+            // 코스 데이터 저장
+            courseData.push({
+              title: title,
+              content: block,
+              places: extractPlacesFromCourse(block, idx)
+            });
+            return `<div class="course-block course-${idx+1}">
+              <div class="course-title">${title}</div>
+              ${block.replace(/\n/g, '<br>')}
+              <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
+            </div>`;
           }).join('');
       } else if (blocks.length > 1) {
         courseHtml = blocks.map((block, idx) => {
           const title = courseTitles[idx] || `코스 ${idx+1}`;
-          return `<div class=\"course-block course-${idx+1}\"><div class=\"course-title\">${title}</div>${block.replace(/\n/g, '<br>')}</div>`;
+          // 코스 데이터 저장
+          courseData.push({
+            title: title,
+            content: block,
+            places: extractPlacesFromCourse(block, idx)
+          });
+          return `<div class="course-block course-${idx+1}">
+            <div class="course-title">${title}</div>
+            ${block.replace(/\n/g, '<br>')}
+            <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
+          </div>`;
         }).join('');
       } else {
-        courseHtml = `<div class=\"course-block\"><div class=\"course-title\">첫번째 코스</div>${text.replace(/\n/g, '<br>')}</div>`;
+        // 코스 데이터 저장
+        courseData.push({
+          title: '첫번째 코스',
+          content: text,
+          places: extractPlacesFromCourse(text, 0)
+        });
+        courseHtml = `<div class="course-block">
+          <div class="course-title">첫번째 코스</div>
+          ${text.replace(/\n/g, '<br>')}
+          <button class="route-btn" onclick="showCourseMap(0)">🗺️ 길안내</button>
+        </div>`;
       }
-      box.innerHTML = `<span class='close-btn' onclick=\"closeCourseBox()\">✕</span>` + courseHtml;
+      box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>` + courseHtml;
       box.style.display = 'block';
     }
 
@@ -1109,6 +1224,114 @@
         // 원래 스타일로 복원
         iframe.style.opacity = '1';
         iframe.style.filter = 'none';
+      }
+    }
+
+    // 코스에서 장소명 추출하는 함수
+    function extractPlacesFromCourse(courseText, courseIndex) {
+      const places = [];
+      const allPlaces = [...attractions, ...restaurants];
+      
+      // 코스 텍스트에서 장소명 찾기 (볼드 처리된 텍스트나 특정 패턴)
+      const placeMatches = courseText.match(/\*\*(.*?)\*\*/g) || [];
+      
+      placeMatches.forEach(match => {
+        const placeName = match.replace(/\*\*/g, '').trim();
+        // 기존 관광지/맛집 목록에서 매칭되는 장소 찾기
+        const foundPlace = allPlaces.find(place => 
+          place.name.includes(placeName) || placeName.includes(place.name)
+        );
+        
+        if (foundPlace) {
+          places.push({
+            name: foundPlace.name,
+            location: foundPlace.geometry?.location,
+            type: attractions.includes(foundPlace) ? 'attraction' : 'restaurant',
+            rating: foundPlace.rating
+          });
+        }
+      });
+      
+      return places;
+    }
+
+    // 코스 지도 표시 함수
+    function showCourseMap(courseIndex) {
+      if (!courseData[courseIndex]) {
+        alert('코스 정보를 찾을 수 없습니다.');
+        return;
+      }
+      
+      const course = courseData[courseIndex];
+      const popup = document.getElementById('courseMapPopup');
+      const titleElement = document.getElementById('courseMapTitle');
+      const mapElement = document.getElementById('courseMap');
+      
+      titleElement.textContent = course.title + ' - 길안내';
+      popup.style.display = 'flex';
+      
+      // 지도 초기화
+      if (courseMap) {
+        courseMap.setMap(null);
+      }
+      
+      courseMap = new google.maps.Map(mapElement, {
+        zoom: 12,
+        center: destLatLng,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      });
+      
+      // 코스의 장소들을 지도에 표시
+      const bounds = new google.maps.LatLngBounds();
+      const markers = [];
+      
+      course.places.forEach((place, index) => {
+        if (place.location) {
+          const marker = new google.maps.Marker({
+            position: place.location,
+            map: courseMap,
+            title: place.name,
+            label: `${index + 1}`,
+            icon: {
+              url: place.type === 'attraction' ? '/assets/attraction.png' : '/assets/restaurant.png',
+              scaledSize: new google.maps.Size(32, 32)
+            }
+          });
+          
+          // 정보창 추가
+          const infoWindow = new google.maps.InfoWindow({
+            content: `
+              <div style="padding: 10px;">
+                <h4 style="margin: 0 0 5px 0; color: #217093;">${place.name}</h4>
+                <p style="margin: 0; font-size: 12px;">
+                  ${place.type === 'attraction' ? '관광지' : '맛집'}
+                  ${place.rating ? ` | 평점: ${place.rating}점` : ''}
+                </p>
+              </div>
+            `
+          });
+          
+          marker.addListener('click', () => {
+            infoWindow.open(courseMap, marker);
+          });
+          
+          markers.push(marker);
+          bounds.extend(place.location);
+        }
+      });
+      
+      // 모든 마커가 보이도록 지도 영역 조정
+      if (markers.length > 0) {
+        courseMap.fitBounds(bounds);
+      }
+    }
+
+    // 코스 지도 팝업 닫기 함수
+    function closeCourseMap() {
+      document.getElementById('courseMapPopup').style.display = 'none';
+      if (courseMap) {
+        courseMap.setMap(null);
+        courseMap = null;
       }
     }
 
