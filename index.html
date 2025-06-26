@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>주변 관광지 및 맛집 소개 HJM 서비스</title>
+  <script src="https://w.soundcloud.com/player/api.js" async></script>
   <style>
     body {
       margin: 0;
@@ -568,6 +569,7 @@
     let speechVoices = [];
     let originalMusicVolume = 10; // 원래 음악 볼륨 저장
     let isVoicePlaying = false; // 음성 재생 상태 추적
+    let scWidget = null; // SoundCloud Widget 객체
 
     function loadVoices() {
       speechVoices = window.speechSynthesis.getVoices();
@@ -579,20 +581,30 @@
 
     // 음악 볼륨 제어 함수들
     function lowerMusicVolume() {
-      const iframe = document.getElementById('scPlayer');
-      if (iframe && !isVoicePlaying) {
+      if (scWidget && !isVoicePlaying) {
         isVoicePlaying = true;
-        // 음악 볼륨을 5%로 낮춤
-        iframe.src = iframe.src.replace(/&volume=\d+/, '&volume=5');
+        // SoundCloud Widget API를 사용하여 볼륨을 0.1로 설정 (10%)
+        scWidget.setVolume(0.1);
       }
     }
 
     function restoreMusicVolume() {
-      const iframe = document.getElementById('scPlayer');
-      if (iframe && isVoicePlaying) {
+      if (scWidget && isVoicePlaying) {
         isVoicePlaying = false;
-        // 원래 볼륨으로 복원
-        iframe.src = iframe.src.replace(/&volume=\d+/, `&volume=${originalMusicVolume}`);
+        // 원래 볼륨으로 복원 (0.1 = 10%)
+        scWidget.setVolume(0.1);
+      }
+    }
+
+    // SoundCloud Widget 초기화
+    function initSoundCloudWidget() {
+      const iframe = document.getElementById('scPlayer');
+      if (iframe) {
+        scWidget = SC.Widget(iframe);
+        scWidget.bind(SC.Widget.Events.READY, function() {
+          // 위젯이 준비되면 볼륨 설정
+          scWidget.setVolume(0.1);
+        });
       }
     }
 
@@ -664,6 +676,12 @@
       const iframe = document.getElementById('scPlayer');
       if (iframe && !iframe.src.includes('auto_play=true')) {
         iframe.src += "&auto_play=true&volume=10";
+        // SoundCloud Widget이 준비되면 볼륨 설정
+        if (scWidget) {
+          setTimeout(() => {
+            scWidget.setVolume(0.1);
+          }, 1000);
+        }
       }
       
       // '현재위치', '현위치', '여기', '이곳' 입력 시 현재 위치로 검색
@@ -1110,6 +1128,7 @@
     // 페이지 로드 시 Google Maps API 로드 시작
     window.onload = function() {
       loadGoogleMapAPI();
+      initSoundCloudWidget();
     };
   </script>
 </body>
