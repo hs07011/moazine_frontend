@@ -629,12 +629,6 @@
       const dest = document.getElementById('destination').value;
       if (!dest) return alert('목적지를 입력하세요!');
       
-      // 음악 재생 시작
-      const iframe = document.getElementById('scPlayer');
-      if (iframe && !iframe.src.includes('auto_play=true')) {
-        iframe.src += "&auto_play=true&volume=10";
-      }
-      
       // '현재위치', '현위치', '여기', '이곳' 입력 시 현재 위치로 검색
       const currentKeywords = ['현재위치', '현위치', '여기', '이곳'];
       if (currentKeywords.includes(dest.trim().replace(/\s/g, ''))) {
