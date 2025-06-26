@@ -567,7 +567,6 @@
     let map, marker, destLatLng, attractions = [], restaurants = [];
     let placeMarkers = [];
     let speechVoices = [];
-    let originalMusicVolume = 10; // 원래 음악 볼륨 저장
     let isVoicePlaying = false; // 음성 재생 상태 추적
     let scWidget = null; // SoundCloud Widget 객체
 
@@ -577,48 +576,6 @@
     loadVoices();
     if (window.speechSynthesis.onvoiceschanged !== undefined) {
       window.speechSynthesis.onvoiceschanged = loadVoices;
-    }
-
-    // 음악 볼륨 제어 함수들
-    function lowerMusicVolume() {
-      if (scWidget && !isVoicePlaying) {
-        isVoicePlaying = true;
-        // SoundCloud Widget API를 사용하여 볼륨을 0.1로 설정 (10%)
-        scWidget.setVolume(0.1);
-      }
-    }
-
-    function restoreMusicVolume() {
-      if (scWidget && isVoicePlaying) {
-        isVoicePlaying = false;
-        // 원래 볼륨으로 복원 (0.1 = 10%)
-        scWidget.setVolume(0.1);
-      }
-    }
-
-    // SoundCloud Widget 초기화
-    function initSoundCloudWidget() {
-      const iframe = document.getElementById('scPlayer');
-      if (iframe) {
-        scWidget = SC.Widget(iframe);
-        scWidget.bind(SC.Widget.Events.READY, function() {
-          // 위젯이 준비되면 볼륨 설정
-          scWidget.setVolume(0.1);
-        });
-      }
-    }
-
-    // 음성 합성 이벤트 리스너 추가
-    function setupSpeechEvents(utterance) {
-      utterance.onstart = function() {
-        lowerMusicVolume();
-      };
-      utterance.onend = function() {
-        restoreMusicVolume();
-      };
-      utterance.onerror = function() {
-        restoreMusicVolume();
-      };
     }
 
     // Google Maps JS API 동적 로드
@@ -676,12 +633,6 @@
       const iframe = document.getElementById('scPlayer');
       if (iframe && !iframe.src.includes('auto_play=true')) {
         iframe.src += "&auto_play=true&volume=10";
-        // SoundCloud Widget이 준비되면 볼륨 설정
-        if (scWidget) {
-          setTimeout(() => {
-            scWidget.setVolume(0.1);
-          }, 1000);
-        }
       }
       
       // '현재위치', '현위치', '여기', '이곳' 입력 시 현재 위치로 검색
@@ -996,8 +947,8 @@
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
-      // 음성 종료 시 음악 볼륨 복원
-      restoreMusicVolume();
+      // 음성 종료 시 음악 플레이어 복원
+      restoreMusicPlayer();
     }
 
     function showDestinationIntro(searchQuery, placeName, latLng) {
@@ -1066,8 +1017,8 @@
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
-      // 음성 종료 시 음악 볼륨 복원
-      restoreMusicVolume();
+      // 음성 종료 시 음악 플레이어 복원
+      restoreMusicPlayer();
     }
 
     // 추천코스 버튼 이벤트
@@ -1125,10 +1076,44 @@
       document.getElementById('coursePopup').style.display = 'none';
     }
 
+    // 음성 합성 이벤트 리스너 추가
+    function setupSpeechEvents(utterance) {
+      utterance.onstart = function() {
+        dimMusicPlayer();
+      };
+      utterance.onend = function() {
+        restoreMusicPlayer();
+      };
+      utterance.onerror = function() {
+        restoreMusicPlayer();
+      };
+    }
+
+    // 음악 플레이어 시각적 제어 함수들
+    function dimMusicPlayer() {
+      const iframe = document.getElementById('scPlayer');
+      if (iframe && !isVoicePlaying) {
+        isVoicePlaying = true;
+        // iframe을 시각적으로 어둡게 표시하여 음성이 재생 중임을 나타냄
+        iframe.style.opacity = '0.3';
+        iframe.style.filter = 'grayscale(50%)';
+        iframe.style.transition = 'all 0.3s ease';
+      }
+    }
+
+    function restoreMusicPlayer() {
+      const iframe = document.getElementById('scPlayer');
+      if (iframe && isVoicePlaying) {
+        isVoicePlaying = false;
+        // 원래 스타일로 복원
+        iframe.style.opacity = '1';
+        iframe.style.filter = 'none';
+      }
+    }
+
     // 페이지 로드 시 Google Maps API 로드 시작
     window.onload = function() {
       loadGoogleMapAPI();
-      initSoundCloudWidget();
     };
   </script>
 </body>
