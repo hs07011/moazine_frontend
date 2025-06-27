@@ -886,6 +886,11 @@
             document.getElementById('destination').placeholder = '현재 위치 검색 결과';
             document.getElementById('destination').style.color = '#888';
             loadPlaces(true);
+            // 목적지 안내 영역/콘텐츠바 상태 초기화
+            document.getElementById('contentBar').style.display = 'none';
+            document.getElementById('destinationIntroInBar').style.display = 'none';
+            document.getElementById('externalContentLinks').style.display = 'flex';
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
           }, () => {
             alert('현재 위치 정보를 가져올 수 없습니다.');
           });
@@ -906,7 +911,10 @@
           if (marker) marker.setMap(null);
           marker = new google.maps.Marker({ position: destLatLng, map: map, title: '목적지' });
           document.getElementById('destination').style.color = '#222';
-          // 목적지 소개 표시 (Gemini API 호출)
+          // 목적지 안내 표시 및 콘텐츠바 상태
+          document.getElementById('contentBar').style.display = 'flex';
+          document.getElementById('destinationIntroInBar').style.display = 'block';
+          document.getElementById('externalContentLinks').style.display = 'none';
           showDestinationIntro(dest, placeName, destLatLng);
           loadPlaces(false);
         } else {
