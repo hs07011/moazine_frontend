@@ -661,7 +661,7 @@
     .content-bar {
       display: flex;
       overflow-x: auto;
-      gap: 28px;
+      gap: 42px; /* 기존 28px에서 42px로 간격 확대 */
       padding: 18px 0 18px 18px;
       background: #fff;
       border-bottom: 2px solid #eee;
@@ -696,6 +696,19 @@
       .content-bar img, .content-bar .default-logo { width: 60px; height: 60px; border-radius: 12px; font-size: 1.8rem; }
       .content-bar span { font-size: 1.05rem; }
       .header-btn { font-size: 1.1rem; padding: 8px 14px; }
+    }
+    #destinationIntroInBar .title {
+      font-size: 4.2rem !important; /* 기존보다 1.5배 확대 */
+      font-weight: bold;
+      color: #217093;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    #destinationIntroInBar .guide-text {
+      font-size: 3.3rem !important; /* 기존보다 1.5배 확대 */
+      line-height: 1.8;
+      text-align: justify;
+      margin-bottom: 16px;
     }
   </style>
 </head>
