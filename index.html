@@ -710,6 +710,19 @@
       text-align: justify;
       margin-bottom: 16px;
     }
+    #destinationIntroInBar .title {
+      font-size: 2.94rem !important; /* 4.2rem * 0.7 */
+      font-weight: bold;
+      color: #217093;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    #destinationIntroInBar .guide-text {
+      font-size: 2.31rem !important; /* 3.3rem * 0.7 */
+      line-height: 1.8;
+      text-align: left;
+      margin-bottom: 16px;
+    }
   </style>
 </head>
 <body>
@@ -1223,7 +1236,8 @@
       })
       .then(res => res.json())
       .then(data => {
-        const introText = data.intro.replace(/\n/g, '<br>');
+        // 줄바꿈 없이 한 문단으로 표시
+        const introText = data.intro.replace(/\n/g, ' ');
         const guideTextElement = introBox.querySelector('.guide-text');
         if (guideTextElement) {
           guideTextElement.innerHTML = introText;
