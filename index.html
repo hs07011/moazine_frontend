@@ -710,38 +710,41 @@
     </div>
   </div>
 
-  <div id="contentBar" class="content-bar" style="display:none;">
-    <a href="https://www.disneyplus.com/ko-kr" target="_blank"><img src="assets/disney+.png" alt="디즈니+"><span>디즈니+</span></a>
-    <a href="https://www.wavve.com" target="_blank"><img src="assets/wavve.png" alt="웨이브"><span>웨이브</span></a>
-    <a href="https://www.youtube.com" target="_blank"><img src="assets/youtube.png" alt="유튜브"><span>유튜브</span></a>
-    <a href="https://watcha.com" target="_blank"><img src="assets/watcha.png" alt="왓챠"><span>왓챠</span></a>
-    <a href="https://www.moazine.com/" target="_blank"><img src="assets/moazine.png" alt="모아진"><span>모아진</span></a>
-    <a href="https://www.welaaa.com" target="_blank"><img src="assets/welaaa.png" alt="윌라"><span>윌라</span></a>
-    <a href="https://www.tving.com" target="_blank"><img src="assets/tving.png" alt="티빙"><span>티빙</span></a>
-    <a href="https://www.melon.com/" target="_blank"><img src="assets/mellon.png" alt="멜론"><span>멜론</span></a>
-    <a href="https://www.netflix.com/kr" target="_blank"><img src="assets/netflix.png" alt="넷플릭스"><span>넷플릭스</span></a>
-    <a href="https://www.genesis-music.com" target="_blank">
-      <span class="default-logo" style="background:#222; color:#fff;">
-        <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="24" fill="#222"/><path d="M32 16v14.5a4.5 4.5 0 1 1-2-3.7V18h-8v10.5a4.5 4.5 0 1 1-2-3.7V16h12z" fill="#fff"/></svg>
-      </span>
-      <span>GENESIS MUSIC</span>
-    </a>
-    <a href="https://www.podbbang.com" target="_blank"><img src="assets/podbbang.png" alt="팟빵"><span>팟빵</span></a>
-    <a href="https://www.tjmedia.com" target="_blank"><img src="assets/tjmedia.png" alt="TJ미디어"><span>TJ미디어</span></a>
-    <a href="https://www.genie.co.kr" target="_blank"><img src="assets/genie.png" alt="지니"><span>지니</span></a>
-    <a href="https://www.bloomberg.com" target="_blank"><img src="assets/bloomberg.png" alt="블룸버그"><span>블룸버그</span></a>
-    <a href="https://motvlnk.uplus.co.kr/" target="_blank"><img src="assets/mobiletvtb.png" alt="모바일TV"><span>모바일TV</span></a>
-    <a href="https://www.soundcloud.com" target="_blank"><img src="assets/soundcloud.png" alt="사운드클라우드"><span>사운드클라우드</span></a>
-    <a href="https://www.millie.co.kr" target="_blank"><img src="assets/millie.png" alt="밀리의서재"><span>밀리의서재</span></a>
-    <a href="https://vibe.naver.com/" target="_blank"><img src="assets/vibe.png" alt="VIBE"><span>VIBE</span></a>
-    <a href="https://www.airbnb.com/" target="_blank"><img src="assets/airbnb.png" alt="에어비앤비"><span>에어비앤비</span></a>
-    <a href="https://www.interpark.com/" target="_blank"><img src="assets/interpark.png" alt="인터파크"><span>인터파크</span></a>
-    <a href="https://www.letskorail.com/" target="_blank"><img src="assets/ktx.png" alt="KTX"><span>KTX</span></a>
-    <a href="https://www.koreanair.com/" target="_blank"><img src="assets/korean.png" alt="대한항공"><span>대한항공</span></a>
-    <a href="https://flyasiana.com/" target="_blank"><img src="assets/asiana.png" alt="아시아나항공"><span>아시아나항공</span></a>
-    <a href="https://www.klook.com/" target="_blank"><img src="assets/klook.png" alt="클룩"><span>클룩</span></a>
-    <a href="https://www.booking.com/" target="_blank"><img src="assets/booking.png" alt="부킹닷컴"><span>부킹닷컴</span></a>
-    <a href="https://www.agoda.com/" target="_blank"><img src="assets/agoda.png" alt="아고다"><span>아고다</span></a>
+  <div id="contentBar" class="content-bar" style="display:none; position:relative;">
+    <div id="destinationIntroInBar" style="display:none; width:100%; text-align:center;"></div>
+    <div id="externalContentLinks">
+      <a href="https://www.disneyplus.com/ko-kr" target="_blank"><img src="assets/disney+.png" alt="디즈니+"><span>디즈니+</span></a>
+      <a href="https://www.wavve.com" target="_blank"><img src="assets/wavve.png" alt="웨이브"><span>웨이브</span></a>
+      <a href="https://www.youtube.com" target="_blank"><img src="assets/youtube.png" alt="유튜브"><span>유튜브</span></a>
+      <a href="https://watcha.com" target="_blank"><img src="assets/watcha.png" alt="왓챠"><span>왓챠</span></a>
+      <a href="https://www.moazine.com/" target="_blank"><img src="assets/moazine.png" alt="모아진"><span>모아진</span></a>
+      <a href="https://www.welaaa.com" target="_blank"><img src="assets/welaaa.png" alt="윌라"><span>윌라</span></a>
+      <a href="https://www.tving.com" target="_blank"><img src="assets/tving.png" alt="티빙"><span>티빙</span></a>
+      <a href="https://www.melon.com/" target="_blank"><img src="assets/mellon.png" alt="멜론"><span>멜론</span></a>
+      <a href="https://www.netflix.com/kr" target="_blank"><img src="assets/netflix.png" alt="넷플릭스"><span>넷플릭스</span></a>
+      <a href="https://www.genesis-music.com" target="_blank">
+        <span class="default-logo" style="background:#222; color:#fff;">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="24" fill="#222"/><path d="M32 16v14.5a4.5 4.5 0 1 1-2-3.7V18h-8v10.5a4.5 4.5 0 1 1-2-3.7V16h12z" fill="#fff"/></svg>
+        </span>
+        <span>GENESIS MUSIC</span>
+      </a>
+      <a href="https://www.podbbang.com" target="_blank"><img src="assets/podbbang.png" alt="팟빵"><span>팟빵</span></a>
+      <a href="https://www.tjmedia.com" target="_blank"><img src="assets/tjmedia.png" alt="TJ미디어"><span>TJ미디어</span></a>
+      <a href="https://www.genie.co.kr" target="_blank"><img src="assets/genie.png" alt="지니"><span>지니</span></a>
+      <a href="https://www.bloomberg.com" target="_blank"><img src="assets/bloomberg.png" alt="블룸버그"><span>블룸버그</span></a>
+      <a href="https://motvlnk.uplus.co.kr/" target="_blank"><img src="assets/mobiletvtb.png" alt="모바일TV"><span>모바일TV</span></a>
+      <a href="https://www.soundcloud.com" target="_blank"><img src="assets/soundcloud.png" alt="사운드클라우드"><span>사운드클라우드</span></a>
+      <a href="https://www.millie.co.kr" target="_blank"><img src="assets/millie.png" alt="밀리의서재"><span>밀리의서재</span></a>
+      <a href="https://vibe.naver.com/" target="_blank"><img src="assets/vibe.png" alt="VIBE"><span>VIBE</span></a>
+      <a href="https://www.airbnb.com/" target="_blank"><img src="assets/airbnb.png" alt="에어비앤비"><span>에어비앤비</span></a>
+      <a href="https://www.interpark.com/" target="_blank"><img src="assets/interpark.png" alt="인터파크"><span>인터파크</span></a>
+      <a href="https://www.letskorail.com/" target="_blank"><img src="assets/ktx.png" alt="KTX"><span>KTX</span></a>
+      <a href="https://www.koreanair.com/" target="_blank"><img src="assets/korean.png" alt="대한항공"><span>대한항공</span></a>
+      <a href="https://flyasiana.com/" target="_blank"><img src="assets/asiana.png" alt="아시아나항공"><span>아시아나항공</span></a>
+      <a href="https://www.klook.com/" target="_blank"><img src="assets/klook.png" alt="클룩"><span>클룩</span></a>
+      <a href="https://www.booking.com/" target="_blank"><img src="assets/booking.png" alt="부킹닷컴"><span>부킹닷컴</span></a>
+      <a href="https://www.agoda.com/" target="_blank"><img src="assets/agoda.png" alt="아고다"><span>아고다</span></a>
+    </div>
   </div>
 
   <div class="main">
@@ -1180,15 +1183,18 @@
     }
 
     function showDestinationIntro(searchQuery, placeName, latLng) {
-      const box = document.getElementById('destinationIntroBox');
-      box.innerHTML = `
-        <span class='close-btn' onclick="closeDestinationIntro()">✕</span>
+      // contentBar intro 영역에 표시
+      const introBox = document.getElementById('destinationIntroInBar');
+      introBox.innerHTML = `
         <div class="title">🎯 ${searchQuery} 여행 가이드</div>
         <div class="guide-text">가이드 정보를 생성하는 중입니다... 잠시만 기다려주세요.</div>
+        <button class='close-btn' style='position:absolute;top:10px;right:18px;font-size:1.5rem;color:#888;font-weight:bold;cursor:pointer;' onclick="closeDestinationIntroInBar()">✕</button>
       `;
-      box.style.display = 'block';
+      introBox.style.display = 'block';
+      document.getElementById('externalContentLinks').style.display = 'none';
+      // 팝업은 사용하지 않음
+      // document.getElementById('destinationIntroBox').style.display = 'none';
 
-      // 서버에 Gemini 소개 생성 요청
       fetch(`${PROXY}/generate-intro`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1196,33 +1202,29 @@
       })
       .then(res => res.json())
       .then(data => {
-        const introText = data.intro.replace(/\n/g, '<br>'); // 줄바꿈을 <br>로
-        const guideTextElement = box.querySelector('.guide-text');
+        const introText = data.intro.replace(/\n/g, '<br>');
+        const guideTextElement = introBox.querySelector('.guide-text');
         if (guideTextElement) {
           guideTextElement.innerHTML = introText;
         }
-
         // 음성 출력
         if ('speechSynthesis' in window) {
           window.speechSynthesis.cancel();
           const speechText = getDestinationSpeechText(introText);
           const utter = new SpeechSynthesisUtterance(speechText);
           utter.lang = 'ko-KR';
-          utter.rate = 0.9; // 조금 더 천천히
-          utter.pitch = 1; // 자연스러운 높이
-          utter.volume = 3.0; // 최대 볼륨의 3배로 설정 (기존 2.0에서 증가)
+          utter.rate = 0.9;
+          utter.pitch = 1;
+          utter.volume = 3.0;
           const koVoice = speechVoices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
           if (koVoice) utter.voice = koVoice;
-          
-          // 음성 이벤트 리스너 설정
           setupSpeechEvents(utter);
-          
           window.speechSynthesis.speak(utter);
         }
       })
       .catch(err => {
         console.error('Failed to get destination intro:', err);
-        const guideTextElement = box.querySelector('.guide-text');
+        const guideTextElement = introBox.querySelector('.guide-text');
         if (guideTextElement) {
           guideTextElement.innerHTML = '가이드 정보 생성에 실패했습니다. 다시 시도해 주세요.';
         }
@@ -1240,13 +1242,13 @@
       return speech;
     }
 
-    function closeDestinationIntro() {
-      document.getElementById('destinationIntroBox').style.display = 'none';
+    function closeDestinationIntroInBar() {
+      document.getElementById('destinationIntroInBar').style.display = 'none';
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
-      // 음성 종료 시 음악 플레이어 복원
-      restoreMusicPlayer();
+      // 외부 콘텐츠 복원
+      document.getElementById('externalContentLinks').style.display = 'flex';
     }
 
     // 추천코스 버튼 이벤트
@@ -1580,13 +1582,26 @@
     // 페이지 로드 시 Google Maps API 로드 시작
     window.onload = function() {
       loadGoogleMapAPI();
-
-      // 추천 콘텐츠 버튼 토글 이벤트 등록
       var recommendBtn = document.getElementById('recommendContentBtn');
       if (recommendBtn) {
         recommendBtn.onclick = function() {
           const bar = document.getElementById('contentBar');
-          bar.style.display = (bar.style.display === 'none' || bar.style.display === '') ? 'flex' : 'none';
+          const intro = document.getElementById('destinationIntroInBar');
+          const links = document.getElementById('externalContentLinks');
+          // 추천 콘텐츠 버튼 클릭 시 intro 닫고 콘텐츠 표시
+          if (bar.style.display === 'none' || bar.style.display === '') {
+            bar.style.display = 'flex';
+            intro.style.display = 'none';
+            links.style.display = 'flex';
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+          } else if (links.style.display === 'none') {
+            intro.style.display = 'none';
+            links.style.display = 'flex';
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+          } else {
+            bar.style.display = 'none';
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+          }
         };
       }
     };
