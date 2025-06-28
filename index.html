@@ -1515,11 +1515,17 @@
         </div>`;
       }
       box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>` + courseHtml;
-      box.style.display = 'block';
+      showOnlyContentBarPopup('coursePopup');
     }
 
     function closeCourseBox() {
-      document.getElementById('coursePopup').style.display = 'none';
+      if (isRecommendContentActive) {
+        showOnlyContentBarPopup('externalContentLinks');
+      } else {
+        showOnlyContentBarPopup('none');
+      }
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      restoreMusicPlayer();
     }
     // 음성 합성 이벤트 리스너 추가
     function setupSpeechEvents(utterance) {
