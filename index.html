@@ -1470,61 +1470,27 @@
       const courseEmojis = ['🌅', '🌞', '🌙'];
       const courseTitles = ['첫번째 코스', '두번째 코스', '세번째 코스'];
       
-      // Gemini API에서 받은 텍스트를 그대로 표시하되, 코스 구분만 처리
-      const courseBlocks = text.split(/(?=첫번째\s*코스|두번째\s*코스|세번째\s*코스)/g);
+      // 코스 데이터 초기화
+      courseData = [];
       
-      let courseIndex = 0;
-      
-      // 코스 블록이 있는 경우 처리
-      courseBlocks.forEach((block, idx) => {
-        if (!block.trim()) return;
+      // 3개의 개별 코스 생성
+      for (let i = 0; i < 3; i++) {
+        // 코스 데이터 저장
+        courseData.push({
+          title: courseTitles[i],
+          content: `${courseTitles[i]}의 추천 장소들입니다.`,
+          places: generateSamplePlaces(i)
+        });
         
-        // 코스 제목 추출
-        const titleMatch = block.match(/^(첫번째\s*코스|두번째\s*코스|세번째\s*코스)/);
-        if (titleMatch) {
-          const title = titleMatch[1];
-          const content = block.replace(titleMatch[0], '').trim();
-          
-          // 코스 데이터 저장 (샘플 데이터 포함)
-          courseData.push({
-            title: title,
-            content: block,
-            places: generateSamplePlaces(courseIndex)
-          });
-          
-          courseHtml += `<div class="course-block course-${courseIndex + 1}" style="background:${courseBg[courseIndex]}; border:2px solid ${courseBorder[courseIndex]}; border-radius:12px; margin-bottom:40px; padding:22px 18px 18px 18px; box-shadow:0 2px 8px #0001;">
-            <div class="course-title" style="font-size:2rem; font-weight:900; color:#217093; margin-bottom:14px; display:flex; align-items:center; gap:15px; letter-spacing:0.5px;">
-              ${courseEmojis[courseIndex]} ${title}
-              <button class="route-btn" onclick="showCourseMap(${courseIndex})">🗺️ 길안내</button>
-            </div>
-            <div class="course-content" style="font-size:1.15rem; color:#263040; line-height:2.1; font-weight:normal;">${cleanMarkdown(content)}</div>
-          </div>`;
-          
-          courseIndex++;
-        } else if (courseIndex === 0) {
-          // 첫 번째 블록이 코스 제목이 아닌 경우 (인트로 텍스트)
-          courseHtml += `<div class="course-intro" style="margin-bottom:32px; font-size:1.15rem; color:#263040; line-height:2.1; font-weight:normal;">${cleanMarkdown(block)}</div>`;
-        }
-      });
-      
-      // 코스 블록이 없는 경우 샘플 코스 생성
-      if (courseIndex === 0) {
-        for (let i = 0; i < 3; i++) {
-          // 코스 데이터 저장
-          courseData.push({
-            title: courseTitles[i],
-            content: `${courseTitles[i]}의 추천 장소들입니다.`,
-            places: generateSamplePlaces(i)
-          });
-          
-          courseHtml += `<div class="course-block course-${i + 1}" style="background:${courseBg[i]}; border:2px solid ${courseBorder[i]}; border-radius:12px; margin-bottom:40px; padding:22px 18px 18px 18px; box-shadow:0 2px 8px #0001;">
-            <div class="course-title" style="font-size:2rem; font-weight:900; color:#217093; margin-bottom:14px; display:flex; align-items:center; gap:15px; letter-spacing:0.5px;">
-              ${courseEmojis[i]} ${courseTitles[i]}
-              <button class="route-btn" onclick="showCourseMap(${i})">🗺️ 길안내</button>
-            </div>
-            <div class="course-content" style="font-size:1.15rem; color:#263040; line-height:2.1; font-weight:normal;">${cleanMarkdown(text)}</div>
-          </div>`;
-        }
+        courseHtml += `<div class="course-block course-${i + 1}" style="background:${courseBg[i]}; border:2px solid ${courseBorder[i]}; border-radius:12px; margin-bottom:40px; padding:22px 18px 18px 18px; box-shadow:0 2px 8px #0001;">
+          <div class="course-title" style="font-size:2rem; font-weight:900; color:#217093; margin-bottom:14px; display:flex; align-items:center; gap:15px; letter-spacing:0.5px;">
+            ${courseEmojis[i]} ${courseTitles[i]}
+            <button class="route-btn" onclick="showCourseMap(${i})">🗺️ 길안내</button>
+          </div>
+          <div class="course-content" style="font-size:1.15rem; color:#263040; line-height:2.1; font-weight:normal;">
+            ${cleanMarkdown(text)}
+          </div>
+        </div>`;
       }
       
       box.innerHTML = `<button class='close-btn' onclick="closeCourseBox()">✕</button>` + courseHtml;
