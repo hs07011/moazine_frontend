@@ -1463,7 +1463,7 @@
       // Gemini API에서 받은 텍스트를 그대로 표시하되, 코스 구분만 처리
       const courseBlocks = text.split(/(?=첫번째\s*코스|두번째\s*코스|세번째\s*코스)/g);
       
-      courseHtml += `<div class="course-intro" style="margin-bottom:32px; text-align:center; color:#217093; font-weight:bold;">
+      courseHtml += `<div class="course-intro" style="margin-bottom:32px; text-align:left; color:#217093; font-weight:bold;">
         🎯 <span style="font-size:1.2em;">추천 코스 3가지를 제안해 드립니다</span>
       </div>`;
       
@@ -1483,11 +1483,11 @@
           const title = titleMatch[1];
           const content = block.replace(titleMatch[0], '').trim();
           
-          // 코스 데이터 저장
+          // 코스 데이터 저장 (샘플 데이터 포함)
           courseData.push({
             title: title,
             content: block,
-            places: extractPlacesFromCourse(block, courseIndex)
+            places: generateSamplePlaces(courseIndex)
           });
           
           courseHtml += `<div class="course-block course-${courseIndex + 1}" style="background:${courseBg[courseIndex]}; border:2px solid ${courseBorder[courseIndex]}; border-radius:12px; margin-bottom:40px; padding:22px 18px 18px 18px; box-shadow:0 2px 8px #0001;">
@@ -1495,18 +1495,107 @@
               ${courseEmojis[courseIndex]} ${title}
               <button class="route-btn" onclick="showCourseMap(${courseIndex})">🗺️ 길안내</button>
             </div>
-            <div class="course-content" style="font-size:1.15rem; color:#263040; line-height:2.1;">${cleanMarkdown(content)}</div>
+            <div class="course-content" style="font-size:1.15rem; color:#263040; line-height:2.1; font-weight:normal;">${cleanMarkdown(content)}</div>
           </div>`;
           
           courseIndex++;
         } else if (courseIndex === 0) {
           // 첫 번째 블록이 코스 제목이 아닌 경우 (인트로 텍스트)
-          courseHtml += `<div class="course-intro" style="margin-bottom:32px; font-size:1.15rem; color:#263040; line-height:2.1;">${cleanMarkdown(block)}</div>`;
+          courseHtml += `<div class="course-intro" style="margin-bottom:32px; font-size:1.15rem; color:#263040; line-height:2.1; font-weight:normal;">${cleanMarkdown(block)}</div>`;
         }
       });
       
       box.innerHTML = `<button class='close-btn' onclick="closeCourseBox()">✕</button>` + courseHtml;
       box.style.display = 'block';
+    }
+
+    // 샘플 장소 데이터 생성 함수
+    function generateSamplePlaces(courseIndex) {
+      const samplePlaces = [
+        // 첫번째 코스 샘플
+        [
+          {
+            name: "경복궁",
+            location: { lat: 37.5796, lng: 126.9770 },
+            type: "attraction",
+            rating: 4.5,
+            visitOrder: 1,
+            time: "09:00"
+          },
+          {
+            name: "광화문",
+            location: { lat: 37.5716, lng: 126.9764 },
+            type: "attraction", 
+            rating: 4.3,
+            visitOrder: 2,
+            time: "10:30"
+          },
+          {
+            name: "명동칼국수",
+            location: { lat: 37.5636, lng: 126.9834 },
+            type: "restaurant",
+            rating: 4.2,
+            visitOrder: 3,
+            time: "12:00"
+          }
+        ],
+        // 두번째 코스 샘플
+        [
+          {
+            name: "남산타워",
+            location: { lat: 37.5512, lng: 126.9882 },
+            type: "attraction",
+            rating: 4.4,
+            visitOrder: 1,
+            time: "14:00"
+          },
+          {
+            name: "명동",
+            location: { lat: 37.5636, lng: 126.9834 },
+            type: "attraction",
+            rating: 4.1,
+            visitOrder: 2,
+            time: "15:30"
+          },
+          {
+            name: "명동교자",
+            location: { lat: 37.5636, lng: 126.9834 },
+            type: "restaurant",
+            rating: 4.0,
+            visitOrder: 3,
+            time: "17:00"
+          }
+        ],
+        // 세번째 코스 샘플
+        [
+          {
+            name: "한강공원",
+            location: { lat: 37.5215, lng: 126.9369 },
+            type: "attraction",
+            rating: 4.6,
+            visitOrder: 1,
+            time: "18:00"
+          },
+          {
+            name: "여의도",
+            location: { lat: 37.5215, lng: 126.9369 },
+            type: "attraction",
+            rating: 4.2,
+            visitOrder: 2,
+            time: "19:30"
+          },
+          {
+            name: "한강맛집",
+            location: { lat: 37.5215, lng: 126.9369 },
+            type: "restaurant",
+            rating: 4.3,
+            visitOrder: 3,
+            time: "20:00"
+          }
+        ]
+      ];
+      
+      return samplePlaces[courseIndex] || [];
     }
 
     function closeCourseBox() {
@@ -1686,14 +1775,18 @@
             if (place.location) {
               console.log('장소 위치:', place.location);
               
+              // 관광지와 맛집을 다른 아이콘으로 구분
+              const iconUrl = place.type === 'attraction' ? '/assets/attraction.png' : '/assets/restaurant.png';
+              const iconSize = new google.maps.Size(32, 32);
+              
               const marker = new google.maps.Marker({
                 position: place.location,
                 map: courseMap,
                 title: `${place.visitOrder}. ${place.name}`,
                 label: `${place.visitOrder}`,
                 icon: {
-                  url: place.type === 'attraction' ? '/assets/attraction.png' : '/assets/restaurant.png',
-                  scaledSize: new google.maps.Size(32, 32)
+                  url: iconUrl,
+                  scaledSize: iconSize
                 }
               });
               
@@ -1708,7 +1801,7 @@
                       ${place.type === 'attraction' ? '🏛️ 관광지' : '🍽️ 맛집'}
                       ${place.rating ? ` | ⭐ ${place.rating}점` : ''}
                     </p>
-                    ${place.time ? `<p style=\"margin: 0; font-size: 12px; color: #ff6b35; font-weight: bold;\">🕘 ${place.time}</p>` : ''}
+                    ${place.time ? `<p style="margin: 0; font-size: 12px; color: #ff6b35; font-weight: bold;">🕘 ${place.time}</p>` : ''}
                   </div>
                 `
               });
