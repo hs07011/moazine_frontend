@@ -1421,7 +1421,6 @@
 
     // 추천코스 버튼 이벤트
     document.getElementById('courseBtn').onclick = function() {
-      showOnlyContentBarPopup('coursePopup');
       showCoursePopup();
     };
 
@@ -1446,154 +1445,82 @@
 
     function showCourseBox(text) {
       const box = document.getElementById('coursePopup');
+      // Gemini 응답을 3가지 코스로 분리 (###, --- 등으로 구분)
       let courseHtml = '';
-      
-      // 마크다운 표시 제거 함수
-      function cleanMarkdown(text) {
-        return text
-          .replace(/#+/g, '') // # 제거
-          .replace(/\*\*/g, '') // ** 제거
-          .replace(/\*/g, '') // * 제거
-          .replace(/\n/g, '<br>') // 줄바꿈을 <br>로 변환
-          .replace(/<br>\s*<br>/g, '<br>') // 연속 줄바꿈 정리
-          .replace(/\s{2,}/g, ' ') // 연속 공백 정리
-          .trim();
-      }
-      
-      courseHtml += `<div class="course-intro" style="margin-bottom:32px; text-align:left; color:#217093; font-weight:bold;">
-        🎯 <span style="font-size:1.2em;">추천 코스 3가지를 제안해 드립니다</span>
-      </div>`;
-      
-      // 코스별 배경색과 이모지
-      const courseBg = ['#e0f7fa', '#fffbe6', '#f1faee'];
-      const courseBorder = ['#8ecae6', '#ffd166', '#b7e4c7'];
-      const courseEmojis = ['🌅', '🌞', '🌙'];
       const courseTitles = ['첫번째 코스', '두번째 코스', '세번째 코스'];
+      const blocks = text.split(/(?:^|\n)[#\-]{2,}[^\n]*\n?/g).map(s => s.trim()).filter(Boolean);
       
       // 코스 데이터 초기화
       courseData = [];
       
-      // 3개의 개별 코스 생성
-      for (let i = 0; i < 3; i++) {
-        // 코스 데이터 저장
-        courseData.push({
-          title: courseTitles[i],
-          content: `${courseTitles[i]}의 추천 장소들입니다.`,
-          places: generateSamplePlaces(i)
-        });
-        
-        courseHtml += `<div class="course-block course-${i + 1}" style="background:${courseBg[i]}; border:2px solid ${courseBorder[i]}; border-radius:12px; margin-bottom:40px; padding:22px 18px 18px 18px; box-shadow:0 2px 8px #0001;">
-          <div class="course-title" style="font-size:2rem; font-weight:900; color:#217093; margin-bottom:14px; display:flex; align-items:center; gap:15px; letter-spacing:0.5px;">
-            ${courseEmojis[i]} ${courseTitles[i]}
-            <button class="route-btn" onclick="showCourseMap(${i})">🗺️ 길안내</button>
-          </div>
-          <div class="course-content" style="font-size:1.15rem; color:#263040; line-height:2.1; font-weight:normal;">
-            ${cleanMarkdown(text)}
-          </div>
-        </div>`;
+      // 마크다운 문법 제거 함수
+      function cleanMarkdown(text) {
+        return text
+          .replace(/\*\*/g, '') // ** 제거
+          .replace(/\*/g, '')   // * 제거
+          .replace(/\n/g, '<br>'); // 줄바꿈을 <br>로 변환
       }
       
-      box.innerHTML = `<button class='close-btn' onclick="closeCourseBox()">✕</button>` + courseHtml;
+      // 안내문구(인트로)가 있는 경우 첫 블록이 인트로, 나머지가 코스
+      if (blocks.length > 2) {
+        const intro = cleanMarkdown(blocks[0]);
+        const courses = blocks.slice(1);
+        courseHtml = `<div class="course-intro">${intro}</div>` +
+          courses.map((block, idx) => {
+            const title = courseTitles[idx] || `코스 ${idx+1}`;
+            // 코스 데이터 저장 (원본 텍스트는 마크다운 제거 전에 저장)
+            courseData.push({
+              title: title,
+              content: block,
+              places: extractPlacesFromCourse(block, idx)
+            });
+            return `<div class="course-block course-${idx+1}">
+              <div class="course-title">
+                ${title}
+                <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
+              </div>
+              ${cleanMarkdown(block)}
+            </div>`;
+          }).join('');
+      } else if (blocks.length > 1) {
+        courseHtml = blocks.map((block, idx) => {
+          const title = courseTitles[idx] || `코스 ${idx+1}`;
+          // 코스 데이터 저장 (원본 텍스트는 마크다운 제거 전에 저장)
+          courseData.push({
+            title: title,
+            content: block,
+            places: extractPlacesFromCourse(block, idx)
+          });
+          return `<div class="course-block course-${idx+1}">
+            <div class="course-title">
+              ${title}
+              <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
+            </div>
+            ${cleanMarkdown(block)}
+          </div>`;
+        }).join('');
+      } else {
+        // 코스 데이터 저장 (원본 텍스트는 마크다운 제거 전에 저장)
+        courseData.push({
+          title: '첫번째 코스',
+          content: text,
+          places: extractPlacesFromCourse(text, 0)
+        });
+        courseHtml = `<div class="course-block">
+          <div class="course-title">
+            첫번째 코스
+            <button class="route-btn" onclick="showCourseMap(0)">🗺️ 길안내</button>
+          </div>
+          ${cleanMarkdown(text)}
+        </div>`;
+      }
+      box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>` + courseHtml;
       box.style.display = 'block';
     }
 
-    // 샘플 장소 데이터 생성 함수
-    function generateSamplePlaces(courseIndex) {
-      const samplePlaces = [
-        // 첫번째 코스 샘플
-        [
-          {
-            name: "경복궁",
-            location: { lat: 37.5796, lng: 126.9770 },
-            type: "attraction",
-            rating: 4.5,
-            visitOrder: 1,
-            time: "09:00"
-          },
-          {
-            name: "광화문",
-            location: { lat: 37.5716, lng: 126.9764 },
-            type: "attraction", 
-            rating: 4.3,
-            visitOrder: 2,
-            time: "10:30"
-          },
-          {
-            name: "명동칼국수",
-            location: { lat: 37.5636, lng: 126.9834 },
-            type: "restaurant",
-            rating: 4.2,
-            visitOrder: 3,
-            time: "12:00"
-          }
-        ],
-        // 두번째 코스 샘플
-        [
-          {
-            name: "남산타워",
-            location: { lat: 37.5512, lng: 126.9882 },
-            type: "attraction",
-            rating: 4.4,
-            visitOrder: 1,
-            time: "14:00"
-          },
-          {
-            name: "명동",
-            location: { lat: 37.5636, lng: 126.9834 },
-            type: "attraction",
-            rating: 4.1,
-            visitOrder: 2,
-            time: "15:30"
-          },
-          {
-            name: "명동교자",
-            location: { lat: 37.5636, lng: 126.9834 },
-            type: "restaurant",
-            rating: 4.0,
-            visitOrder: 3,
-            time: "17:00"
-          }
-        ],
-        // 세번째 코스 샘플
-        [
-          {
-            name: "한강공원",
-            location: { lat: 37.5215, lng: 126.9369 },
-            type: "attraction",
-            rating: 4.6,
-            visitOrder: 1,
-            time: "18:00"
-          },
-          {
-            name: "여의도",
-            location: { lat: 37.5215, lng: 126.9369 },
-            type: "attraction",
-            rating: 4.2,
-            visitOrder: 2,
-            time: "19:30"
-          },
-          {
-            name: "한강맛집",
-            location: { lat: 37.5215, lng: 126.9369 },
-            type: "restaurant",
-            rating: 4.3,
-            visitOrder: 3,
-            time: "20:00"
-          }
-        ]
-      ];
-      
-      return samplePlaces[courseIndex] || [];
-    }
-
     function closeCourseBox() {
-      if (isRecommendContentActive) {
-        showOnlyContentBarPopup('externalContentLinks');
-      } else {
-        showOnlyContentBarPopup('none');
-      }
+      document.getElementById('coursePopup').style.display = 'none';
     }
-
     // 음성 합성 이벤트 리스너 추가
     function setupSpeechEvents(utterance) {
       utterance.onstart = function() {
