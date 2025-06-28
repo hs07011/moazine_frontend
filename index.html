@@ -697,31 +697,62 @@
       .content-bar span { font-size: 1.05rem; }
       .header-btn { font-size: 1.1rem; padding: 8px 14px; }
     }
+    #destinationIntroInBar {
+      background: #f8fafc;
+      border-left: 6px solid #217093;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px #0001;
+      padding: 32px 36px 28px 32px;
+      margin: 32px 0 24px 0;
+      position: relative;
+      max-width: 900px;
+      min-width: 260px;
+      color: #1a2733;
+      font-family: 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+    }
     #destinationIntroInBar .title {
-      font-size: 2.1rem !important; /* 더 작게 */
-      font-weight: bold;
+      font-size: 2.5rem !important;
+      font-weight: 900;
       color: #217093;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       text-align: left;
+      letter-spacing: 0.5px;
+      line-height: 1.3;
+      text-shadow: 0 2px 8px #21709322;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #destinationIntroInBar .title .emoji {
+      font-size: 2.6rem;
+      vertical-align: middle;
+      margin-right: 6px;
+      filter: drop-shadow(0 1px 2px #21709333);
     }
     #destinationIntroInBar .guide-text {
-      font-size: 1.7rem !important; /* 더 작게 */
-      line-height: 1.8;
+      font-size: 1.15rem !important;
+      line-height: 2.1;
       text-align: left;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
+      color: #263040;
+      letter-spacing: 0.02em;
+      font-family: 'Noto Sans KR', 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
     }
-    #destinationIntroInBar .title {
-      font-size: 2.94rem !important; /* 4.2rem * 0.7 */
+    #destinationIntroInBar .close-btn {
+      position: absolute;
+      top: 18px;
+      right: 24px;
+      font-size: 1.7rem;
+      color: #888;
       font-weight: bold;
-      color: #217093;
-      margin-bottom: 20px;
-      text-align: left;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.2s;
+      z-index: 10;
     }
-    #destinationIntroInBar .guide-text {
-      font-size: 2.31rem !important; /* 3.3rem * 0.7 */
-      line-height: 1.8;
-      text-align: left;
-      margin-bottom: 16px;
+    #destinationIntroInBar .close-btn:hover {
+      color: #217093;
     }
   </style>
 </head>
@@ -1220,9 +1251,9 @@
       // contentBar intro 영역에 표시
       const introBox = document.getElementById('destinationIntroInBar');
       introBox.innerHTML = `
-        <div class="title">🎯 ${searchQuery} 여행 가이드</div>
+        <div class="title"><span class="emoji">🎯</span> <span>${searchQuery} 여행 가이드</span></div>
         <div class="guide-text">가이드 정보를 생성하는 중입니다... 잠시만 기다려주세요.</div>
-        <button class='close-btn' style='position:absolute;top:10px;right:18px;font-size:1.5rem;color:#888;font-weight:bold;cursor:pointer;' onclick="closeDestinationIntroInBar()">✕</button>
+        <button class='close-btn' onclick="closeDestinationIntroInBar()">✕</button>
       `;
       introBox.style.display = 'block';
       document.getElementById('externalContentLinks').style.display = 'none';
