@@ -845,8 +845,10 @@
     </div>
   </div>
 
-  <div id="contentBar" class="content-bar" style="display:none; position:relative;">
+  <div id="contentBar" class="content-bar" style="display:none; position:relative; flex-direction:column; align-items:flex-start;">
     <div id="destinationIntroInBar" style="display:none; width:100%; text-align:center;"></div>
+    <div id="coursePopup" class="summary-popup" style="display:none;"></div>
+    <div id="summaryBox" class="summary-popup" style="display:none;"></div>
     <div id="externalContentLinks">
       <a href="https://www.disneyplus.com/ko-kr" target="_blank"><img src="assets/disney+.png" alt="디즈니+"><span>디즈니+</span></a>
       <a href="https://www.wavve.com" target="_blank"><img src="assets/wavve.png" alt="웨이브"><span>웨이브</span></a>
@@ -916,7 +918,6 @@
     </div>
   </div>
   <div id="placeDetailsBox" class="details-popup" style="display:none;"></div>
-  <div id="coursePopup" class="summary-popup" style="display:none;"></div>
   <div id="courseMapPopup" class="course-map-popup" style="display:none;">
     <div class="course-map-content">
       <span class="close-btn" onclick="closeCourseMap()">✕</span>
@@ -1239,21 +1240,11 @@
 
     // 요약 정보 보기 버튼 이벤트
     document.getElementById('attractionSummaryBtn').onclick = function() {
-      // 관광지 요약 클릭 시 contentBar에 summaryBox 표시, 외부 콘텐츠/다른 팝업 숨김
-      document.getElementById('contentBar').style.display = 'flex';
-      document.getElementById('externalContentLinks').style.display = 'none';
-      document.getElementById('destinationIntroInBar').style.display = 'none';
-      document.getElementById('coursePopup').style.display = 'none';
-      document.getElementById('summaryBox').style.display = 'block';
+      showOnlyContentBarPopup('summaryBox');
       showSummary('관광지', attractions);
     };
     document.getElementById('restaurantSummaryBtn').onclick = function() {
-      // 맛집 요약 클릭 시 contentBar에 summaryBox 표시, 외부 콘텐츠/다른 팝업 숨김
-      document.getElementById('contentBar').style.display = 'flex';
-      document.getElementById('externalContentLinks').style.display = 'none';
-      document.getElementById('destinationIntroInBar').style.display = 'none';
-      document.getElementById('coursePopup').style.display = 'none';
-      document.getElementById('summaryBox').style.display = 'block';
+      showOnlyContentBarPopup('summaryBox');
       showSummary('맛집', restaurants);
     };
 
@@ -1327,9 +1318,7 @@
     }
 
     function closeSummaryBox() {
-      document.getElementById('summaryBox').style.display = 'none';
-      // 외부 콘텐츠 복원
-      document.getElementById('externalContentLinks').style.display = 'flex';
+      showOnlyContentBarPopup('externalContentLinks');
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
@@ -1385,6 +1374,7 @@
           guideTextElement.innerHTML = '가이드 정보 생성에 실패했습니다. 다시 시도해 주세요.';
         }
       });
+      showOnlyContentBarPopup('destinationIntroInBar');
     }
 
     function getDestinationSpeechText(text) {
@@ -1399,21 +1389,13 @@
     }
 
     function closeDestinationIntroInBar() {
-      document.getElementById('destinationIntroInBar').style.display = 'none';
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
-      // 외부 콘텐츠 복원
-      document.getElementById('externalContentLinks').style.display = 'flex';
+      showOnlyContentBarPopup('externalContentLinks');
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     }
 
     // 추천코스 버튼 이벤트
     document.getElementById('courseBtn').onclick = function() {
-      // 추천코스 버튼 클릭 시 contentBar에 coursePopup 표시, 외부 콘텐츠 숨김, intro 숨김
-      document.getElementById('contentBar').style.display = 'flex';
-      document.getElementById('externalContentLinks').style.display = 'none';
-      document.getElementById('destinationIntroInBar').style.display = 'none';
-      document.getElementById('coursePopup').style.display = 'block';
+      showOnlyContentBarPopup('coursePopup');
       showCoursePopup();
     };
 
@@ -1512,9 +1494,7 @@
     }
 
     function closeCourseBox() {
-      document.getElementById('coursePopup').style.display = 'none';
-      // 외부 콘텐츠 복원
-      document.getElementById('externalContentLinks').style.display = 'flex';
+      showOnlyContentBarPopup('externalContentLinks');
     }
 
     // 음성 합성 이벤트 리스너 추가
@@ -1748,23 +1728,8 @@
       var recommendBtn = document.getElementById('recommendContentBtn');
       if (recommendBtn) {
         recommendBtn.onclick = function() {
-          const bar = document.getElementById('contentBar');
-          const intro = document.getElementById('destinationIntroInBar');
-          const links = document.getElementById('externalContentLinks');
-          // 추천 콘텐츠 버튼 클릭 시 intro 닫고 콘텐츠 표시
-          if (bar.style.display === 'none' || bar.style.display === '') {
-            bar.style.display = 'flex';
-            intro.style.display = 'none';
-            links.style.display = 'flex';
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-          } else if (links.style.display === 'none') {
-            intro.style.display = 'none';
-            links.style.display = 'flex';
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-          } else {
-            bar.style.display = 'none';
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-          }
+          showOnlyContentBarPopup('externalContentLinks');
+          if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         };
       }
     };
