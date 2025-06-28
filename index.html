@@ -1448,6 +1448,18 @@
       const box = document.getElementById('coursePopup');
       let courseHtml = '';
       
+      // 마크다운 표시 제거 함수
+      function cleanMarkdown(text) {
+        return text
+          .replace(/#+/g, '') // # 제거
+          .replace(/\*\*/g, '') // ** 제거
+          .replace(/\*/g, '') // * 제거
+          .replace(/\n/g, '<br>') // 줄바꿈을 <br>로 변환
+          .replace(/<br>\s*<br>/g, '<br>') // 연속 줄바꿈 정리
+          .replace(/\s{2,}/g, ' ') // 연속 공백 정리
+          .trim();
+      }
+      
       // Gemini API에서 받은 텍스트를 그대로 표시하되, 코스 구분만 처리
       const courseBlocks = text.split(/(?=첫번째\s*코스|두번째\s*코스|세번째\s*코스)/g);
       
@@ -1483,13 +1495,13 @@
               ${courseEmojis[courseIndex]} ${title}
               <button class="route-btn" onclick="showCourseMap(${courseIndex})">🗺️ 길안내</button>
             </div>
-            <div class="course-content" style="font-size:1.15rem; color:#263040; line-height:2.1; white-space:pre-wrap;">${content}</div>
+            <div class="course-content" style="font-size:1.15rem; color:#263040; line-height:2.1;">${cleanMarkdown(content)}</div>
           </div>`;
           
           courseIndex++;
         } else if (courseIndex === 0) {
           // 첫 번째 블록이 코스 제목이 아닌 경우 (인트로 텍스트)
-          courseHtml += `<div class="course-intro" style="margin-bottom:32px; font-size:1.15rem; color:#263040; line-height:2.1; white-space:pre-wrap;">${block}</div>`;
+          courseHtml += `<div class="course-intro" style="margin-bottom:32px; font-size:1.15rem; color:#263040; line-height:2.1;">${cleanMarkdown(block)}</div>`;
         }
       });
       
