@@ -729,11 +729,13 @@
       margin-right: 6px;
       filter: drop-shadow(0 1px 2px #21709333);
     }
-    #destinationIntroInBar .guide-text {
+    #destinationIntroInBar .guide-text,
+    #coursePopup .course-intro,
+    #coursePopup .course-block,
+    #summaryBox {
       font-size: 1.15rem !important;
       line-height: 2.1;
       text-align: left;
-      margin-bottom: 12px;
       color: #263040;
       letter-spacing: 0.02em;
       font-family: 'Noto Sans KR', 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
@@ -946,6 +948,8 @@
     let courseMap = null; // 코스 지도 인스턴스
     let courseData = []; // 코스 데이터 저장
     let courseMarkers = []; // 코스 지도 마커 배열
+    // 추천콘텐츠 버튼 토글 상태 변수 추가
+    let isRecommendContentActive = false;
 
     function loadVoices() {
       speechVoices = window.speechSynthesis.getVoices();
@@ -1739,7 +1743,14 @@
       var recommendBtn = document.getElementById('recommendContentBtn');
       if (recommendBtn) {
         recommendBtn.onclick = function() {
-          showOnlyContentBarPopup('externalContentLinks');
+          // 토글 동작: 이미 추천콘텐츠가 보이면 숨기고, 아니면 보여줌
+          if (isRecommendContentActive) {
+            showOnlyContentBarPopup('none'); // 모두 숨김
+            isRecommendContentActive = false;
+          } else {
+            showOnlyContentBarPopup('externalContentLinks');
+            isRecommendContentActive = true;
+          }
           if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         };
       }
@@ -1769,7 +1780,6 @@
 
     // 관광지/맛집 요약, 추천코스, 목적지 안내, 추천콘텐츠는 모두 contentBar 내부에서 하나만 보이도록 show/hide 처리
     function showOnlyContentBarPopup(popupId) {
-      // 모든 모드 종료: 팝업 숨김, 음성 중지, 음악 플레이어 복원
       document.getElementById('contentBar').style.display = 'flex';
       document.getElementById('destinationIntroInBar').style.display = 'none';
       document.getElementById('coursePopup').style.display = 'none';
@@ -1777,11 +1787,14 @@
       document.getElementById('externalContentLinks').style.display = 'none';
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
       if (typeof restoreMusicPlayer === 'function') restoreMusicPlayer();
-      // 요청된 모드만 표시
       if (popupId === 'destinationIntroInBar') document.getElementById('destinationIntroInBar').style.display = 'block';
       if (popupId === 'coursePopup') document.getElementById('coursePopup').style.display = 'block';
       if (popupId === 'summaryBox') document.getElementById('summaryBox').style.display = 'block';
       if (popupId === 'externalContentLinks') document.getElementById('externalContentLinks').style.display = 'flex';
+      // 추천콘텐츠 외 모드 진입 시 토글 상태 해제
+      if (popupId !== 'externalContentLinks') isRecommendContentActive = false;
+      // 모두 숨김 모드
+      if (popupId === 'none') document.getElementById('contentBar').style.display = 'none';
     }
   </script>
 </body>
