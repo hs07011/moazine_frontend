@@ -1449,6 +1449,7 @@
       let courseHtml = '';
       let intro = '';
       let courses = [];
+      
       // 1. robustly split by course headings (e.g., '첫번째 코스', '두번째 코스', '세번째 코스')
       const courseHeadingRegex = /(첫번째\s*코스|두번째\s*코스|세번째\s*코스)/g;
       let split = text.split(courseHeadingRegex);
@@ -1474,6 +1475,7 @@
           courses = [{ title: '첫번째 코스', content: text }];
         }
       }
+      
       // 마크다운 및 불필요한 텍스트 제거 함수
       function cleanMarkdown(text) {
         return text
@@ -1487,31 +1489,43 @@
           .replace(/^[\s\-\*]+/gm, '') // 각 줄 앞 불필요한 기호 제거
           .trim();
       }
-      // 인트로가 있으면 먼저 출력 (비어있지 않을 때만)
+      
+      // 코스 제안 안내 문구 추가
+      courseHtml += `<div class="course-intro" style="margin-bottom:32px; text-align:center; color:#217093; font-weight:bold;">
+        🎯 <span style="font-size:1.2em;">추천 코스 3가지를 제안해 드립니다</span>
+      </div>`;
+      
+      // 인트로가 있으면 출력 (비어있지 않을 때만)
       if (intro && cleanMarkdown(intro)) {
         courseHtml += `<div class="course-intro" style="margin-bottom:32px;">${cleanMarkdown(intro)}</div>`;
       }
+      
       // 코스별 배경색
       const courseBg = ['#e0f7fa', '#fffbe6', '#f1faee'];
       const courseBorder = ['#8ecae6', '#ffd166', '#b7e4c7'];
+      const courseEmojis = ['🌅', '🌞', '🌙'];
+      
       // 최대 3개 코스만 출력, 내용이 비어있거나 마크다운만 있으면 건너뜀
       courses.slice(0, 3).forEach((course, idx) => {
         const content = cleanMarkdown(course.content);
         if (!content || content.length < 10) return; // 내용이 너무 짧으면 건너뜀
         const title = course.title || `코스 ${idx+1}`;
+        
         courseData.push({
           title: title,
           content: course.content,
           places: extractPlacesFromCourse(course.content, idx)
         });
+        
         courseHtml += `<div class="course-block course-${idx+1}" style="background:${courseBg[idx]}; border:2px solid ${courseBorder[idx]}; border-radius:12px; margin-bottom:40px; padding:22px 18px 18px 18px; box-shadow:0 2px 8px #0001;">
           <div class="course-title" style="font-size:2rem; font-weight:900; color:#217093; margin-bottom:14px; display:flex; align-items:center; gap:15px; letter-spacing:0.5px;">
-            ${title}
+            ${courseEmojis[idx]} ${title}
             <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
           </div>
           <div class="course-content" style="font-size:1.15rem; color:#263040; line-height:2.1;">${content}</div>
         </div>`;
       });
+      
       box.innerHTML = `<button class='close-btn' onclick="closeCourseBox()">✕</button>` + courseHtml;
       box.style.display = 'block';
     }
