@@ -754,6 +754,84 @@
     #destinationIntroInBar .close-btn:hover {
       color: #217093;
     }
+    #coursePopup.summary-popup {
+      display: none;
+      position: static;
+      top: auto;
+      left: auto;
+      width: auto;
+      min-width: 0;
+      max-width: 900px;
+      min-height: 0;
+      max-height: none;
+      background: #f8fafc;
+      border-left: 6px solid #27ae60;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px #0001;
+      padding: 32px 36px 28px 32px;
+      margin: 32px 0 24px 0;
+      color: #1a2733;
+      font-family: 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+      z-index: 1000;
+      line-height: 1.7;
+      overflow-y: visible;
+      transform: none;
+    }
+    #coursePopup .close-btn {
+      position: absolute;
+      top: 18px;
+      right: 24px;
+      font-size: 1.7rem;
+      color: #888;
+      font-weight: bold;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.2s;
+      z-index: 10;
+    }
+    #coursePopup .close-btn:hover {
+      color: #27ae60;
+    }
+    #summaryBox.summary-popup {
+      display: none;
+      position: static;
+      top: auto;
+      left: auto;
+      width: auto;
+      min-width: 0;
+      max-width: 900px;
+      min-height: 0;
+      max-height: none;
+      background: #f8fafc;
+      border-left: 6px solid #217093;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px #0001;
+      padding: 32px 36px 28px 32px;
+      margin: 32px 0 24px 0;
+      color: #1a2733;
+      font-family: 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+      z-index: 1000;
+      line-height: 1.7;
+      overflow-y: visible;
+      transform: none;
+    }
+    #summaryBox .close-btn {
+      position: absolute;
+      top: 18px;
+      right: 24px;
+      font-size: 1.7rem;
+      color: #888;
+      font-weight: bold;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.2s;
+      z-index: 10;
+    }
+    #summaryBox .close-btn:hover {
+      color: #217093;
+    }
   </style>
 </head>
 <body>
@@ -1161,9 +1239,21 @@
 
     // 요약 정보 보기 버튼 이벤트
     document.getElementById('attractionSummaryBtn').onclick = function() {
+      // 관광지 요약 클릭 시 contentBar에 summaryBox 표시, 외부 콘텐츠/다른 팝업 숨김
+      document.getElementById('contentBar').style.display = 'flex';
+      document.getElementById('externalContentLinks').style.display = 'none';
+      document.getElementById('destinationIntroInBar').style.display = 'none';
+      document.getElementById('coursePopup').style.display = 'none';
+      document.getElementById('summaryBox').style.display = 'block';
       showSummary('관광지', attractions);
     };
     document.getElementById('restaurantSummaryBtn').onclick = function() {
+      // 맛집 요약 클릭 시 contentBar에 summaryBox 표시, 외부 콘텐츠/다른 팝업 숨김
+      document.getElementById('contentBar').style.display = 'flex';
+      document.getElementById('externalContentLinks').style.display = 'none';
+      document.getElementById('destinationIntroInBar').style.display = 'none';
+      document.getElementById('coursePopup').style.display = 'none';
+      document.getElementById('summaryBox').style.display = 'block';
       showSummary('맛집', restaurants);
     };
 
@@ -1216,7 +1306,7 @@
 
     function showSummaryBox(text) {
       const box = document.getElementById('summaryBox');
-      box.innerHTML = `<span class='close-btn' onclick="closeSummaryBox()">✕</span>` + text;
+      box.innerHTML = `<button class='close-btn' onclick="closeSummaryBox()">✕</button>` + text;
       box.style.display = 'block';
       // 음성 출력 (여행 가이드 인트로, 옵션 조정)
       if ('speechSynthesis' in window) {
@@ -1230,16 +1320,16 @@
         // 자연스러운 한국어 voice 선택
         const koVoice = speechVoices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
         if (koVoice) utter.voice = koVoice;
-        
         // 음성 이벤트 리스너 설정
         setupSpeechEvents(utter);
-        
         window.speechSynthesis.speak(utter);
       }
     }
 
     function closeSummaryBox() {
       document.getElementById('summaryBox').style.display = 'none';
+      // 외부 콘텐츠 복원
+      document.getElementById('externalContentLinks').style.display = 'flex';
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
@@ -1319,6 +1409,11 @@
 
     // 추천코스 버튼 이벤트
     document.getElementById('courseBtn').onclick = function() {
+      // 추천코스 버튼 클릭 시 contentBar에 coursePopup 표시, 외부 콘텐츠 숨김, intro 숨김
+      document.getElementById('contentBar').style.display = 'flex';
+      document.getElementById('externalContentLinks').style.display = 'none';
+      document.getElementById('destinationIntroInBar').style.display = 'none';
+      document.getElementById('coursePopup').style.display = 'block';
       showCoursePopup();
     };
 
@@ -1412,12 +1507,14 @@
           ${cleanMarkdown(text)}
         </div>`;
       }
-      box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>` + courseHtml;
+      box.innerHTML = `<button class='close-btn' onclick="closeCourseBox()">✕</button>` + courseHtml;
       box.style.display = 'block';
     }
 
     function closeCourseBox() {
       document.getElementById('coursePopup').style.display = 'none';
+      // 외부 콘텐츠 복원
+      document.getElementById('externalContentLinks').style.display = 'flex';
     }
 
     // 음성 합성 이벤트 리스너 추가
