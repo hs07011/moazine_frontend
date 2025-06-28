@@ -1449,25 +1449,31 @@
       let courseHtml = '';
       let intro = '';
       let courses = [];
-      // 1. 먼저 인트로(설명)와 코스 구분
-      const courseSplitRegex = /(?=\n?\s*(?:첫번째|두번째|세번째|네번째|코스\s*\d+)[^\n]*\n)/g;
-      let blocks = text.split(courseSplitRegex).map(s => s.trim()).filter(Boolean);
-      if (blocks.length > 1) {
-        intro = blocks[0];
-        courses = blocks.slice(1, 4); // 최대 3개만
+      // 1. robustly split by course headings (e.g., '첫번째 코스', '두번째 코스', '세번째 코스')
+      const courseHeadingRegex = /(첫번째\s*코스|두번째\s*코스|세번째\s*코스)/g;
+      let split = text.split(courseHeadingRegex);
+      // split will be like: [intro, '첫번째 코스', block1, '두번째 코스', block2, '세번째 코스', block3]
+      if (split.length >= 3) {
+        intro = split[0].trim();
+        // collect up to 3 courses
+        for (let i = 1; i < split.length - 1; i += 2) {
+          const title = split[i].trim();
+          const content = split[i + 1].trim();
+          courses.push({ title, content });
+          if (courses.length === 3) break;
+        }
       } else {
-        const fallbackBlocks = text.split(/(?:^|\n)[#\-]{2,}[^\n]*\n?/g).map(s => s.trim()).filter(Boolean);
-        if (fallbackBlocks.length > 2) {
-          intro = fallbackBlocks[0];
-          courses = fallbackBlocks.slice(1, 4);
-        } else if (fallbackBlocks.length > 1) {
-          courses = fallbackBlocks.slice(0, 3);
+        // fallback: old logic
+        const courseSplitRegex = /(?=\n?\s*(?:첫번째|두번째|세번째|네번째|코스\s*\d+)[^\n]*\n)/g;
+        let blocks = text.split(courseSplitRegex).map(s => s.trim()).filter(Boolean);
+        if (blocks.length > 1) {
+          intro = blocks[0];
+          const courseTitles = ['첫번째 코스', '두번째 코스', '세번째 코스'];
+          courses = blocks.slice(1, 4).map((content, idx) => ({ title: courseTitles[idx], content }));
         } else {
-          courses = [text];
+          courses = [{ title: '첫번째 코스', content: text }];
         }
       }
-      // 코스 제목 배열
-      const courseTitles = ['첫번째 코스', '두번째 코스', '세번째 코스'];
       // 마크다운 및 불필요한 텍스트 제거 함수
       function cleanMarkdown(text) {
         return text
@@ -1489,16 +1495,16 @@
       const courseBg = ['#e0f7fa', '#fffbe6', '#f1faee'];
       const courseBorder = ['#8ecae6', '#ffd166', '#b7e4c7'];
       // 최대 3개 코스만 출력, 내용이 비어있거나 마크다운만 있으면 건너뜀
-      courses.slice(0, 3).forEach((block, idx) => {
-        const content = cleanMarkdown(block);
+      courses.slice(0, 3).forEach((course, idx) => {
+        const content = cleanMarkdown(course.content);
         if (!content || content.length < 10) return; // 내용이 너무 짧으면 건너뜀
-        const title = courseTitles[idx] || `코스 ${idx+1}`;
+        const title = course.title || `코스 ${idx+1}`;
         courseData.push({
           title: title,
-          content: block,
-          places: extractPlacesFromCourse(block, idx)
+          content: course.content,
+          places: extractPlacesFromCourse(course.content, idx)
         });
-        courseHtml += `<div class="course-block course-${idx+1}" style="background:${courseBg[idx]}; border:2px solid ${courseBorder[idx]}; border-radius:12px; margin-bottom:32px; padding:22px 18px 18px 18px; box-shadow:0 2px 8px #0001;">
+        courseHtml += `<div class="course-block course-${idx+1}" style="background:${courseBg[idx]}; border:2px solid ${courseBorder[idx]}; border-radius:12px; margin-bottom:40px; padding:22px 18px 18px 18px; box-shadow:0 2px 8px #0001;">
           <div class="course-title" style="font-size:2rem; font-weight:900; color:#217093; margin-bottom:14px; display:flex; align-items:center; gap:15px; letter-spacing:0.5px;">
             ${title}
             <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
