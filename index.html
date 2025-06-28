@@ -832,6 +832,17 @@
     #summaryBox .close-btn:hover {
       color: #217093;
     }
+    #destinationIntroInBar,
+    #coursePopup.summary-popup,
+    #summaryBox.summary-popup {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0;
+      box-sizing: border-box;
+      word-break: break-word;
+      white-space: normal;
+      /* 기존 스타일 유지 */
+    }
   </style>
 </head>
 <body>
@@ -1758,11 +1769,19 @@
 
     // 관광지/맛집 요약, 추천코스, 목적지 안내, 추천콘텐츠는 모두 contentBar 내부에서 하나만 보이도록 show/hide 처리
     function showOnlyContentBarPopup(popupId) {
+      // 모든 모드 종료: 팝업 숨김, 음성 중지, 음악 플레이어 복원
       document.getElementById('contentBar').style.display = 'flex';
-      document.getElementById('destinationIntroInBar').style.display = (popupId === 'destinationIntroInBar') ? 'block' : 'none';
-      document.getElementById('coursePopup').style.display = (popupId === 'coursePopup') ? 'block' : 'none';
-      document.getElementById('summaryBox').style.display = (popupId === 'summaryBox') ? 'block' : 'none';
-      document.getElementById('externalContentLinks').style.display = (popupId === 'externalContentLinks') ? 'flex' : 'none';
+      document.getElementById('destinationIntroInBar').style.display = 'none';
+      document.getElementById('coursePopup').style.display = 'none';
+      document.getElementById('summaryBox').style.display = 'none';
+      document.getElementById('externalContentLinks').style.display = 'none';
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      if (typeof restoreMusicPlayer === 'function') restoreMusicPlayer();
+      // 요청된 모드만 표시
+      if (popupId === 'destinationIntroInBar') document.getElementById('destinationIntroInBar').style.display = 'block';
+      if (popupId === 'coursePopup') document.getElementById('coursePopup').style.display = 'block';
+      if (popupId === 'summaryBox') document.getElementById('summaryBox').style.display = 'block';
+      if (popupId === 'externalContentLinks') document.getElementById('externalContentLinks').style.display = 'flex';
     }
   </script>
 </body>
