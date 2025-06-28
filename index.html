@@ -555,21 +555,27 @@
     
     /* 길안내 버튼 스타일 */
     .route-btn {
-      background: #ff6b35;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 6px;
+      background: #ff6b35 !important;
+      color: #fff !important;
+      border: 2px solid #ff6b35 !important;
+      padding: 10px 22px !important;
+      border-radius: 8px !important;
       cursor: pointer;
-      font-size: 1.2rem;
+      font-size: 1.15rem !important;
       font-weight: bold;
-      transition: background 0.2s;
+      box-shadow: 0 2px 8px #ff6b3533;
       white-space: nowrap;
       flex-shrink: 0;
+      transition: background 0.2s, border 0.2s, color 0.2s;
+      outline: none;
+      margin-left: 10px;
+      display: inline-block;
+      vertical-align: middle;
     }
-    
-    .route-btn:hover {
-      background: #e55a2b;
+    .route-btn:hover, .route-btn:focus {
+      background: #e55a2b !important;
+      border-color: #e55a2b !important;
+      color: #fff !important;
     }
     
     @media (max-width: 768px) {
@@ -1333,11 +1339,12 @@
     }
 
     function closeSummaryBox() {
-      showOnlyContentBarPopup('externalContentLinks');
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
+      if (isRecommendContentActive) {
+        showOnlyContentBarPopup('externalContentLinks');
+      } else {
+        showOnlyContentBarPopup('none');
       }
-      // 음성 종료 시 음악 플레이어 복원
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
       restoreMusicPlayer();
     }
 
@@ -1404,7 +1411,11 @@
     }
 
     function closeDestinationIntroInBar() {
-      showOnlyContentBarPopup('externalContentLinks');
+      if (isRecommendContentActive) {
+        showOnlyContentBarPopup('externalContentLinks');
+      } else {
+        showOnlyContentBarPopup('none');
+      }
       if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     }
 
@@ -1435,14 +1446,32 @@
 
     function showCourseBox(text) {
       const box = document.getElementById('coursePopup');
-      // Gemini 응답을 3가지 코스로 분리 (###, --- 등으로 구분)
+      // 코스 분리: '첫번째 코스', '두번째 코스', '세번째 코스' 등으로 분리
       let courseHtml = '';
+      let intro = '';
+      let courses = [];
+      // 1. 먼저 인트로(설명)와 코스 구분
+      // '코스'라는 단어가 포함된 제목(예: '첫번째 코스', '코스 1' 등) 기준으로 분리
+      const courseSplitRegex = /(?=\n?\s*(?:첫번째|두번째|세번째|네번째|코스\s*\d+)[^\n]*\n)/g;
+      let blocks = text.split(courseSplitRegex).map(s => s.trim()).filter(Boolean);
+      // 인트로가 있으면 첫 블록, 나머지는 코스
+      if (blocks.length > 1) {
+        intro = blocks[0];
+        courses = blocks.slice(1, 4); // 최대 3개만
+      } else {
+        // fallback: 기존 방식
+        const fallbackBlocks = text.split(/(?:^|\n)[#\-]{2,}[^\n]*\n?/g).map(s => s.trim()).filter(Boolean);
+        if (fallbackBlocks.length > 2) {
+          intro = fallbackBlocks[0];
+          courses = fallbackBlocks.slice(1, 4);
+        } else if (fallbackBlocks.length > 1) {
+          courses = fallbackBlocks.slice(0, 3);
+        } else {
+          courses = [text];
+        }
+      }
+      // 코스 제목 배열
       const courseTitles = ['첫번째 코스', '두번째 코스', '세번째 코스'];
-      const blocks = text.split(/(?:^|\n)[#\-]{2,}[^\n]*\n?/g).map(s => s.trim()).filter(Boolean);
-      
-      // 코스 데이터 초기화
-      courseData = [];
-      
       // 마크다운 문법 제거 함수
       function cleanMarkdown(text) {
         return text
@@ -1450,66 +1479,36 @@
           .replace(/\*/g, '')   // * 제거
           .replace(/\n/g, '<br>'); // 줄바꿈을 <br>로 변환
       }
-      
-      // 안내문구(인트로)가 있는 경우 첫 블록이 인트로, 나머지가 코스
-      if (blocks.length > 2) {
-        const intro = cleanMarkdown(blocks[0]);
-        const courses = blocks.slice(1);
-        courseHtml = `<div class="course-intro">${intro}</div>` +
-          courses.map((block, idx) => {
-            const title = courseTitles[idx] || `코스 ${idx+1}`;
-            // 코스 데이터 저장 (원본 텍스트는 마크다운 제거 전에 저장)
-            courseData.push({
-              title: title,
-              content: block,
-              places: extractPlacesFromCourse(block, idx)
-            });
-            return `<div class="course-block course-${idx+1}">
-              <div class="course-title">
-                ${title}
-                <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
-              </div>
-              ${cleanMarkdown(block)}
-            </div>`;
-          }).join('');
-      } else if (blocks.length > 1) {
-        courseHtml = blocks.map((block, idx) => {
-          const title = courseTitles[idx] || `코스 ${idx+1}`;
-          // 코스 데이터 저장 (원본 텍스트는 마크다운 제거 전에 저장)
-          courseData.push({
-            title: title,
-            content: block,
-            places: extractPlacesFromCourse(block, idx)
-          });
-          return `<div class="course-block course-${idx+1}">
-            <div class="course-title">
-              ${title}
-              <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
-            </div>
-            ${cleanMarkdown(block)}
-          </div>`;
-        }).join('');
-      } else {
-        // 코스 데이터 저장 (원본 텍스트는 마크다운 제거 전에 저장)
-        courseData.push({
-          title: '첫번째 코스',
-          content: text,
-          places: extractPlacesFromCourse(text, 0)
-        });
-        courseHtml = `<div class="course-block">
-          <div class="course-title">
-            첫번째 코스
-            <button class="route-btn" onclick="showCourseMap(0)">🗺️ 길안내</button>
-          </div>
-          ${cleanMarkdown(text)}
-        </div>`;
+      // 인트로가 있으면 먼저 출력
+      if (intro) {
+        courseHtml += `<div class="course-intro">${cleanMarkdown(intro)}</div>`;
       }
+      // 최대 3개 코스만 출력
+      courses.slice(0, 3).forEach((block, idx) => {
+        const title = courseTitles[idx] || `코스 ${idx+1}`;
+        courseData.push({
+          title: title,
+          content: block,
+          places: extractPlacesFromCourse(block, idx)
+        });
+        courseHtml += `<div class="course-block course-${idx+1}">
+          <div class="course-title">
+            ${title}
+            <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
+          </div>
+          ${cleanMarkdown(block)}
+        </div>`;
+      });
       box.innerHTML = `<button class='close-btn' onclick="closeCourseBox()">✕</button>` + courseHtml;
       box.style.display = 'block';
     }
 
     function closeCourseBox() {
-      showOnlyContentBarPopup('externalContentLinks');
+      if (isRecommendContentActive) {
+        showOnlyContentBarPopup('externalContentLinks');
+      } else {
+        showOnlyContentBarPopup('none');
+      }
     }
 
     // 음성 합성 이벤트 리스너 추가
