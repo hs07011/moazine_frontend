@@ -1429,6 +1429,10 @@
         showCourseBox('추천할 코스 정보가 없습니다.');
         return;
       }
+      
+      // 목적지 소개 정보를 명시적으로 숨김
+      document.getElementById('destinationIntroInBar').style.display = 'none';
+      
       showCourseBox('추천 코스를 생성 중입니다...');
       fetch('https://moazine.onrender.com/generate-course', {
         method: 'POST',
@@ -1445,6 +1449,10 @@
 
     function showCourseBox(text) {
       const box = document.getElementById('coursePopup');
+      
+      // 목적지 소개 정보를 명시적으로 숨김
+      document.getElementById('destinationIntroInBar').style.display = 'none';
+      
       // Gemini 응답을 3가지 코스로 분리 (###, --- 등으로 구분)
       let courseHtml = '';
       const courseTitles = ['첫번째 코스', '두번째 코스', '세번째 코스'];
