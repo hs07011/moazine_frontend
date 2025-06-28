@@ -1447,83 +1447,50 @@
     function showCourseBox(text) {
       const box = document.getElementById('coursePopup');
       let courseHtml = '';
-      let intro = '';
-      let courses = [];
       
-      // 1. robustly split by course headings (e.g., '첫번째 코스', '두번째 코스', '세번째 코스')
-      const courseHeadingRegex = /(첫번째\s*코스|두번째\s*코스|세번째\s*코스)/g;
-      let split = text.split(courseHeadingRegex);
-      // split will be like: [intro, '첫번째 코스', block1, '두번째 코스', block2, '세번째 코스', block3]
-      if (split.length >= 3) {
-        intro = split[0].trim();
-        // collect up to 3 courses
-        for (let i = 1; i < split.length - 1; i += 2) {
-          const title = split[i].trim();
-          const content = split[i + 1].trim();
-          courses.push({ title, content });
-          if (courses.length === 3) break;
-        }
-      } else {
-        // fallback: old logic
-        const courseSplitRegex = /(?=\n?\s*(?:첫번째|두번째|세번째|네번째|코스\s*\d+)[^\n]*\n)/g;
-        let blocks = text.split(courseSplitRegex).map(s => s.trim()).filter(Boolean);
-        if (blocks.length > 1) {
-          intro = blocks[0];
-          const courseTitles = ['첫번째 코스', '두번째 코스', '세번째 코스'];
-          courses = blocks.slice(1, 4).map((content, idx) => ({ title: courseTitles[idx], content }));
-        } else {
-          courses = [{ title: '첫번째 코스', content: text }];
-        }
-      }
+      // Gemini API에서 받은 텍스트를 그대로 표시하되, 코스 구분만 처리
+      const courseBlocks = text.split(/(?=첫번째\s*코스|두번째\s*코스|세번째\s*코스)/g);
       
-      // 마크다운 및 불필요한 텍스트 제거 함수
-      function cleanMarkdown(text) {
-        return text
-          .replace(/\*\*/g, '') // ** 제거
-          .replace(/\*/g, '')   // * 제거
-          .replace(/\n/g, '<br>') // 줄바꿈을 <br>로 변환
-          .replace(/---+/g, '') // --- 구분선 제거
-          .replace(/#+/g, '') // # 헤딩 제거
-          .replace(/<br>\s*<br>/g, '<br>') // 연속 줄바꿈 정리
-          .replace(/\s{2,}/g, ' ') // 연속 공백 정리
-          .replace(/^[\s\-\*]+/gm, '') // 각 줄 앞 불필요한 기호 제거
-          .trim();
-      }
-      
-      // 코스 제안 안내 문구 추가
       courseHtml += `<div class="course-intro" style="margin-bottom:32px; text-align:center; color:#217093; font-weight:bold;">
         🎯 <span style="font-size:1.2em;">추천 코스 3가지를 제안해 드립니다</span>
       </div>`;
       
-      // 인트로가 있으면 출력 (비어있지 않을 때만)
-      if (intro && cleanMarkdown(intro)) {
-        courseHtml += `<div class="course-intro" style="margin-bottom:32px;">${cleanMarkdown(intro)}</div>`;
-      }
-      
-      // 코스별 배경색
+      // 코스별 배경색과 이모지
       const courseBg = ['#e0f7fa', '#fffbe6', '#f1faee'];
       const courseBorder = ['#8ecae6', '#ffd166', '#b7e4c7'];
       const courseEmojis = ['🌅', '🌞', '🌙'];
       
-      // 최대 3개 코스만 출력, 내용이 비어있거나 마크다운만 있으면 건너뜀
-      courses.slice(0, 3).forEach((course, idx) => {
-        const content = cleanMarkdown(course.content);
-        if (!content || content.length < 10) return; // 내용이 너무 짧으면 건너뜀
-        const title = course.title || `코스 ${idx+1}`;
+      let courseIndex = 0;
+      
+      courseBlocks.forEach((block, idx) => {
+        if (!block.trim()) return;
         
-        courseData.push({
-          title: title,
-          content: course.content,
-          places: extractPlacesFromCourse(course.content, idx)
-        });
-        
-        courseHtml += `<div class="course-block course-${idx+1}" style="background:${courseBg[idx]}; border:2px solid ${courseBorder[idx]}; border-radius:12px; margin-bottom:40px; padding:22px 18px 18px 18px; box-shadow:0 2px 8px #0001;">
-          <div class="course-title" style="font-size:2rem; font-weight:900; color:#217093; margin-bottom:14px; display:flex; align-items:center; gap:15px; letter-spacing:0.5px;">
-            ${courseEmojis[idx]} ${title}
-            <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
-          </div>
-          <div class="course-content" style="font-size:1.15rem; color:#263040; line-height:2.1;">${content}</div>
-        </div>`;
+        // 코스 제목 추출
+        const titleMatch = block.match(/^(첫번째\s*코스|두번째\s*코스|세번째\s*코스)/);
+        if (titleMatch) {
+          const title = titleMatch[1];
+          const content = block.replace(titleMatch[0], '').trim();
+          
+          // 코스 데이터 저장
+          courseData.push({
+            title: title,
+            content: block,
+            places: extractPlacesFromCourse(block, courseIndex)
+          });
+          
+          courseHtml += `<div class="course-block course-${courseIndex + 1}" style="background:${courseBg[courseIndex]}; border:2px solid ${courseBorder[courseIndex]}; border-radius:12px; margin-bottom:40px; padding:22px 18px 18px 18px; box-shadow:0 2px 8px #0001;">
+            <div class="course-title" style="font-size:2rem; font-weight:900; color:#217093; margin-bottom:14px; display:flex; align-items:center; gap:15px; letter-spacing:0.5px;">
+              ${courseEmojis[courseIndex]} ${title}
+              <button class="route-btn" onclick="showCourseMap(${courseIndex})">🗺️ 길안내</button>
+            </div>
+            <div class="course-content" style="font-size:1.15rem; color:#263040; line-height:2.1; white-space:pre-wrap;">${content}</div>
+          </div>`;
+          
+          courseIndex++;
+        } else if (courseIndex === 0) {
+          // 첫 번째 블록이 코스 제목이 아닌 경우 (인트로 텍스트)
+          courseHtml += `<div class="course-intro" style="margin-bottom:32px; font-size:1.15rem; color:#263040; line-height:2.1; white-space:pre-wrap;">${block}</div>`;
+        }
       });
       
       box.innerHTML = `<button class='close-btn' onclick="closeCourseBox()">✕</button>` + courseHtml;
@@ -1583,12 +1550,14 @@
       
       // 코스 텍스트에서 장소명 찾기 (여러 패턴 시도)
       const patterns = [
-        // 시간 패턴: 🕘 09:00 – **장소명**
-        /🕘\s*(\d{1,2}:\d{2})\s*–\s*\*\*(.*?)\*\*/g,
-        // 번호 패턴: 1. **장소명**
-        /(\d+)\.\s*\*\*(.*?)\*\*/g,
+        // 시간 패턴: 🕘 09:00 – **장소명** 또는 🕘 09:00 - 장소명
+        /🕘\s*(\d{1,2}:\d{2})\s*[–-]\s*(\*\*)?([^*\n]+?)(\*\*)?/g,
+        // 번호 패턴: 1. **장소명** 또는 1. 장소명
+        /(\d+)\.\s*(\*\*)?([^*\n]+?)(\*\*)?/g,
         // 단순 볼드 패턴: **장소명**
-        /\*\*(.*?)\*\*/g
+        /(\*\*)([^*\n]+?)(\*\*)/g,
+        // 시간 패턴 (다양한 형식): 09:00 장소명, 09:00-장소명 등
+        /(\d{1,2}:\d{2})\s*[–-]?\s*([^\n]+?)(?=\n|$)/g
       ];
       
       let visitOrder = 1;
@@ -1600,30 +1569,37 @@
           let placeName, time = null;
           
           if (patternIndex === 0) {
-            // 시간 패턴
+            // 시간 패턴 (🕘 포함)
             time = match[1];
-            placeName = match[2].trim();
+            placeName = match[3].trim();
           } else if (patternIndex === 1) {
             // 번호 패턴
             visitOrder = parseInt(match[1]);
-            placeName = match[2].trim();
-          } else {
+            placeName = match[3].trim();
+          } else if (patternIndex === 2) {
             // 단순 볼드 패턴
-            placeName = match[1].trim();
+            placeName = match[2].trim();
+          } else if (patternIndex === 3) {
+            // 시간 패턴 (🕘 없음)
+            time = match[1];
+            placeName = match[2].trim();
           }
           
           // 이미 찾은 장소는 건너뛰기
           if (foundPlaces.has(placeName)) continue;
           
-          console.log('찾은 장소명:', placeName);
+          console.log('찾은 장소명:', placeName, '시간:', time);
           
           // 기존 관광지/맛집 목록에서 매칭되는 장소 찾기
           const foundPlace = allPlaces.find(place => {
             const placeNameLower = placeName.toLowerCase();
             const placeNameInList = place.name.toLowerCase();
+            
+            // 정확한 매칭 또는 부분 매칭
             return placeNameInList.includes(placeNameLower) || 
                    placeNameLower.includes(placeNameInList) ||
-                   placeNameInList.includes(placeNameLower.replace(/\s+/g, ''));
+                   placeNameInList.includes(placeNameLower.replace(/\s+/g, '')) ||
+                   placeNameLower.includes(placeNameInList.replace(/\s+/g, ''));
           });
           
           if (foundPlace) {
