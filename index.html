@@ -1755,5 +1755,14 @@
       });
       // 터치 스와이프 지원은 기본적으로 overflow-x: auto로 동작
     })();
+
+    // 관광지/맛집 요약, 추천코스, 목적지 안내, 추천콘텐츠는 모두 contentBar 내부에서 하나만 보이도록 show/hide 처리
+    function showOnlyContentBarPopup(popupId) {
+      document.getElementById('contentBar').style.display = 'flex';
+      document.getElementById('destinationIntroInBar').style.display = (popupId === 'destinationIntroInBar') ? 'block' : 'none';
+      document.getElementById('coursePopup').style.display = (popupId === 'coursePopup') ? 'block' : 'none';
+      document.getElementById('summaryBox').style.display = (popupId === 'summaryBox') ? 'block' : 'none';
+      document.getElementById('externalContentLinks').style.display = (popupId === 'externalContentLinks') ? 'flex' : 'none';
+    }
   </script>
 </body>
