@@ -311,60 +311,10 @@
       text-align: left;
       height: 1%;
       vertical-align: middle;
+      word-break: break-all;
+      white-space: nowrap;
       border-bottom: 1px solid var(--border-color);
       transition: all 0.2s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* 장소명 셀에 대한 특별한 스타일 */
-    td:nth-child(2) {
-      position: relative;
-      overflow: hidden;
-      width: 60%;
-    }
-
-    /* 장소명 텍스트 컨테이너 */
-    .place-name-container {
-      position: relative;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      transition: all 0.3s ease;
-      max-width: 100%;
-      display: inline-block;
-      width: 100%;
-    }
-
-    /* 호버 시 텍스트가 흘러가도록 */
-    tr.clickable:hover .place-name-container {
-      text-overflow: clip;
-    }
-
-    /* 긴 텍스트가 있을 때만 애니메이션 적용 */
-    .place-name-container.scrollable:hover {
-      animation: scrollText 10s ease-in-out infinite;
-      overflow: hidden;
-    }
-
-    /* 텍스트 스크롤 애니메이션 */
-    @keyframes scrollText {
-      0%, 10% {
-        transform: translateX(0);
-      }
-      90%, 100% {
-        transform: translateX(calc(-100% + 250px));
-      }
-    }
-
-    /* 스크롤바 숨기기 */
-    .place-name-container::-webkit-scrollbar {
-      display: none;
-    }
-
-    .place-name-container {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
     }
 
     th {
@@ -1539,17 +1489,13 @@
         }
       } else {
         // 데이터가 있을 때 최대 10개만 표시
-        html = list.slice(0, maxRows).map((item, i) => {
-          // 긴 텍스트인지 확인 (15자 이상)
-          const isLongText = item.name.length > 15;
-          const scrollableClass = isLongText ? 'scrollable' : '';
-          
-          return `<tr class="clickable" onclick="showPlaceInfo('${type}', '${item.place_id}')">
+        html = list.slice(0, maxRows).map((item, i) =>
+          `<tr class="clickable" onclick="showPlaceInfo('${type}', '${item.place_id}')">
             <td style="width:48px;text-align:center;white-space:nowrap;">${i+1}.</td>
-            <td><div class="place-name-container ${scrollableClass}">${item.name}</div></td>
+            <td>${item.name}</td>
             <td class="score">${item.rating ? item.rating.toFixed(1) + '점' : '-'}</td>
-          </tr>`;
-        }).join('');
+          </tr>`
+        ).join('');
         // 10개 미만일 때 빈 항목으로 채움
         if (list.length < maxRows) {
           for (let i = list.length; i < maxRows; i++) {
