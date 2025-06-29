@@ -1166,7 +1166,7 @@
     <div class="header-search">
       <input id="destination" placeholder="현재 위치 검색 결과" style="color:#888;" />
       <button id="searchBtn">검색</button>
-      <button id="courseBtn" class="course-btn">추천코스</button>
+      <button id="courseBtn" class="course-btn">여행코스추천</button>
     </div>
     <button id="recommendContentBtn" class="header-btn orange">추천 콘텐츠</button>
   </div>
@@ -1758,6 +1758,20 @@
     };
 
     function showCoursePopup() {
+      // 음성 안내 먼저 출력
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance("추천코스 3개를 주변 관광지와 맛집을 선정하여 여행 코스를 선정해 드립니다");
+        utter.lang = 'ko-KR';
+        utter.rate = 0.9;
+        utter.pitch = 1;
+        utter.volume = 3.0;
+        const koVoice = speechVoices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
+        if (koVoice) utter.voice = koVoice;
+        setupSpeechEvents(utter);
+        window.speechSynthesis.speak(utter);
+      }
+
       if ((!attractions || attractions.length === 0) && (!restaurants || restaurants.length === 0)) {
         showCourseBox('추천할 코스 정보가 없습니다.');
         return;
