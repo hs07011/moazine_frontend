@@ -785,7 +785,8 @@
     .course-btn {
       font-size: clamp(1.8rem, 3.2vw, 2.4rem);
       font-weight: 600;
-      padding: 20px 40px;
+      padding: 0 36px;
+      height: 48px;
       border-radius: var(--border-radius-md);
       margin-left: 12px;
       background: var(--success-gradient);
@@ -795,12 +796,13 @@
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       white-space: nowrap;
       box-sizing: border-box;
-      display: inline-block;
-      vertical-align: middle;
+      min-width: 200px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       box-shadow: var(--shadow-md);
       position: relative;
       overflow: hidden;
-      min-width: 180px;
     }
     .course-btn::before {
       content: '';
