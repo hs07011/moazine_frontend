@@ -321,6 +321,7 @@
     td:nth-child(2) {
       position: relative;
       overflow: hidden;
+      width: 60%;
     }
 
     /* 장소명 텍스트 컨테이너 */
@@ -331,26 +332,28 @@
       text-overflow: ellipsis;
       transition: all 0.3s ease;
       max-width: 100%;
+      display: inline-block;
+      width: 100%;
     }
 
     /* 호버 시 텍스트가 흘러가도록 */
     tr.clickable:hover .place-name-container {
-      overflow-x: auto;
       text-overflow: clip;
     }
 
     /* 긴 텍스트가 있을 때만 애니메이션 적용 */
     .place-name-container.scrollable:hover {
-      animation: scrollText 6s ease-in-out infinite;
+      animation: scrollText 10s ease-in-out infinite;
+      overflow: hidden;
     }
 
     /* 텍스트 스크롤 애니메이션 */
     @keyframes scrollText {
-      0%, 25% {
+      0%, 10% {
         transform: translateX(0);
       }
-      75%, 100% {
-        transform: translateX(calc(-100% + 150px));
+      90%, 100% {
+        transform: translateX(calc(-100% + 250px));
       }
     }
 
@@ -1537,8 +1540,8 @@
       } else {
         // 데이터가 있을 때 최대 10개만 표시
         html = list.slice(0, maxRows).map((item, i) => {
-          // 긴 텍스트인지 확인 (20자 이상)
-          const isLongText = item.name.length > 20;
+          // 긴 텍스트인지 확인 (15자 이상)
+          const isLongText = item.name.length > 15;
           const scrollableClass = isLongText ? 'scrollable' : '';
           
           return `<tr class="clickable" onclick="showPlaceInfo('${type}', '${item.place_id}')">
