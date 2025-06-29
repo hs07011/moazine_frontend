@@ -1797,7 +1797,10 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ attractions, restaurants })
+        body: JSON.stringify({
+          attractions, restaurants,
+          prompt: `아래 조건에 맞춰 3개의 여행코스를 표로 요약해줘.\n각 코스는 반드시 '시간 – 장소명'만 '→'로 연결해서 한 줄로 출력해줘.\n예시: 제 1 코스 ▪ 10:00 – 선유도공원 → 11:00 – 한강공원 → 12:00 – 맛집A\n설명, 영어명, 괄호, 부가정보 없이 시간과 장소명만 나열.\n각 코스는 5~7개 장소로 구성, 관광지와 맛집이 섞이도록 해줘.\n표 이외의 텍스트는 출력하지 마.`
+        })
       })
       .then(res => res.json())
       .then(data => {
@@ -1808,80 +1811,55 @@
 
     function showCourseBox(text) {
       const box = document.getElementById('coursePopup');
-      
-      // 목적지 소개 정보를 명시적으로 숨김
       document.getElementById('destinationIntroInBar').style.display = 'none';
-      
-      // Gemini 응답을 3가지 코스로 분리 (###, --- 등으로 구분)
-      let courseHtml = '';
-      const courseTitles = ['첫번째 코스', '두번째 코스', '세번째 코스'];
-      const blocks = text.split(/(?:^|\n)[#\-]{2,}[^\n]*\n?/g).map(s => s.trim()).filter(Boolean);
-      
-      // 코스 데이터 초기화
+      const courseTitles = ['제 1 코스', '제 2 코스', '제 3 코스'];
       courseData = [];
-      
-      // 마크다운 문법 제거 함수
-      function cleanMarkdown(text) {
-        return text
-          .replace(/\*\*/g, '') // ** 제거
-          .replace(/\*/g, '')   // * 제거
-          .replace(/\n/g, '<br>'); // 줄바꿈을 <br>로 변환
+      const blocks = text.split(/(?:^|\n)[#\-]{2,}[^\n]*\n?/g).map(s => s.trim()).filter(Boolean);
+      let intro = '';
+      let courses = blocks;
+      if (blocks.length > 3) {
+        intro = blocks[0];
+        courses = blocks.slice(1);
       }
-      
-      // 안내문구(인트로)가 있는 경우 첫 블록이 인트로, 나머지가 코스
-      if (blocks.length > 2) {
-        const intro = cleanMarkdown(blocks[0]);
-        const courses = blocks.slice(1);
-        courseHtml = `<div class="course-intro">${intro}</div>` +
-          courses.map((block, idx) => {
-            const title = courseTitles[idx] || `코스 ${idx+1}`;
-            // 코스 데이터 저장 (원본 텍스트는 마크다운 제거 전에 저장)
-            courseData.push({
-              title: title,
-              content: block,
-              places: extractPlacesFromCourse(block, idx)
-            });
-            return `<div class="course-block course-${idx+1}">
-              <div class="course-title">
-                ${title}
-                <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
-              </div>
-              ${cleanMarkdown(block)}
-            </div>`;
-          }).join('');
-      } else if (blocks.length > 1) {
-        courseHtml = blocks.map((block, idx) => {
-          const title = courseTitles[idx] || `코스 ${idx+1}`;
-          // 코스 데이터 저장 (원본 텍스트는 마크다운 제거 전에 저장)
-          courseData.push({
-            title: title,
-            content: block,
-            places: extractPlacesFromCourse(block, idx)
-          });
-          return `<div class="course-block course-${idx+1}">
-            <div class="course-title">
-              ${title}
-              <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
-            </div>
-            ${cleanMarkdown(block)}
-          </div>`;
-        }).join('');
-      } else {
-        // 코스 데이터 저장 (원본 텍스트는 마크다운 제거 전에 저장)
+      function extractRouteLine(block) {
+        let line = block.replace(/제 ?[0-9]+ ?코스[\s:·▪\-]*/gi, '').replace(/\*|\·|\:|\(|\)|\[|\]|\{|\}|\*/g, '').trim();
+        const regex = /(\d{1,2}:\d{2})\s*[–-]\s*([가-힣A-Za-z0-9\s]+)/g;
+        let match, results = [];
+        while ((match = regex.exec(line)) !== null) {
+          let place = match[2].replace(/\s*\([^)]*\)/g, '').replace(/[a-zA-Z]+/g, '').trim();
+          results.push(`${match[1]} – ${place}`);
+        }
+        return results.length > 0 ? results.join(' → ') : '';
+      }
+      // table 기반 코스 안내 박스 (변경 전 방식)
+      let tableHtml = `<table style="width:100%; background:#ffeb3b; border-radius:8px; border-collapse:separate; border-spacing:0; font-size:1.25rem; font-weight:600; margin-bottom:18px; box-shadow:0 2px 8px #0001;">`;
+      let hasAnyRoute = false;
+      courses.slice(0,3).forEach((block, idx) => {
+        const routeLine = extractRouteLine(block);
+        if (routeLine) hasAnyRoute = true;
         courseData.push({
-          title: '첫번째 코스',
-          content: text,
-          places: extractPlacesFromCourse(text, 0)
+          title: courseTitles[idx],
+          content: block,
+          places: extractPlacesFromCourse(block, idx)
         });
-        courseHtml = `<div class="course-block">
-          <div class="course-title">
-            첫번째 코스
-            <button class="route-btn" onclick="showCourseMap(0)">🗺️ 길안내</button>
-          </div>
-          ${cleanMarkdown(text)}
-        </div>`;
+        tableHtml += `
+          <tr style="border-bottom:1.5px solid #fff;">
+            <td style="padding:10px 16px; min-width:90px; color:#222;">${courseTitles[idx]}</td>
+            <td style="padding:10px 0; color:#222;">${routeLine ? '▪ ' + routeLine : '<span style=\'color:#888;\'>코스 정보 없음</span>'}</td>
+            <td style="padding:10px 12px; min-width:90px; text-align:right;">
+              <button class="route-btn" style="background:#ff6b35; border-color:#ff6b35; color:#fff; font-size:1.1rem; font-weight:700; border-radius:8px; padding:8px 22px; box-shadow:0 2px 8px #ff6b3533;" onclick="showCourseMap(${idx})">길안내</button>
+            </td>
+          </tr>`;
+      });
+      tableHtml += '</table>';
+      let introHtml = '';
+      if (intro) {
+        introHtml = `<div style="font-size:1.1rem; font-weight:500; color:#222; margin-bottom:10px;">${intro.replace(/\n/g, ' ')}</div>`;
       }
-      box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>` + courseHtml;
+      if (!hasAnyRoute) {
+        tableHtml = `<div style='color:#888; font-size:1.1rem; padding:32px 0; text-align:center;'>여행코스 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</div>`;
+      }
+      box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>` + introHtml + tableHtml;
       showOnlyContentBarPopup('coursePopup');
     }
 
