@@ -1765,11 +1765,23 @@
         utter.lang = 'ko-KR';
         utter.rate = 0.9;
         utter.pitch = 1;
-        utter.volume = 3.0;
-        const koVoice = speechVoices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
-        if (koVoice) utter.voice = koVoice;
-        setupSpeechEvents(utter);
-        window.speechSynthesis.speak(utter);
+        utter.volume = 1.0; // 볼륨을 1.0으로 조정
+        
+        // 음성 선택 로직 개선
+        const voices = window.speechSynthesis.getVoices();
+        const koVoice = voices.find(v => v.lang === 'ko-KR') || 
+                       voices.find(v => v.lang.startsWith('ko')) ||
+                       voices.find(v => v.name.includes('Google')) ||
+                       voices[0];
+        
+        if (koVoice) {
+          utter.voice = koVoice;
+        }
+        
+        // 음성 출력 전에 약간의 지연 추가
+        setTimeout(() => {
+          window.speechSynthesis.speak(utter);
+        }, 100);
       }
 
       if ((!attractions || attractions.length === 0) && (!restaurants || restaurants.length === 0)) {
