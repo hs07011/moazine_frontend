@@ -2476,28 +2476,25 @@
       const foundPlaces = new Set();
       const normalize = str => str.replace(/[\s\W_]+/g, '').replace(/[\u{1F300}-\u{1FAFF}]/gu, '').toLowerCase();
 
-      // 각 줄마다 시간-장소 패턴 추출
-      const lines = courseText.split('\n');
+      // 전체 텍스트에서 시간-장소 패턴 모두 추출 (줄바꿈 무관)
+      const timePlacePattern = /(\d{1,2}:\d{2})\s*[–-]\s*([^\n→-]+)/g;
+      let match;
       let visitOrder = 1;
-      for (const line of lines) {
-        // 예: 11:00 - 선한고양이 🐾
-        const match = line.match(/\d{1,2}:\d{2}\s*[–-]\s*([^\s\d\-–][^\-–]*)/);
-        if (match) {
-          let placeName = match[1].trim();
-          // 이모지, 특수문자, 공백 제거
-          placeName = placeName.replace(/[\p{Emoji}\p{P}\p{S}]/gu, '').replace(/\s+/g, '');
-          // 관광지/맛집 리스트와 매칭
-          const foundPlace = allPlaces.find(place => normalize(place.name) === normalize(placeName));
-          if (foundPlace && !foundPlaces.has(foundPlace.name)) {
-            places.push({
-              name: foundPlace.name,
-              location: foundPlace.geometry?.location,
-              type: attractions.includes(foundPlace) ? 'attraction' : 'restaurant',
-              rating: foundPlace.rating,
-              visitOrder: visitOrder++,
-            });
-            foundPlaces.add(foundPlace.name);
-          }
+      while ((match = timePlacePattern.exec(courseText)) !== null) {
+        let placeName = match[2].trim();
+        // 이모지, 특수문자, 공백 제거
+        placeName = placeName.replace(/[\p{Emoji}\p{P}\p{S}]/gu, '').replace(/\s+/g, '');
+        // 관광지/맛집 리스트와 매칭
+        const foundPlace = allPlaces.find(place => normalize(place.name) === normalize(placeName));
+        if (foundPlace && !foundPlaces.has(foundPlace.name)) {
+          places.push({
+            name: foundPlace.name,
+            location: foundPlace.geometry?.location,
+            type: attractions.includes(foundPlace) ? 'attraction' : 'restaurant',
+            rating: foundPlace.rating,
+            visitOrder: visitOrder++,
+          });
+          foundPlaces.add(foundPlace.name);
         }
       }
       return places;
