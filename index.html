@@ -1158,6 +1158,553 @@
         max-width: 100%;
       }
     }
+
+    /* --- 여행코스 표 스타일 추가 및 개선 --- */
+    .course-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-bottom: 24px;
+      background: #f8fafc;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px #0001;
+      overflow: hidden;
+      table-layout: fixed;
+    }
+    .course-row {
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 1.25rem;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    .course-row:last-child { border-bottom: none; }
+    .course-title-cell {
+      font-weight: 900;
+      color: #217093;
+      background: #e0f7fa;
+      padding: 18px 18px 18px 24px;
+      border-right: 2px solid #e2e8f0;
+      min-width: 120px;
+      max-width: 140px;
+      width: 140px;
+      text-align: left;
+      white-space: nowrap;
+      font-size: 1.15rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .course-place-cell {
+      padding: 18px 12px;
+      color: #263040;
+      font-size: 1.15rem;
+      text-align: left;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: 40vw;
+      min-width: 60px;
+      scrollbar-width: thin;
+      scrollbar-color: #bbb #eee;
+    }
+    .course-place-cell::-webkit-scrollbar {
+      height: 8px;
+    }
+    .course-place-cell::-webkit-scrollbar-thumb {
+      background: #bbb;
+      border-radius: 8px;
+    }
+    .course-place-cell::-webkit-scrollbar-track {
+      background: #eee;
+    }
+    .course-route-cell {
+      text-align: right;
+      padding: 0 24px 0 12px;
+      min-width: 120px;
+      max-width: 140px;
+      width: 140px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    @media (max-width: 700px) {
+      .course-title-cell, .course-route-cell { min-width: 70px; max-width: 80px; width: 80px; font-size: 0.95rem; padding: 10px 6px; }
+      .course-place-cell { font-size: 0.95rem; padding: 10px 4px; max-width: 60vw; }
+      .course-route-btn { font-size: 0.95rem; padding: 8px 12px; }
+    }
+    .course-route-btn {
+      background: var(--success-gradient) !important;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 900;
+      padding: 12px 28px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px #38f9d755, 0 1.5px 6px #43e97b44;
+      background-clip: padding-box;
+      transition: background 0.2s, box-shadow 0.2s;
+      opacity: 1;
+      filter: none;
+      text-shadow: 0 2px 6px #1a2733cc, 0 0.5px 0.5px #000a;
+    }
+    .course-route-btn:hover {
+      background: var(--accent-gradient);
+      box-shadow: 0 4px 16px #4facfe22;
+    }
+    .course-btn {
+      font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+      font-weight: 600;
+      padding: 18px 36px;
+      border-radius: var(--border-radius-md);
+      margin-left: 12px;
+      background: var(--success-gradient);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+      box-sizing: border-box;
+      display: inline-block;
+      vertical-align: middle;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+    .course-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    .course-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    .course-btn:hover::before {
+      left: 100%;
+    }
+    .course-btn:active {
+      transform: translateY(0);
+    }
+    
+    /* 코스 지도 팝업 스타일 */
+    .course-map-popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .course-map-content {
+      background: #fff;
+      border-radius: 12px;
+      padding: 30px;
+      width: 95%;
+      max-width: 1200px;
+      max-height: 95vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .course-map-popup .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      cursor: pointer;
+      font-size: 2rem;
+      color: #aaa;
+      font-weight: bold;
+      z-index: 10;
+    }
+    
+    .course-map-popup .close-btn:hover {
+      color: #333;
+    }
+    
+    /* 길안내 버튼 스타일 */
+    .route-btn {
+      background: #ff6b35 !important;
+      color: #fff !important;
+      border: 2px solid #ff6b35 !important;
+      padding: 10px 22px !important;
+      border-radius: 8px !important;
+      cursor: pointer;
+      font-size: 1.15rem !important;
+      font-weight: bold;
+      box-shadow: 0 2px 8px #ff6b3533;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background 0.2s, border 0.2s, color 0.2s;
+      outline: none;
+      margin-left: 10px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .route-btn:hover, .route-btn:focus {
+      background: #e55a2b !important;
+      border-color: #e55a2b !important;
+      color: #fff !important;
+    }
+    
+    @media (max-width: 768px) {
+      .course-map-content {
+        width: 98%;
+        padding: 20px;
+        margin: 5px;
+      }
+      
+      .course-map-popup #courseMap {
+        height: 600px;
+      }
+      
+      .course-title {
+        font-size: 2rem;
+        gap: 10px;
+      }
+      
+      .route-btn {
+        font-size: 1rem;
+        padding: 5px 10px;
+      }
+    }
+    .site-scroll-row {
+      display: flex;
+      gap: 32px;
+      padding: 20px;
+      background: #f9f9f9;
+      border-bottom: 1px solid #ddd;
+      overflow-x: auto;
+      overflow-y: visible;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      cursor: grab;
+    }
+    .site-block {
+      min-width: 320px;
+      max-width: 420px;
+      flex: 0 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px #0001;
+      padding: 10px 8px 18px 8px;
+      text-align: center;
+      border: 1px solid #eee;
+      position: relative;
+      transition: box-shadow 0.2s;
+    }
+    .site-block:active {
+      box-shadow: 0 4px 16px #0002;
+    }
+    .site-block h3 {
+      margin: 0 0 10px 0;
+      color: #217093;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+    .site-block iframe {
+      width: 100%;
+      min-width: 280px;
+      max-width: 400px;
+      height: 166px;
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 6px;
+    }
+    .site-block .fallback-link {
+      margin-top: 8px;
+      display: none;
+    }
+    @media (max-width: 900px) {
+      .site-block { min-width: 220px; max-width: 320px; }
+      .site-block iframe { min-width: 180px; max-width: 300px; height: 120px; }
+    }
+    .header-btn {
+      font-size: clamp(1.8rem, 3.2vw, 2.4rem);
+      font-weight: 600;
+      padding: 18px 36px;
+      border-radius: var(--border-radius-md);
+      margin: 0 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .header-btn.blue {
+      background: var(--primary-gradient);
+      color: #fff;
+    }
+
+    .header-btn.orange {
+      background: var(--warning-gradient);
+      color: #fff;
+    }
+
+    .header-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .header-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .header-btn:hover::before {
+      left: 100%;
+    }
+
+    .header-btn:active {
+      transform: translateY(0);
+    }
+    .content-bar {
+      display: flex;
+      overflow-x: auto;
+      gap: 120px; /* 확실히 넓게 간격 조정 */
+      padding: 18px 0 18px 18px;
+      background: #fff;
+      border-bottom: 2px solid #eee;
+      align-items: center;
+      scrollbar-width: thin;
+      scrollbar-color: #bbb #eee;
+    }
+    .content-bar::-webkit-scrollbar { height: 12px; }
+    .content-bar::-webkit-scrollbar-thumb { background: #bbb; border-radius: 8px; }
+    .content-bar::-webkit-scrollbar-track { background: #eee; }
+    .content-bar a, .content-bar button {
+      display: flex; flex-direction: column; align-items: center; text-decoration: none; border: none; background: none; cursor: pointer;
+    }
+    .content-bar img, .content-bar .default-logo {
+      width: 96px; height: 96px; border-radius: 22px; background: #fff; box-shadow: 0 2px 12px #0002;
+      margin-bottom: 10px;
+      transition: transform 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3.2rem;
+    }
+    .content-bar img:hover, .content-bar .default-logo:hover { transform: scale(1.12); }
+    .content-bar span {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #222;
+      text-align: center;
+      text-shadow: 0 1px 2px #fff, 0 0 2px #eee;
+      letter-spacing: 0.2px;
+      margin-top: 2px;
+    }
+    @media (max-width: 600px) {
+      .content-bar img, .content-bar .default-logo { width: 60px; height: 60px; border-radius: 12px; font-size: 1.8rem; }
+      .content-bar span { font-size: 1.05rem; }
+      .header-btn { font-size: 1.1rem; padding: 8px 14px; }
+    }
+    #destinationIntroInBar {
+      background: #f8fafc;
+      border-left: 6px solid #217093;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px #0001;
+      padding: 32px 36px 28px 32px;
+      margin: 32px 0 24px 0;
+      position: relative;
+      max-width: 900px;
+      min-width: 260px;
+      color: #1a2733;
+      font-family: 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+    }
+    #destinationIntroInBar .title {
+      font-size: 2.5rem !important;
+      font-weight: 900;
+      color: #217093;
+      margin-bottom: 18px;
+      text-align: left;
+      letter-spacing: 0.5px;
+      line-height: 1.3;
+      text-shadow: 0 2px 8px #21709322;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #destinationIntroInBar .title .emoji {
+      font-size: 2.6rem;
+      vertical-align: middle;
+      margin-right: 6px;
+      filter: drop-shadow(0 1px 2px #21709333);
+    }
+    #destinationIntroInBar .guide-text,
+    #coursePopup .course-intro,
+    #coursePopup .course-block,
+    #summaryBox {
+      font-size: 1.15rem !important;
+      line-height: 2.1;
+      text-align: left;
+      color: #263040;
+      letter-spacing: 0.02em;
+      font-family: 'Noto Sans KR', 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    }
+    #destinationIntroInBar .close-btn {
+      position: absolute;
+      top: 18px;
+      right: 24px;
+      font-size: 1.7rem;
+      color: #888;
+      font-weight: bold;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.2s;
+      z-index: 10;
+    }
+    #destinationIntroInBar .close-btn:hover {
+      color: #217093;
+    }
+    #coursePopup.summary-popup {
+      display: none;
+      position: static;
+      top: auto;
+      left: auto;
+      width: auto;
+      min-width: 0;
+      max-width: 900px;
+      min-height: 0;
+      max-height: none;
+      background: #f8fafc;
+      border-left: 6px solid #27ae60;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px #0001;
+      padding: 24px 28px 20px 28px;
+      margin: 24px 0 18px 0;
+      color: #1a2733;
+      font-family: 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+      z-index: 1000;
+      line-height: 1.05;
+      overflow-y: visible;
+      transform: none;
+    }
+    #coursePopup .close-btn {
+      position: absolute;
+      top: 18px;
+      right: 24px;
+      font-size: 1.7rem;
+      color: #888;
+      font-weight: bold;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.2s;
+      z-index: 10;
+    }
+    #coursePopup .close-btn:hover {
+      color: #27ae60;
+    }
+    #summaryBox.summary-popup {
+      display: none;
+      position: static;
+      top: auto;
+      left: auto;
+      width: auto;
+      min-width: 0;
+      max-width: 900px;
+      min-height: 0;
+      max-height: none;
+      background: #f8fafc;
+      border-left: 6px solid #217093;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px #0001;
+      padding: 32px 36px 28px 32px;
+      margin: 32px 0 24px 0;
+      color: #1a2733;
+      font-family: 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+      z-index: 1000;
+      line-height: 1.7;
+      overflow-y: visible;
+      transform: none;
+    }
+    #summaryBox .close-btn {
+      position: absolute;
+      top: 18px;
+      right: 24px;
+      font-size: 1.7rem;
+      color: #888;
+      font-weight: bold;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.2s;
+      z-index: 10;
+    }
+    #summaryBox .close-btn:hover {
+      color: #217093;
+    }
+    #destinationIntroInBar,
+    #coursePopup.summary-popup,
+    #summaryBox.summary-popup {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0;
+      box-sizing: border-box;
+      word-break: break-word;
+      white-space: normal;
+      /* 기존 스타일 유지 */
+    }
+
+    .map-container, .side-tables {
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    .header-search button,
+    .course-btn,
+    .summary-btn,
+    .header-btn {
+      font-size: 1.4rem !important;
+      line-height: 1.2 !important;
+      padding: 12px 24px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      min-width: 100px !important;
+      min-height: 48px !important;
+      box-sizing: border-box !important;
+    }
+
+    @media (max-width: 900px) {
+      .main {
+        flex-direction: column;
+      }
+      .map-container, .side-tables {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+
+    .marquee {
+      display: inline-block;
+      white-space: nowrap;
+      will-change: transform;
+      animation: marquee-linear 56s linear infinite;
+    }
+    @keyframes marquee-linear {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
   </style>
 </head>
 <body>
@@ -1808,80 +2355,55 @@
 
     function showCourseBox(text) {
       const box = document.getElementById('coursePopup');
-      
-      // 목적지 소개 정보를 명시적으로 숨김
       document.getElementById('destinationIntroInBar').style.display = 'none';
-      
+      // 코스명
+      const courseTitles = ['제 1 코스', '제 2 코스', '제 3 코스'];
       // Gemini 응답을 3가지 코스로 분리 (###, --- 등으로 구분)
-      let courseHtml = '';
-      const courseTitles = ['첫번째 코스', '두번째 코스', '세번째 코스'];
       const blocks = text.split(/(?:^|\n)[#\-]{2,}[^\n]*\n?/g).map(s => s.trim()).filter(Boolean);
-      
-      // 코스 데이터 초기화
       courseData = [];
-      
-      // 마크다운 문법 제거 함수
-      function cleanMarkdown(text) {
-        return text
-          .replace(/\*\*/g, '') // ** 제거
-          .replace(/\*/g, '')   // * 제거
-          .replace(/\n/g, '<br>'); // 줄바꿈을 <br>로 변환
-      }
-      
       // 안내문구(인트로)가 있는 경우 첫 블록이 인트로, 나머지가 코스
+      let introHtml = '';
+      let courseBlocks = blocks;
       if (blocks.length > 2) {
-        const intro = cleanMarkdown(blocks[0]);
-        const courses = blocks.slice(1);
-        courseHtml = `<div class="course-intro">${intro}</div>` +
-          courses.map((block, idx) => {
-            const title = courseTitles[idx] || `코스 ${idx+1}`;
-            // 코스 데이터 저장 (원본 텍스트는 마크다운 제거 전에 저장)
-            courseData.push({
-              title: title,
-              content: block,
-              places: extractPlacesFromCourse(block, idx)
-            });
-            return `<div class="course-block course-${idx+1}">
-              <div class="course-title">
-                ${title}
-                <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
-              </div>
-              ${cleanMarkdown(block)}
-            </div>`;
-          }).join('');
-      } else if (blocks.length > 1) {
-        courseHtml = blocks.map((block, idx) => {
-          const title = courseTitles[idx] || `코스 ${idx+1}`;
-          // 코스 데이터 저장 (원본 텍스트는 마크다운 제거 전에 저장)
-          courseData.push({
-            title: title,
-            content: block,
-            places: extractPlacesFromCourse(block, idx)
-          });
-          return `<div class="course-block course-${idx+1}">
-            <div class="course-title">
-              ${title}
-              <button class="route-btn" onclick="showCourseMap(${idx})">🗺️ 길안내</button>
-            </div>
-            ${cleanMarkdown(block)}
-          </div>`;
-        }).join('');
-      } else {
-        // 코스 데이터 저장 (원본 텍스트는 마크다운 제거 전에 저장)
-        courseData.push({
-          title: '첫번째 코스',
-          content: text,
-          places: extractPlacesFromCourse(text, 0)
-        });
-        courseHtml = `<div class="course-block">
-          <div class="course-title">
-            첫번째 코스
-            <button class="route-btn" onclick="showCourseMap(0)">🗺️ 길안내</button>
-          </div>
-          ${cleanMarkdown(text)}
-        </div>`;
+        introHtml = `<div class="course-intro" style="margin-bottom:18px;">${blocks[0]}</div>`;
+        courseBlocks = blocks.slice(1);
       }
-      box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>` + courseHtml;
+      // 각 코스별 장소명만 추출하여 표로 렌더링
+      let tableHtml = '<table class="course-table">';
+      courseBlocks.forEach((block, idx) => {
+        // 장소명만 추출 (번호, 특수문자, 시간 등 제거)
+        const placeNames = block.split(/\n|→|\u2192|\-/)
+          .map(s => s.replace(/^[0-9]+\.|\*+|\s*\([^)]+\)|\s*\[[^\]]+\]|\s*\-\s*|\s*\*\*/g, '').trim())
+          .filter(Boolean);
+        const places = extractPlacesFromCourse(block, idx);
+        courseData.push({ title: courseTitles[idx] || `코스 ${idx+1}`, content: block, places });
+        // cellText: 시계 심볼 앞에서만 → 표시, 맨 처음에는 표시하지 않음
+        let cellText = '';
+        // 시계 심볼/시간 패턴
+        const timePattern = /(🕘|⏰|⏱|⏲|⏳|\d{1,2}:\d{2})/;
+        let lastIdx = 0;
+        let match;
+        let re = /(🕘|⏰|⏱|⏲|⏳|\d{1,2}:\d{2})/g;
+        let str = block;
+        let first = true;
+        while ((match = re.exec(str)) !== null) {
+          let before = str.slice(lastIdx, match.index);
+          let time = match[0];
+          if (!first) cellText += '<span style="color:#bbb;font-weight:900;">→</span>';
+          cellText += before + time;
+          lastIdx = match.index + time.length;
+          first = false;
+        }
+        cellText += str.slice(lastIdx);
+        cellText = cellText.trim();
+        tableHtml += `<tr class="course-row">
+          <td class="course-title-cell">${courseTitles[idx] || `코스 ${idx+1}`}</td>
+          <td class="course-place-cell"><div class='marquee'>${cellText}</div></td>
+          <td class="course-route-cell"><button class="course-route-btn" onclick="showCourseMap(${idx})">길안내</button></td>
+        </tr>`;
+      });
+      tableHtml += '</table>';
+      box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>${introHtml}${tableHtml}`;
       showOnlyContentBarPopup('coursePopup');
     }
 
@@ -2018,30 +2540,36 @@
 
     // 코스 지도 표시 함수
     function showCourseMap(courseIndex) {
-      console.log('showCourseMap 호출됨, courseIndex:', courseIndex);
-      console.log('courseData:', courseData);
-      
       if (!courseData[courseIndex]) {
         alert('코스 정보를 찾을 수 없습니다.');
         return;
       }
-      
       const course = courseData[courseIndex];
-      console.log('선택된 코스:', course);
-      
       const popup = document.getElementById('courseMapPopup');
       const titleElement = document.getElementById('courseMapTitle');
       const mapElement = document.getElementById('courseMap');
-      
-      titleElement.textContent = course.title + ' - 길안내';
+
+      // 장소 리스트 HTML 생성
+      let placesHtml = '';
+      if (course.places && course.places.length > 0) {
+        placesHtml = `<div style="margin-bottom:12px; padding:10px 0 10px 0; border-bottom:1px solid #e2e8f0; font-size:1.1rem; font-weight:500; color:#217093; display:flex; flex-wrap:wrap; gap:18px; align-items:center; justify-content:flex-start;">
+          ${course.places.map(place => `
+            <span style="display:inline-flex;align-items:center;gap:4px;">
+              <img src="${place.type === 'attraction' ? '/assets/attraction.png' : '/assets/restaurant.png'}" alt="${place.type}" style="width:22px;height:22px;vertical-align:middle;"> ${place.name}
+            </span>
+          `).join('<span style=\"color:#bbb;font-weight:900;\">→</span>')}
+        </div>`;
+      }
+
+      titleElement.innerHTML = `${course.title} - 길안내` + placesHtml;
       popup.style.display = 'flex';
-      
+
       // 기존 마커 제거
       if (courseMarkers.length > 0) {
         courseMarkers.forEach(marker => marker.setMap(null));
         courseMarkers = [];
       }
-      
+
       // 지도 초기화 (지연)
       setTimeout(() => {
         courseMap = new google.maps.Map(mapElement, {
@@ -2049,24 +2577,14 @@
           center: destLatLng,
           mapTypeId: google.maps.MapTypeId.ROADMAP
         });
-        
-        console.log('지도 초기화 완료');
-        console.log('코스 장소들:', course.places);
-        
+
         // 코스의 장소들을 지도에 표시
         const bounds = new google.maps.LatLngBounds();
-        
         if (course.places && course.places.length > 0) {
           course.places.forEach((place, index) => {
-            console.log('장소 처리 중:', place);
-            
             if (place.location) {
-              console.log('장소 위치:', place.location);
-              
-              // 관광지와 맛집을 다른 아이콘으로 구분
               const iconUrl = place.type === 'attraction' ? '/assets/attraction.png' : '/assets/restaurant.png';
               const iconSize = new google.maps.Size(32, 32);
-              
               const marker = new google.maps.Marker({
                 position: place.location,
                 map: courseMap,
@@ -2077,8 +2595,6 @@
                   scaledSize: iconSize
                 }
               });
-              
-              // 정보창 추가 (방문 순서와 시간 포함)
               const infoWindow = new google.maps.InfoWindow({
                 content: `
                   <div style="padding: 10px; min-width: 200px;">
@@ -2089,33 +2605,21 @@
                       ${place.type === 'attraction' ? '🏛️ 관광지' : '🍽️ 맛집'}
                       ${place.rating ? ` | ⭐ ${place.rating}점` : ''}
                     </p>
-                    ${place.time ? `<p style="margin: 0; font-size: 12px; color: #ff6b35; font-weight: bold;">🕘 ${place.time}</p>` : ''}
+                    ${place.time ? `<p style=\"margin: 0; font-size: 12px; color: #ff6b35; font-weight: bold;\">🕘 ${place.time}</p>` : ''}
                   </div>
                 `
               });
-              
               marker.addListener('click', () => {
                 infoWindow.open(courseMap, marker);
               });
-              
               courseMarkers.push(marker);
               bounds.extend(place.location);
-              console.log('마커 추가됨:', place.name);
-            } else {
-              console.log('장소 위치 정보 없음:', place.name);
             }
           });
-          
-          // 모든 마커가 보이도록 지도 영역 조정
           if (courseMarkers.length > 0) {
             courseMap.fitBounds(bounds);
-            console.log('지도 영역 조정 완료, 마커 수:', courseMarkers.length);
-          } else {
-            console.log('표시할 마커가 없습니다.');
           }
         } else {
-          console.log('코스에 장소가 없습니다.');
-          // 기본 위치로 지도 설정
           courseMap.setCenter(destLatLng);
         }
       }, 100);
@@ -2191,5 +2695,22 @@
       // 모두 숨김 모드
       if (popupId === 'none') document.getElementById('contentBar').style.display = 'none';
     }
+
+    // 마퀴(흘러감) 효과: 텍스트가 셀보다 길 때만 애니메이션 적용
+    setTimeout(() => {
+      document.querySelectorAll('.course-place-cell').forEach(cell => {
+        const marquee = cell.querySelector('.marquee');
+        if (marquee) {
+          // reset
+          marquee.style.animation = 'none';
+          void marquee.offsetWidth; // reflow
+          if (marquee.scrollWidth > cell.clientWidth) {
+            marquee.style.animation = '';
+          } else {
+            marquee.style.animation = 'none';
+          }
+        }
+      });
+    }, 100);
   </script>
 </body>
