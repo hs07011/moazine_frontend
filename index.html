@@ -2312,7 +2312,7 @@
       // 음성 안내 먼저 출력
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance("관광지와 맛집 리스트 10선을 기준으로 3개의 여행 코스를 추천해 드리겠습니다");
+        const utter = new SpeechSynthesisUtterance("추천코스 3개를 주변 관광지와 맛집을 선정하여 여행 코스를 선정해 드립니다");
         utter.lang = 'ko-KR';
         utter.rate = 0.9;
         utter.pitch = 1;
@@ -2368,18 +2368,13 @@
       // 안내문구(인트로)가 있는 경우 첫 블록이 인트로, 나머지가 코스
       let introHtml = '';
       let courseBlocks = blocks;
-      // 안내문구를 항상 고정 문구로 대체
-      introHtml = `<div class="course-intro" style="margin-bottom:18px;">관광지와 맛집 리스트 10선을 기준으로 3개의 여행 코스를 추천해 드리겠습니다</div>`;
-      // 코스는 최대 3개만 표시
-      courseBlocks = blocks.length > 2 ? blocks.slice(1) : blocks;
-
-      // 1) 원본 Gemini 코스 텍스트(인트로 포함)에서 *, **, > 제거 후 맨 위에 표시
-      let cleanedText = text.replace(/[*>]/g, '').replace(/\n{2,}/g, '\n').trim();
-      let originalTextHtml = `<div style="background:#f1faee;border:1.5px solid #b7e4c7;border-radius:10px;padding:14px 18px 10px 18px;margin-bottom:18px;white-space:pre-line;font-size:1.08em;line-height:1.7;">${cleanedText}</div>`;
-
-      // 표 HTML 변수 선언 (반복문 밖에서)
+      if (blocks.length > 2) {
+        introHtml = `<div class="course-intro" style="margin-bottom:18px;">${blocks[0]}</div>`;
+        courseBlocks = blocks.slice(1);
+      }
+      // 각 코스별 장소명만 추출하여 표로 렌더링
       let tableHtml = '<table class="course-table">';
-      courseBlocks.slice(0, 3).forEach((block, idx) => {
+      courseBlocks.forEach((block, idx) => {
         // 장소명만 추출 (번호, 특수문자, 시간 등 제거)
         const placeNames = block.split(/\n|→|\u2192|\-/)
           .map(s => s.replace(/^[0-9]+\.|\*+|\s*\([^)]+\)|\s*\[[^\]]+\]|\s*\-\s*|\s*\*\*/g, '').trim())
@@ -2388,13 +2383,12 @@
         courseData.push({ title: courseTitles[idx] || `코스 ${idx+1}`, content: block, places });
         // cellText: 시계 이모지/시간, 장소명, 장소소개, 평점 단위로 분리하여 →로 연결
         let cellText = '';
-        // 패턴: 시계 이모지/시간(09:00, 10:00 등) 또는 한글 시간대 + 장소명 + 상세소개 전체 추출 (여러 줄 포함)
-        const blockPattern = /([🕘⏰⏱⏲⏳]|\d{1,2}:\d{2}|오전|오후|저녁|점심|아침|밤)\s*[–-]\s*([\s\S]*?)(?=\s*([🕘⏰⏱⏲⏳]|\d{1,2}:\d{2}|오전|오후|저녁|점심|아침|밤)\s*[–-]|$)/g;
+        // 패턴: 시계이모지/시간(09:00, 10:00 등)으로 시작하는 블록 추출
+        const blockPattern = /(🕘|⏰|⏱|⏲|⏳|\d{1,2}:\d{2})[^🕘⏰⏱⏲⏳\d{1,2}:\d{2}]*/g;
         let blocks = [];
         let match;
         while ((match = blockPattern.exec(block)) !== null) {
-          // match[0]: 전체, match[1]: 시간, match[2]: 장소명+상세소개 (여러 줄)
-          blocks.push(`${match[1]} – ${match[2]}`.trim());
+          blocks.push(match[0].trim());
         }
         // 1. 특수문자 제거 먼저
         let cleanedBlocks = blocks.map(b => b.replace(/[[\](){}*_\-=~^|#@$%&+=•▪︎"'`<>]/g, '').trim());
@@ -2405,7 +2399,7 @@
           if (prev.trim().endsWith('평점')) {
             return '<span class="arrow-sep">→</span> ' + b;
           }
-          if (/^(🕘|⏰|⏱|⏲|⏳|\d{1,2}:\d{2}|오전|오후|저녁|점심|아침|밤)/.test(b.trim())) {
+          if (/^(🕘|⏰|⏱|⏲|⏳|\d{1,2}:\d{2})/.test(b.trim())) {
             return b;
           }
           return '<span class="arrow-sep">→</span> ' + b;
@@ -2418,8 +2412,7 @@
         </tr>`;
       });
       tableHtml += '</table>';
-      // 원본 텍스트 + 안내문구 + 표 순서로 표시
-      box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>${originalTextHtml}${introHtml}${tableHtml}`;
+      box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>${introHtml}${tableHtml}`;
       showOnlyContentBarPopup('coursePopup');
     }
 
@@ -2477,14 +2470,14 @@
       
       // 코스 텍스트에서 장소명 찾기 (여러 패턴 시도)
       const patterns = [
-        // 1. 🕘 09:00 - 장소명 (굵게 처리 포함)
-        /🕘\s*(\d{1,2}:\d{2})\s*[–-]\s*(\*\*)?([^\*\n\(\[\|]+?)(\*\*)?/g,
-        // 2. 09:00 - 장소명 (굵게 처리 포함)
-        /(\d{1,2}:\d{2})\s*[–-]\s*(\*\*)?([^\*\n\(\[\|]+?)(\*\*)?/g,
-        // 3. 번호 패턴: 1. **장소명** 또는 1. 장소명
-        /(\d+)\.\s*(\*\*)?([^\*\n\(\[\|]+?)(\*\*)?/g,
-        // 4. 단순 볼드 패턴: **장소명**
-        /(\*\*)([^\*\n\(\[\|]+?)(\*\*)/g,
+        // 시간 패턴: 🕘 09:00 – **장소명** 또는 🕘 09:00 - 장소명
+        /🕘\s*(\d{1,2}:\d{2})\s*[–-]\s*(\*\*)?([^*\n]+?)(\*\*)?/g,
+        // 번호 패턴: 1. **장소명** 또는 1. 장소명
+        /(\d+)\.\s*(\*\*)?([^*\n]+?)(\*\*)?/g,
+        // 단순 볼드 패턴: **장소명**
+        /(\*\*)([^*\n]+?)(\*\*)/g,
+        // 시간 패턴 (다양한 형식): 09:00 장소명, 09:00-장소명 등
+        /(\d{1,2}:\d{2})\s*[–-]?\s*([^\n]+?)(?=\n|$)/g
       ];
       
       let visitOrder = 1;
@@ -2496,34 +2489,39 @@
           let placeName, time = null;
           
           if (patternIndex === 0) {
-            // 🕘 시간 패턴
+            // 시간 패턴 (🕘 포함)
             time = match[1];
             placeName = match[3].trim();
           } else if (patternIndex === 1) {
-            // 시간 패턴 (🕘 없음)
-            time = match[1];
-            placeName = match[3].trim();
-          } else if (patternIndex === 2) {
             // 번호 패턴
             visitOrder = parseInt(match[1]);
             placeName = match[3].trim();
-          } else if (patternIndex === 3) {
+          } else if (patternIndex === 2) {
             // 단순 볼드 패턴
             placeName = match[2].trim();
+          } else if (patternIndex === 3) {
+            // 시간 패턴 (🕘 없음)
+            time = match[1];
+            placeName = match[2].trim();
           }
+          
           // 이미 찾은 장소는 건너뛰기
           if (foundPlaces.has(placeName)) continue;
+          
           console.log('찾은 장소명:', placeName, '시간:', time);
+          
           // 기존 관광지/맛집 목록에서 매칭되는 장소 찾기
           const foundPlace = allPlaces.find(place => {
             const placeNameLower = placeName.toLowerCase();
             const placeNameInList = place.name.toLowerCase();
+            
             // 정확한 매칭 또는 부분 매칭
             return placeNameInList.includes(placeNameLower) || 
                    placeNameLower.includes(placeNameInList) ||
-                   placeNameInList.replace(/\s+/g, '').includes(placeNameLower.replace(/\s+/g, '')) ||
-                   placeNameLower.replace(/\s+/g, '').includes(placeNameInList.replace(/\s+/g, ''));
+                   placeNameInList.includes(placeNameLower.replace(/\s+/g, '')) ||
+                   placeNameLower.includes(placeNameInList.replace(/\s+/g, ''));
           });
+          
           if (foundPlace) {
             console.log('매칭된 장소:', foundPlace.name);
             places.push({
@@ -2541,20 +2539,12 @@
           }
         }
       });
+      
       // 방문 순서로 정렬
       places.sort((a, b) => a.visitOrder - b.visitOrder);
-      // === 중복 장소 제거 (장소명 기준) ===
-      const seen = new Set();
-      const uniquePlaces = [];
-      for (const p of places) {
-        // 장소명에서 공백, 특수문자 제거 후 소문자로 통일
-        const key = p.name.replace(/[\s\W]/g, '').toLowerCase();
-        if (!seen.has(key)) {
-          seen.add(key);
-          uniquePlaces.push(p);
-        }
-      }
-      return uniquePlaces;
+      
+      console.log('최종 추출된 장소들:', places);
+      return places;
     }
 
     // 코스 지도 표시 함수
@@ -2639,7 +2629,6 @@
             courseMap.fitBounds(bounds);
           }
         } else {
-          // 장소가 없으면 목적지 중심으로 지도 표시
           courseMap.setCenter(destLatLng);
         }
       }, 100);
