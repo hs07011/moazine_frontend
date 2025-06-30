@@ -2473,83 +2473,51 @@
     function extractPlacesFromCourse(courseText, courseIndex) {
       const places = [];
       const allPlaces = [...attractions, ...restaurants];
-      
-      console.log('코스 텍스트:', courseText);
-      console.log('전체 장소 목록:', allPlaces.map(p => p.name));
-      
-      // 코스 텍스트에서 장소명 찾기 (여러 패턴 시도)
-      const patterns = [
-        // 1. 🕘 09:00 - 장소명 (굵게 처리 포함)
-        /🕘\s*(\d{1,2}:\d{2})\s*[–-]\s*(\*\*)?([^\*\n\(\[\|]+?)(\*\*)?/g,
-        // 2. 09:00 - 장소명 (굵게 처리 포함)
-        /(\d{1,2}:\d{2})\s*[–-]\s*(\*\*)?([^\*\n\(\[\|]+?)(\*\*)?/g,
-        // 3. 번호 패턴: 1. **장소명** 또는 1. 장소명
-        /(\d+)\.\s*(\*\*)?([^\*\n\(\[\|]+?)(\*\*)?/g,
-        // 4. 단순 볼드 패턴: **장소명**
-        /(\*\*)([^\*\n\(\[\|]+?)(\*\*)/g,
-      ];
-      
       let visitOrder = 1;
-      let foundPlaces = new Set(); // 중복 방지
-      
-      patterns.forEach((pattern, patternIndex) => {
-        let match;
-        while ((match = pattern.exec(courseText)) !== null) {
-          let placeName, time = null;
-          
-          if (patternIndex === 0) {
-            // 🕘 시간 패턴
-            time = match[1];
-            placeName = match[3].trim();
-          } else if (patternIndex === 1) {
-            // 시간 패턴 (🕘 없음)
-            time = match[1];
-            placeName = match[3].trim();
-          } else if (patternIndex === 2) {
-            // 번호 패턴
-            visitOrder = parseInt(match[1]);
-            placeName = match[3].trim();
-          } else if (patternIndex === 3) {
-            // 단순 볼드 패턴
-            placeName = match[2].trim();
-          }
-          // 이미 찾은 장소는 건너뛰기
-          if (foundPlaces.has(placeName)) continue;
-          // === 개선된 매칭: 공백, 특수문자, 대소문자 무시 ===
-          const normalize = str => str.replace(/[\s\W_]+/g, '').toLowerCase();
-          const foundPlace = allPlaces.find(place => {
-            const n1 = normalize(place.name);
-            const n2 = normalize(placeName);
-            return n1.includes(n2) || n2.includes(n1);
-          });
-          if (foundPlace) {
-            places.push({
-              name: foundPlace.name,
-              location: foundPlace.geometry?.location,
-              type: attractions.includes(foundPlace) ? 'attraction' : 'restaurant',
-              rating: foundPlace.rating,
-              visitOrder: visitOrder,
-              time: time
-            });
-            foundPlaces.add(placeName);
-            visitOrder++;
-          }
+      const foundPlaces = new Set();
+      const normalize = str => str.replace(/[\s\W_]+/g, '').toLowerCase();
+
+      // **로 강조된 모든 텍스트를 찾습니다.
+      const boldPattern = /\*\*([^\*]+)\*\*/g;
+      let match;
+
+      while ((match = boldPattern.exec(courseText)) !== null) {
+        let potentialPlaceName = match[1].trim();
+        
+        // '팁', '평점'과 같은 키워드는 건너뜁니다.
+        if (potentialPlaceName.includes('팁') || potentialPlaceName.includes('평점')) {
+          continue;
         }
-      });
-      // 방문 순서로 정렬
-      places.sort((a, b) => a.visitOrder - b.visitOrder);
-      // === 중복 장소 제거 (장소명 기준) ===
-      const seen = new Set();
-      const uniquePlaces = [];
-      for (const p of places) {
-        // 장소명에서 공백, 특수문자 제거 후 소문자로 통일
-        const key = p.name.replace(/[\s\W]/g, '').toLowerCase();
-        if (!seen.has(key)) {
-          seen.add(key);
-          uniquePlaces.push(p);
+
+        // 시간 정보가 함께 있을 경우 분리합니다 (예: "09:00 - 장소명").
+        const timeMatch = potentialPlaceName.match(/(\d{1,2}:\d{2})\s*[-–]\s*(.*)/);
+        let time = null;
+        if (timeMatch) {
+          time = timeMatch[1];
+          potentialPlaceName = timeMatch[2].trim();
+        }
+        
+        if (foundPlaces.has(potentialPlaceName)) continue;
+
+        const foundPlace = allPlaces.find(place => {
+          const n1 = normalize(place.name);
+          const n2 = normalize(potentialPlaceName);
+          return n1.includes(n2) || n2.includes(n1);
+        });
+
+        if (foundPlace) {
+          places.push({
+            name: foundPlace.name,
+            location: foundPlace.geometry?.location,
+            type: attractions.includes(foundPlace) ? 'attraction' : 'restaurant',
+            rating: foundPlace.rating,
+            visitOrder: visitOrder++,
+            time: time
+          });
+          foundPlaces.add(potentialPlaceName);
         }
       }
-      return uniquePlaces;
+      return places;
     }
 
     // 코스 지도 표시 함수
