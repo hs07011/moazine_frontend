@@ -2473,48 +2473,31 @@
     function extractPlacesFromCourse(courseText, courseIndex) {
       const places = [];
       const allPlaces = [...attractions, ...restaurants];
-      let visitOrder = 1;
       const foundPlaces = new Set();
-      const normalize = str => str.replace(/[\s\W_]+/g, '').toLowerCase();
+      const normalize = str => str.replace(/[\s\W_]+/g, '').replace(/[\u{1F300}-\u{1FAFF}]/gu, '').toLowerCase();
 
-      // **로 강조된 모든 텍스트를 찾습니다.
-      const boldPattern = /\*\*([^\*]+)\*\*/g;
-      let match;
-
-      while ((match = boldPattern.exec(courseText)) !== null) {
-        let potentialPlaceName = match[1].trim();
-        
-        // '팁', '평점'과 같은 키워드는 건너뜁니다.
-        if (potentialPlaceName.includes('팁') || potentialPlaceName.includes('평점')) {
-          continue;
-        }
-
-        // 시간 정보가 함께 있을 경우 분리합니다 (예: "09:00 - 장소명").
-        const timeMatch = potentialPlaceName.match(/(\d{1,2}:\d{2})\s*[-–]\s*(.*)/);
-        let time = null;
-        if (timeMatch) {
-          time = timeMatch[1];
-          potentialPlaceName = timeMatch[2].trim();
-        }
-        
-        if (foundPlaces.has(potentialPlaceName)) continue;
-
-        const foundPlace = allPlaces.find(place => {
-          const n1 = normalize(place.name);
-          const n2 = normalize(potentialPlaceName);
-          return n1.includes(n2) || n2.includes(n1);
-        });
-
-        if (foundPlace) {
-          places.push({
-            name: foundPlace.name,
-            location: foundPlace.geometry?.location,
-            type: attractions.includes(foundPlace) ? 'attraction' : 'restaurant',
-            rating: foundPlace.rating,
-            visitOrder: visitOrder++,
-            time: time
-          });
-          foundPlaces.add(potentialPlaceName);
+      // 각 줄마다 시간-장소 패턴 추출
+      const lines = courseText.split('\n');
+      let visitOrder = 1;
+      for (const line of lines) {
+        // 예: 11:00 - 선한고양이 🐾
+        const match = line.match(/\d{1,2}:\d{2}\s*[–-]\s*([^\s\d\-–][^\-–]*)/);
+        if (match) {
+          let placeName = match[1].trim();
+          // 이모지, 특수문자, 공백 제거
+          placeName = placeName.replace(/[\p{Emoji}\p{P}\p{S}]/gu, '').replace(/\s+/g, '');
+          // 관광지/맛집 리스트와 매칭
+          const foundPlace = allPlaces.find(place => normalize(place.name) === normalize(placeName));
+          if (foundPlace && !foundPlaces.has(foundPlace.name)) {
+            places.push({
+              name: foundPlace.name,
+              location: foundPlace.geometry?.location,
+              type: attractions.includes(foundPlace) ? 'attraction' : 'restaurant',
+              rating: foundPlace.rating,
+              visitOrder: visitOrder++,
+            });
+            foundPlaces.add(foundPlace.name);
+          }
         }
       }
       return places;
