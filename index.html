@@ -2343,7 +2343,7 @@
       // 목적지 소개 정보를 명시적으로 숨김
       document.getElementById('destinationIntroInBar').style.display = 'none';
       
-      showCourseBox('추천 코스를 생성 중입니다...');
+      // showCourseBox('추천 코스를 생성 중입니다...'); // 이 줄을 삭제하여 로딩 팝업이 뜨지 않게 함
       fetch('https://moazine.onrender.com/generate-course', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2419,7 +2419,7 @@
       });
       tableHtml += '</table>';
       // 원본 텍스트 + 안내문구 + 표 순서로 표시
-      box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>${originalTextHtml}${introHtml}${tableHtml}`;
+      box.innerHTML = `<span class='close-btn' onclick="closeCourseBox()">✕</span>${introHtml}${tableHtml}`;
       showOnlyContentBarPopup('coursePopup');
     }
 
