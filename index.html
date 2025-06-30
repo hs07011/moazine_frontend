@@ -2515,19 +2515,14 @@
           }
           // 이미 찾은 장소는 건너뛰기
           if (foundPlaces.has(placeName)) continue;
-          console.log('찾은 장소명:', placeName, '시간:', time);
-          // 기존 관광지/맛집 목록에서 매칭되는 장소 찾기
+          // === 개선된 매칭: 공백, 특수문자, 대소문자 무시 ===
+          const normalize = str => str.replace(/[\s\W_]+/g, '').toLowerCase();
           const foundPlace = allPlaces.find(place => {
-            const placeNameLower = placeName.toLowerCase();
-            const placeNameInList = place.name.toLowerCase();
-            // 정확한 매칭 또는 부분 매칭
-            return placeNameInList.includes(placeNameLower) || 
-                   placeNameLower.includes(placeNameInList) ||
-                   placeNameInList.replace(/\s+/g, '').includes(placeNameLower.replace(/\s+/g, '')) ||
-                   placeNameLower.replace(/\s+/g, '').includes(placeNameInList.replace(/\s+/g, ''));
+            const n1 = normalize(place.name);
+            const n2 = normalize(placeName);
+            return n1.includes(n2) || n2.includes(n1);
           });
           if (foundPlace) {
-            console.log('매칭된 장소:', foundPlace.name);
             places.push({
               name: foundPlace.name,
               location: foundPlace.geometry?.location,
@@ -2538,8 +2533,6 @@
             });
             foundPlaces.add(placeName);
             visitOrder++;
-          } else {
-            console.log('매칭되지 않은 장소:', placeName);
           }
         }
       });
