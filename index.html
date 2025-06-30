@@ -1705,6 +1705,10 @@
       0% { transform: translateX(100%); }
       100% { transform: translateX(-100%); }
     }
+    .arrow-sep {
+      color: #bbb;
+      font-weight: 900;
+    }
   </style>
 </head>
 <body>
@@ -2377,24 +2381,29 @@
           .filter(Boolean);
         const places = extractPlacesFromCourse(block, idx);
         courseData.push({ title: courseTitles[idx] || `코스 ${idx+1}`, content: block, places });
-        // cellText: 시계 심볼 앞에서만 → 표시, 맨 처음에는 표시하지 않음
+        // cellText: 시계 이모지/시간, 장소명, 장소소개, 평점 단위로 분리하여 →로 연결
         let cellText = '';
-        // 시계 심볼/시간 패턴
-        const timePattern = /(🕘|⏰|⏱|⏲|⏳|\d{1,2}:\d{2})/;
-        let lastIdx = 0;
+        // 패턴: 시계이모지/시간(09:00, 10:00 등)으로 시작하는 블록 추출
+        const blockPattern = /(🕘|⏰|⏱|⏲|⏳|\d{1,2}:\d{2})[^🕘⏰⏱⏲⏳\d{1,2}:\d{2}]*/g;
+        let blocks = [];
         let match;
-        let re = /(🕘|⏰|⏱|⏲|⏳|\d{1,2}:\d{2})/g;
-        let str = block;
-        let first = true;
-        while ((match = re.exec(str)) !== null) {
-          let before = str.slice(lastIdx, match.index);
-          let time = match[0];
-          if (!first) cellText += '<span style="color:#bbb;font-weight:900;">→</span>';
-          cellText += before + time;
-          lastIdx = match.index + time.length;
-          first = false;
+        while ((match = blockPattern.exec(block)) !== null) {
+          blocks.push(match[0].trim());
         }
-        cellText += str.slice(lastIdx);
+        // 1. 특수문자 제거 먼저
+        let cleanedBlocks = blocks.map(b => b.replace(/[[\](){}*_\-=~^|#@$%&+=•▪︎"'`<>]/g, '').trim());
+        // 2. 구분자 삽입 (평점 뒤에는 →, 시계 이모지/시간 앞에는 → 없음)
+        cellText = cleanedBlocks.map((b, i) => {
+          if (i === 0) return b;
+          const prev = cleanedBlocks[i - 1];
+          if (prev.trim().endsWith('평점')) {
+            return '<span class="arrow-sep">→</span> ' + b;
+          }
+          if (/^(🕘|⏰|⏱|⏲|⏳|\d{1,2}:\d{2})/.test(b.trim())) {
+            return b;
+          }
+          return '<span class="arrow-sep">→</span> ' + b;
+        }).join(' ');
         cellText = cellText.trim();
         tableHtml += `<tr class="course-row">
           <td class="course-title-cell">${courseTitles[idx] || `코스 ${idx+1}`}</td>
@@ -2534,8 +2543,18 @@
       // 방문 순서로 정렬
       places.sort((a, b) => a.visitOrder - b.visitOrder);
       
-      console.log('최종 추출된 장소들:', places);
-      return places;
+      // === 중복 장소 제거 (장소명 기준) ===
+      const seen = new Set();
+      const uniquePlaces = [];
+      for (const p of places) {
+        // 장소명에서 공백, 특수문자 제거 후 소문자로 통일
+        const key = p.name.replace(/[\s\W]/g, '').toLowerCase();
+        if (!seen.has(key)) {
+          seen.add(key);
+          uniquePlaces.push(p);
+        }
+      }
+      return uniquePlaces;
     }
 
     // 코스 지도 표시 함수
@@ -2620,6 +2639,7 @@
             courseMap.fitBounds(bounds);
           }
         } else {
+          // 장소가 없으면 목적지 중심으로 지도 표시
           courseMap.setCenter(destLatLng);
         }
       }, 100);
