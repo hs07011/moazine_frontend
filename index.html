@@ -1721,6 +1721,7 @@
       <button id="courseBtn" class="course-btn">여행코스</button>
     </div>
     <button id="recommendContentBtn" class="header-btn orange">추천 콘텐츠</button>
+    <button id="ttsSettingsBtn" class="header-btn blue" style="font-size: 1.2rem; padding: 12px 16px;">TTS 설정</button>
   </div>
 
   <div id="contentBar" class="content-bar" style="display:none; position:relative; flex-direction:column; align-items:flex-start;">
@@ -1802,6 +1803,49 @@
       <span class="close-btn" onclick="closeCourseMap()">✕</span>
       <h3 id="courseMapTitle" style="margin: 0 0 20px 0; color: #217093; text-align: center;">코스 지도</h3>
       <div id="courseMap" style="width: 100%; height: 1000px; border-radius: 8px;"></div>
+    </div>
+  </div>
+  
+  <!-- TTS 설정 팝업 -->
+  <div id="ttsSettingsPopup" class="summary-popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:400px; max-width:90vw;">
+    <div style="padding: 24px;">
+      <span class="close-btn" onclick="closeTTSSettings()">✕</span>
+      <h3 style="margin: 0 0 20px 0; color: #217093; text-align: center;">TTS 설정</h3>
+      
+      <div style="margin-bottom: 16px;">
+        <label style="display:block; margin-bottom: 8px; font-weight: 600;">TTS 엔진:</label>
+        <select id="ttsEngine" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+          <option value="native">기본 Web Speech API</option>
+          <option value="coqui">Coqui TTS (고품질)</option>
+          <option value="gtts">Google TTS</option>
+        </select>
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <label style="display:block; margin-bottom: 8px; font-weight: 600;">음성 속도:</label>
+        <input type="range" id="ttsRate" min="0.5" max="2.0" step="0.1" value="0.9" style="width: 100%;">
+        <span id="ttsRateValue" style="font-size: 0.9em; color: #666;">0.9</span>
+      </div>
+      
+      <div style="margin-bottom: 16px;">
+        <label style="display:block; margin-bottom: 8px; font-weight: 600;">음성 높이:</label>
+        <input type="range" id="ttsPitch" min="0.5" max="2.0" step="0.1" value="1.0" style="width: 100%;">
+        <span id="ttsPitchValue" style="font-size: 0.9em; color: #666;">1.0</span>
+      </div>
+      
+      <div style="margin-bottom: 20px;">
+        <label style="display:block; margin-bottom: 8px; font-weight: 600;">볼륨:</label>
+        <input type="range" id="ttsVolume" min="0.1" max="2.0" step="0.1" value="1.0" style="width: 100%;">
+        <span id="ttsVolumeValue" style="font-size: 0.9em; color: #666;">1.0</span>
+      </div>
+      
+      <button onclick="testTTS()" style="background: var(--primary-gradient); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; width: 100%; margin-bottom: 12px;">
+        테스트 음성 재생
+      </button>
+      
+      <button onclick="saveTTSSettings()" style="background: var(--success-gradient); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; width: 100%;">
+        설정 저장
+      </button>
     </div>
   </div>
   <script>
@@ -2202,26 +2246,126 @@
       return speech;
     }
 
+    // 고품질 TTS 엔진 설정
+    const TTS_CONFIG = {
+      engine: 'coqui', // 'coqui', 'gtts', 'native'
+      coquiUrl: 'https://your-coqui-tts-server.com/synthesize', // 실제 서버 URL로 변경
+      gttsUrl: 'https://translate.google.com/translate_tts'
+    };
+
+    // 고품질 TTS 함수
+    async function playHighQualityTTS(text, options = {}) {
+      const {
+        lang = 'ko-KR',
+        rate = 0.9,
+        pitch = 1,
+        volume = 1.0,
+        voice = 'default'
+      } = options;
+
+      try {
+        switch (TTS_CONFIG.engine) {
+          case 'coqui':
+            await playCoquiTTS(text, { lang, rate, pitch, volume, voice });
+            break;
+          case 'gtts':
+            await playGoogleTTS(text, { lang, rate });
+            break;
+          default:
+            playNativeTTS(text, { lang, rate, pitch, volume, voice });
+        }
+      } catch (error) {
+        console.warn('고품질 TTS 실패, 기본 TTS로 폴백:', error);
+        playNativeTTS(text, { lang, rate, pitch, volume, voice });
+      }
+    }
+
+    // Coqui TTS 재생
+    async function playCoquiTTS(text, options) {
+      const audio = new Audio();
+      audio.volume = options.volume;
+      
+      // Coqui TTS API 호출
+      const response = await fetch(TTS_CONFIG.coquiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: text,
+          speaker_id: options.voice,
+          language_id: options.lang,
+          speed: options.rate
+        })
+      });
+
+      if (!response.ok) throw new Error('Coqui TTS API 오류');
+      
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      audio.src = audioUrl;
+      setupAudioEvents(audio);
+      await audio.play();
+    }
+
+    // Google TTS 재생
+    async function playGoogleTTS(text, options) {
+      const audio = new Audio();
+      const encodedText = encodeURIComponent(text);
+      const url = `${TTS_CONFIG.gttsUrl}?ie=UTF-8&q=${encodedText}&tl=${options.lang}&client=tw-ob`;
+      
+      audio.src = url;
+      setupAudioEvents(audio);
+      await audio.play();
+    }
+
+    // 기본 Web Speech API TTS
+    function playNativeTTS(text, options) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = options.lang;
+        utter.rate = options.rate;
+        utter.pitch = options.pitch;
+        utter.volume = options.volume;
+        
+        const koVoice = speechVoices.find(v => v.lang === options.lang && v.name.includes('Google'));
+        if (koVoice) utter.voice = koVoice;
+        
+        setupSpeechEvents(utter);
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    // 오디오 이벤트 설정
+    function setupAudioEvents(audio) {
+      audio.onplay = () => {
+        dimMusicPlayer();
+        isVoicePlaying = true;
+      };
+      audio.onended = () => {
+        restoreMusicPlayer();
+        isVoicePlaying = false;
+      };
+      audio.onerror = () => {
+        restoreMusicPlayer();
+        isVoicePlaying = false;
+      };
+    }
+
     function showSummaryBox(text) {
       const box = document.getElementById('summaryBox');
       box.innerHTML = `<button class='close-btn' onclick="closeSummaryBox()">✕</button>` + text;
       box.style.display = 'block';
-      // 음성 출력 (여행 가이드 인트로, 옵션 조정)
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel(); // 기존 음성 중지
-        const speechText = getSpeechText(text);
-        const utter = new SpeechSynthesisUtterance(speechText);
-        utter.lang = 'ko-KR';
-        utter.rate = 0.9; // 조금 더 천천히
-        utter.pitch = 1; // 자연스러운 높이
-        utter.volume = 3.0; // 최대 볼륨의 3배로 설정 (기존 2.0에서 증가)
-        // 자연스러운 한국어 voice 선택
-        const koVoice = speechVoices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
-        if (koVoice) utter.voice = koVoice;
-        // 음성 이벤트 리스너 설정
-        setupSpeechEvents(utter);
-        window.speechSynthesis.speak(utter);
-      }
+      
+      // 고품질 TTS 사용
+      const speechText = getSpeechText(text);
+      playHighQualityTTS(speechText, {
+        lang: 'ko-KR',
+        rate: 0.9,
+        pitch: 1,
+        volume: 1.0,
+        voice: 'ko_female_01' // Coqui TTS 음성 모델
+      });
     }
 
     function closeSummaryBox() {
@@ -2260,20 +2404,15 @@
         if (guideTextElement) {
           guideTextElement.innerHTML = introText;
         }
-        // 음성 출력
-        if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-          const speechText = getDestinationSpeechText(introText);
-          const utter = new SpeechSynthesisUtterance(speechText);
-          utter.lang = 'ko-KR';
-          utter.rate = 0.9;
-          utter.pitch = 1;
-          utter.volume = 3.0;
-          const koVoice = speechVoices.find(v => v.lang === 'ko-KR' && v.name.includes('Google'));
-          if (koVoice) utter.voice = koVoice;
-          setupSpeechEvents(utter);
-          window.speechSynthesis.speak(utter);
-        }
+        // 고품질 TTS 출력
+        const speechText = getDestinationSpeechText(introText);
+        playHighQualityTTS(speechText, {
+          lang: 'ko-KR',
+          rate: 0.9,
+          pitch: 1,
+          volume: 1.0,
+          voice: 'ko_female_01'
+        });
       })
       .catch(err => {
         console.error('Failed to get destination intro:', err);
@@ -2311,31 +2450,14 @@
     };
 
     function showCoursePopup() {
-      // 음성 안내 먼저 출력
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance("관광지와 맛집 리스트 10선을 기준으로 3개의 여행 코스를 추천해 드리겠습니다");
-        utter.lang = 'ko-KR';
-        utter.rate = 0.9;
-        utter.pitch = 1;
-        utter.volume = 1.0; // 볼륨을 1.0으로 조정
-        
-        // 음성 선택 로직 개선
-        const voices = window.speechSynthesis.getVoices();
-        const koVoice = voices.find(v => v.lang === 'ko-KR') || 
-                       voices.find(v => v.lang.startsWith('ko')) ||
-                       voices.find(v => v.name.includes('Google')) ||
-                       voices[0];
-        
-        if (koVoice) {
-          utter.voice = koVoice;
-        }
-        
-        // 음성 출력 전에 약간의 지연 추가
-        setTimeout(() => {
-          window.speechSynthesis.speak(utter);
-        }, 100);
-      }
+      // 고품질 TTS 안내 출력
+      playHighQualityTTS("관광지와 맛집 리스트 10선을 기준으로 3개의 여행 코스를 추천해 드리겠습니다", {
+        lang: 'ko-KR',
+        rate: 0.9,
+        pitch: 1,
+        volume: 1.0,
+        voice: 'ko_female_01'
+      });
 
       if ((!attractions || attractions.length === 0) && (!restaurants || restaurants.length === 0)) {
         showCourseBox('추천할 코스 정보가 없습니다.');
@@ -2599,15 +2721,69 @@
       courseMap = null;
     }
 
+    // TTS 설정 관련 함수들
+    function showTTSSettings() {
+      document.getElementById('ttsSettingsPopup').style.display = 'block';
+      loadTTSSettings();
+    }
+
+    function closeTTSSettings() {
+      document.getElementById('ttsSettingsPopup').style.display = 'none';
+    }
+
+    function loadTTSSettings() {
+      const settings = JSON.parse(localStorage.getItem('ttsSettings') || '{}');
+      
+      document.getElementById('ttsEngine').value = settings.engine || 'native';
+      document.getElementById('ttsRate').value = settings.rate || 0.9;
+      document.getElementById('ttsPitch').value = settings.pitch || 1.0;
+      document.getElementById('ttsVolume').value = settings.volume || 1.0;
+      
+      updateTTSValueDisplays();
+    }
+
+    function updateTTSValueDisplays() {
+      document.getElementById('ttsRateValue').textContent = document.getElementById('ttsRate').value;
+      document.getElementById('ttsPitchValue').textContent = document.getElementById('ttsPitch').value;
+      document.getElementById('ttsVolumeValue').textContent = document.getElementById('ttsVolume').value;
+    }
+
+    function saveTTSSettings() {
+      const settings = {
+        engine: document.getElementById('ttsEngine').value,
+        rate: parseFloat(document.getElementById('ttsRate').value),
+        pitch: parseFloat(document.getElementById('ttsPitch').value),
+        volume: parseFloat(document.getElementById('ttsVolume').value)
+      };
+      
+      localStorage.setItem('ttsSettings', JSON.stringify(settings));
+      TTS_CONFIG.engine = settings.engine;
+      
+      alert('TTS 설정이 저장되었습니다.');
+      closeTTSSettings();
+    }
+
+    function testTTS() {
+      const settings = {
+        engine: document.getElementById('ttsEngine').value,
+        rate: parseFloat(document.getElementById('ttsRate').value),
+        pitch: parseFloat(document.getElementById('ttsPitch').value),
+        volume: parseFloat(document.getElementById('ttsVolume').value)
+      };
+      
+      playHighQualityTTS("안녕하세요. 이것은 TTS 테스트 음성입니다.", settings);
+    }
+
     // 페이지 로드 시 Google Maps API 로드 시작
     window.onload = function() {
       loadGoogleMapAPI();
+      
+      // 추천 콘텐츠 버튼
       var recommendBtn = document.getElementById('recommendContentBtn');
       if (recommendBtn) {
         recommendBtn.onclick = function() {
-          // 토글 동작: 이미 추천콘텐츠가 보이면 숨기고, 아니면 보여줌
           if (isRecommendContentActive) {
-            showOnlyContentBarPopup('none'); // 모두 숨김
+            showOnlyContentBarPopup('none');
             isRecommendContentActive = false;
           } else {
             showOnlyContentBarPopup('externalContentLinks');
@@ -2615,6 +2791,23 @@
           }
           if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         };
+      }
+      
+      // TTS 설정 버튼
+      var ttsSettingsBtn = document.getElementById('ttsSettingsBtn');
+      if (ttsSettingsBtn) {
+        ttsSettingsBtn.onclick = showTTSSettings;
+      }
+      
+      // TTS 설정 슬라이더 이벤트
+      document.getElementById('ttsRate').addEventListener('input', updateTTSValueDisplays);
+      document.getElementById('ttsPitch').addEventListener('input', updateTTSValueDisplays);
+      document.getElementById('ttsVolume').addEventListener('input', updateTTSValueDisplays);
+      
+      // 저장된 TTS 설정 로드
+      const savedSettings = JSON.parse(localStorage.getItem('ttsSettings') || '{}');
+      if (savedSettings.engine) {
+        TTS_CONFIG.engine = savedSettings.engine;
       }
     };
 
