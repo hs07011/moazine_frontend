@@ -58,17 +58,76 @@
     }
 
     .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      padding: clamp(20px, 4vw, 40px) clamp(24px, 6vw, 80px);
       background: var(--primary-gradient);
       color: #fff;
-      padding: clamp(20px, 4vw, 40px) clamp(24px, 6vw, 80px);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 24px;
       box-shadow: var(--shadow-lg);
       position: relative;
-      overflow: hidden;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .header-logo {
+      height: 56px;
+      width: auto;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px #0001;
+    }
+
+    .header-title {
+      font-size: clamp(2.2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    .header-center {
+      flex: 1 1 400px;
+      min-width: 260px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .header-search {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.95);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 8px 16px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 18px;
+      }
+      .header-center {
+        justify-content: stretch;
+      }
+      .header-right {
+        justify-content: flex-end;
+      }
     }
 
     .header::before {
@@ -85,39 +144,6 @@
     .header > * {
       position: relative;
       z-index: 1;
-    }
-
-    .header-title {
-      font-size: clamp(2.8rem, 6vw, 4.8rem);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      margin: 0;
-      white-space: nowrap;
-      word-break: keep-all;
-      min-width: 0;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .header-search {
-      display: flex;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-radius: var(--border-radius-lg);
-      padding: clamp(8px, 2vw, 12px) clamp(16px, 3vw, 24px);
-      flex-grow: 1;
-      min-width: 0;
-      max-width: 700px;
-      margin: 0;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: var(--shadow-md);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .header-search:focus-within {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-xl);
-      background: rgba(255, 255, 255, 1);
     }
 
     #destination {
@@ -1713,17 +1739,21 @@
 </head>
 <body>
   <div class="header">
-    <img src="assets/travelhereservice.png" alt="TravelHereService Logo" style="height: 64px; max-width: 96px; width: auto; margin-right:8px; vertical-align:middle; border-radius:12px; box-shadow:0 2px 8px #0001;" />
-    <div class="header-title">Travel Here Service</div>
-    <div class="header-search">
-      <input id="destination" placeholder="현재 위치 검색 결과" style="color:#888;" />
-      <button id="searchBtn">검색</button>
-      <button id="courseBtn" class="course-btn">여행코스</button>
+    <div class="header-left">
+      <img src="assets/travelhereservice.png" alt="TravelHereService Logo" class="header-logo" />
+      <div class="header-title">Travel Here Service</div>
     </div>
-    <button id="recommendContentBtn" class="header-btn orange">추천 콘텐츠</button>
-    <button id="ttsSettingsBtn" class="header-btn blue" style="font-size: 1.2rem; padding: 12px 16px; display: flex; align-items: center; gap: 8px;">
-      설정
-    </button>
+    <div class="header-center">
+      <div class="header-search">
+        <input id="destination" placeholder="현재 위치 검색 결과" />
+        <button id="searchBtn">검색</button>
+        <button id="courseBtn" class="course-btn">여행코스</button>
+      </div>
+    </div>
+    <div class="header-right">
+      <button id="recommendContentBtn" class="header-btn orange">추천 콘텐츠</button>
+      <button id="ttsSettingsBtn" class="header-btn blue">설정</button>
+    </div>
   </div>
 
   <div id="contentBar" class="content-bar" style="display:none; position:relative; flex-direction:column; align-items:flex-start;">
