@@ -157,6 +157,11 @@
       flex-grow: 1;
       transition: all 0.3s ease;
       color: var(--text-primary);
+      height: 48px;         /* 고정 높이 */
+      max-height: 48px;     /* 최대 높이 제한 */
+      min-height: 32px;     /* 최소 높이(선택) */
+      line-height: 1.2;
+      box-sizing: border-box;
     }
 
     #destination::placeholder {
