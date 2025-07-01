@@ -149,9 +149,9 @@
     #destination {
       border: none;
       outline: none;
-      font-size: clamp(1.6rem, 2.8vw, 2rem);
+      font-size: calc(clamp(1.6rem, 2.8vw, 2rem) * 0.75); /* 폰트 사이즈 1/4 축소 */
       font-weight: 500;
-      padding: clamp(12px, 2vw, 16px) clamp(16px, 3vw, 24px);
+      padding: calc(clamp(12px, 2vw, 16px) * 0.6) clamp(12px, 2vw, 16px); /* 상하 패딩 축소 */
       width: 100%;
       background: transparent;
       flex-grow: 1;
@@ -162,6 +162,7 @@
     #destination::placeholder {
       color: var(--text-muted);
       font-weight: 400;
+      font-size: calc(clamp(1.6rem, 2.8vw, 2rem) * 0.75); /* placeholder 폰트 사이즈 1/4 축소 */
     }
 
     #searchBtn {
