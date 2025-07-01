@@ -435,10 +435,24 @@
 
     @media (max-width: 600px) {
       .header {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 8px !important;
-        padding: 12px 4vw !important;
+        padding: 8px 2vw 8px 2vw !important; /* 상하 패딩 확 줄임 */
+        gap: 4px !important;
+      }
+      .header-left,
+      .header-center,
+      .header-right {
+        margin-bottom: 0 !important;
+        margin-top: 0 !important;
+      }
+      .header-center {
+        margin-bottom: 2px !important;
+      }
+      .header-right {
+        margin-top: 2px !important;
+      }
+      .header-btn {
+        margin: 0 4px !important; /* 좌우만 살짝 */
+        padding: 10px 0 !important; /* 상하 패딩도 줄임 */
       }
       .header-left {
         flex-direction: row !important;
